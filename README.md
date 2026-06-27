@@ -21,7 +21,7 @@ Karel IV. is a real-time AI voice translator that:
 Built for **VR environments** — walk into a virtual meeting speaking Czech,
 be heard in any language.
 
-Powered by a **mesh network** of user hardware + **Sepolia ETH** payments.
+Powered by a **mesh network** of user hardware.
 
 ---
 
@@ -99,12 +99,13 @@ Headphones
 ```
 
 **Infrastructure:** Vakuová Mincovna (Primary + Shadow Node, Prometheus)
-**Payments:** Sepolia ETH testnet → mainnet
-**Mesh:** User hardware contributes idle CPU/GPU → earns ETH credits
+**Mesh:** User hardware contributes idle CPU/GPU → reduces subscription cost
 
 ---
 
 ## Pricing
+
+**End of tokenization. Pay for a month, use without limits. No trial period — you either have it or you don't.**
 
 | Plan | Price | Includes |
 |------|-------|---------|
@@ -113,7 +114,7 @@ Headphones
 | Stream Dubbing | 333 Kč/month | Netflix/YouTube dubbing |
 | **Family Plan** | **423 Kč/month** | **Everything, whole household** |
 
-*Paid via Ethereum. Cancel anytime.*
+*Pay once a month. Full access. No limits. No tricks.*
 
 ---
 
@@ -128,7 +129,6 @@ Headphones
 | Core validation | Ada/SPARK | GPL-2.0 + exception |
 | Network | Faucet SDN | Apache 2.0 |
 | Monitoring | Prometheus + Grafana | Apache 2.0 |
-| Payments | Ethereum (Sepolia) | Open |
 
 ---
 
