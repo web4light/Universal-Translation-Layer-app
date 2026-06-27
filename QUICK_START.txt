@@ -1,0 +1,74 @@
+========================================
+VAKUOVÁ MINCOVNA - QUICK START
+========================================
+
+OPRAVENO:
+✅ MCP.json (Erlang → JSON)
+✅ Shadow Node Windows script
+
+========================================
+STARTUP PŘÍKAZY (Windows)
+========================================
+
+1. PRIMARY NODE (Terminal 1):
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start.bat
+
+2. SHADOW NODE (Terminal 2):
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start_shadow.bat
+
+3. WATCHDOG (Terminal 3):
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start_watchdog.bat
+
+4. PRIVACY PROTOCOL (Terminal 4):
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start_privacy.bat
+
+========================================
+MONITORING URLs
+========================================
+
+Primary Node:   http://localhost:9302/metrics
+Shadow Node:    http://localhost:9303/metrics
+Watchdog:       http://localhost:9304/metrics
+Privacy:        http://localhost:9305/metrics
+
+========================================
+TEST FAILOVER
+========================================
+
+1. Spustit Primary + Shadow
+2. V Primary terminálu stisknout Ctrl+C
+3. Počkat 15 sekund
+4. Shadow převezme kontrolu (shadow_is_primary=1)
+5. Spustit Primary znovu
+6. Shadow se vrátí (shadow_is_primary=0)
+
+========================================
+ARCHITEKTURA
+========================================
+
+PRIMARY (9302) ←──sync 5s──→ SHADOW (9303)
+        │                         │
+        └─────────┬───────────────┘
+                  │
+      ┌───────────┴──────────┐
+      │                      │
+WATCHDOG (9304)      PRIVACY (9305)
+
+========================================
+DALŠÍ KROKY
+========================================
+
+1. Test lokálně na Windows (TEĎKA)
+2. Transfer na Ubuntu i5 (Shadow Node)
+3. Network config (Windows ↔ Ubuntu)
+4. Production deployment
+
+========================================
+Standard 700: 12g stříbra = 1 mince
+Formální verifikace: AKTIVNÍ
+Autor: Pan Jeskyně + Kiro AI
+========================================

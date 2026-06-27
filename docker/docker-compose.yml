@@ -1,0 +1,114 @@
+version: '3.8'
+
+# AsgardLab — Karel IV. Stack
+# Usage: docker compose up
+# Web: https://web4light.online
+
+services:
+
+  # ============================================================
+  # Karel IV. — Real-time Voice Translator
+  # ============================================================
+  karel-iv:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: karel-iv
+    restart: unless-stopped
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SOURCE_LANG=${SOURCE_LANG:-cs}
+      - TARGET_LANG=${TARGET_LANG:-en}
+    command: >
+      python src/karel_iv.py
+      --source ${SOURCE_LANG:-cs}
+      --target ${TARGET_LANG:-en}
+      --model base
+    ports:
+      - "9306:9306"
+    devices:
+      - /dev/snd:/dev/snd  # Audio device (Linux)
+    volumes:
+      - voice_samples:/app/voices
+    networks:
+      - asgardlab
+
+  # ============================================================
+  # Primary Node (Faucet Bridge)
+  # ============================================================
+  primary:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mincovna-primary
+    restart: unless-stopped
+    command: python src/faucet_bridge.py
+    ports:
+      - "9302:9302"
+    networks:
+      - asgardlab
+
+  # ============================================================
+  # Shadow Node
+  # ============================================================
+  shadow:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mincovna-shadow
+    restart: unless-stopped
+    environment:
+      - PRIMARY_URL=http://primary:9302/metrics
+    command: python src/shadow_node.py http://primary:9302/metrics
+    ports:
+      - "9303:9303"
+    depends_on:
+      - primary
+    networks:
+      - asgardlab
+
+  # ============================================================
+  # Prometheus
+  # ============================================================
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=90d'
+    networks:
+      - asgardlab
+
+  # ============================================================
+  # Grafana (optional)
+  # ============================================================
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-asgardlab}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - asgardlab
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  voice_samples:
+
+networks:
+  asgardlab:
+    driver: bridge

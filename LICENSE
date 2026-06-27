@@ -1,0 +1,70 @@
+Vakuová Mincovna & Transkomunikátor
+Copyright (C) 2026 Pan Jeskyně
+
+=============================================================================
+DUAL LICENSE
+=============================================================================
+
+This software is available under two licenses:
+
+1. GNU GENERAL PUBLIC LICENSE Version 3 (GPL-3.0)
+   For open-source and non-commercial use.
+
+2. COMMERCIAL LICENSE
+   For commercial use without GPL obligations.
+   Contact the author for pricing and terms.
+
+=============================================================================
+LICENSE 1: GNU GENERAL PUBLIC LICENSE Version 3
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+LICENSE 2: COMMERCIAL LICENSE
+=============================================================================
+
+For commercial use, redistribution in proprietary products, or use
+without the GPL-3.0 obligations (including the requirement to release
+source code), a commercial license is required.
+
+Commercial license covers:
+  - Use in proprietary/closed-source products
+  - SaaS deployment without source disclosure
+  - OEM integration
+  - Priority support
+
+To obtain a commercial license, contact:
+  Author: Pan Jeskyně
+  Project: Vakuová Mincovna / Transkomunikátor
+
+=============================================================================
+THIRD-PARTY COMPONENTS
+=============================================================================
+
+This software uses the following open-source components:
+
+  Faucet SDN Controller   Apache License 2.0
+  Gemini CLI              Apache License 2.0
+  Prometheus              Apache License 2.0
+  GNAT Ada Runtime        GPL-2.0 with GCC Runtime Library Exception
+  prometheus_client       Apache License 2.0
+  requests                Apache License 2.0
+  n8n                     Sustainable Use License (self-hosted: free)
+
+=============================================================================
+STANDARD 700
+=============================================================================
+
+1 MINCE = 12 gramů stříbra
+Matematicky ověřeno pomocí Ada/SPARK formální verifikace.

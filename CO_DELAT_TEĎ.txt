@@ -1,0 +1,104 @@
+========================================
+VAKUOVÁ MINCOVNA - CO DĚLAT TEĎ?
+========================================
+
+✅ HOTOVO:
+1. MCP.json opraven (Erlang → JSON)
+2. Faucet Bridge vytvořen (src/faucet_bridge.py)
+3. Shadow Node Windows script (start_shadow.bat)
+4. Dokumentace kompletní
+
+========================================
+🎯 HARDWARE STRATEGIE
+========================================
+
+i7 "asterisk" (Windows):
+  - Herní PC (RTX 3070, 32 GB RAM)
+  - → Shadow Node (backup)
+  - → Heavy computation (Apache Spark, AI)
+  - → Můžeš vypnout když hraješ
+
+i5 FUJITSU (Ubuntu 26.04):
+  - Slabší, ale ÚSPORNÝ (35W TDP)
+  - → Primary Node (běží 24/7)
+  - → Čistý systém = stabilita
+  - → ~65 Kč/měsíc elektřina
+
+========================================
+PRVNÍ KROK (TEĎ NA i7 Windows):
+========================================
+
+1. Otevři 2 terminály:
+
+   Terminal 1:
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start.bat
+
+   Terminal 2:
+   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+   start_shadow.bat
+
+2. Koukni na metriky:
+   http://localhost:9302/metrics  (Primary)
+   http://localhost:9303/metrics  (Shadow)
+
+3. Test FAILOVER:
+   - V Terminal 1 stiskni Ctrl+C (Primary spadne)
+   - Počkej 15 sekund
+   - Shadow převezme kontrolu!
+   - shadow_is_primary = 1
+
+4. Test RECOVERY:
+   - V Terminal 1 spusť start.bat znovu
+   - Shadow se vrátí do shadow módu
+   - shadow_is_primary = 0
+
+========================================
+DRUHÝ KROK (příště):
+========================================
+
+1. Zabalit projekt:
+   package.bat
+
+2. Přenést na i5 Ubuntu:
+   - USB flash disk NEBO
+   - Síťový share
+
+3. Na i5 Ubuntu nainstalovat:
+   - Python + dependencies
+   - GNAT/SPARK (volitelné)
+   - Spustit Primary Node
+
+4. Network setup:
+   - Zjistit IP adresy
+   - Upravit Shadow na i7
+   - Test cross-machine sync
+
+========================================
+DOKUMENTACE:
+========================================
+
+✅ README.md              - Základní info
+✅ SYSTEM_OVERVIEW.md     - Kompletní přehled
+✅ STARTUP_GUIDE.md       - Startup návod
+✅ DEPLOYMENT_STRATEGY.md - Hardware strategie
+✅ QUICK_START.txt        - Rychlé příkazy
+✅ CO_DELAT_TEĎ.txt       - Tento soubor
+
+========================================
+PORTY:
+========================================
+
+9302 - Primary Node
+9303 - Shadow Node
+9304 - Watchdog
+9305 - Privacy Protocol
+9090 - Prometheus (volitelné)
+3000 - Grafana (volitelné)
+
+========================================
+Standard 700: 12g stříbra = 1 mince
+Autor: Pan Jeskyně + Kiro AI
+========================================
+
+🚀 SPUSŤ start.bat TEĎ!

@@ -1,0 +1,88 @@
+========================================
+VAKUOVÁ MINCOVNA - Ubuntu Setup
+========================================
+
+Pro: i5 FUJITSU ESPRIMO G5010
+OS:  Ubuntu 26.04 LTS
+
+========================================
+KROK 1: Základní dependencies
+========================================
+
+# Update systému
+sudo apt update
+sudo apt upgrade -y
+
+# Python 3 (už by mělo být)
+sudo apt install -y python3 python3-pip
+
+# Install Prometheus client
+pip3 install prometheus_client requests
+
+========================================
+KROK 2: Přenést Mincovnu
+========================================
+
+# Varianta A: USB flash disk
+# 1. Na Windows: Zkopíruj c:\Users\pan_jeskyne\Favorites\vakuova-mincovna na flash
+# 2. Připoj flash k Ubuntu
+# 3. Zkopíruj do home:
+cp -r /media/USERNAME/USB/vakuova-mincovna ~/
+
+# Varianta B: Přes síť (MyCloud NAS)
+# Pokud máš NAS připojený:
+cp -r /mnt/nas/transfer/vakuova-mincovna ~/
+
+========================================
+KROK 3: Test Faucet Bridge
+========================================
+
+cd ~/vakuova-mincovna
+
+# Spustit Primary Node
+python3 src/faucet_bridge.py
+
+# Mělo by vypsat:
+# [PRIMARY] Port: 9302
+# [PRIMARY] Standard 700: 12g stříbra
+# [PRIMARY] Prometheus server běží...
+
+========================================
+KROK 4: Test z Windows
+========================================
+
+# Na i7 Windows - zjisti IP Ubuntu:
+# (na Ubuntu zadej:)
+ip addr show
+
+# Příklad výstupu:
+# inet 192.168.1.100/24
+
+# Na Windows - test připojení:
+curl http://192.168.1.100:9302/metrics
+
+# Nebo v prohlížeči:
+# http://192.168.1.100:9302/metrics
+
+========================================
+KROK 5: Firewall
+========================================
+
+# Povolit port 9302
+sudo ufw allow 9302/tcp
+sudo ufw enable
+sudo ufw status
+
+========================================
+POTOM: Shadow Node na Windows
+========================================
+
+# Upravit src\shadow_node.py:
+# PRIMARY_URL = "http://192.168.1.100:9302/metrics"
+
+# Spustit:
+start_shadow.bat
+
+========================================
+HOTOVO! Primary běží na Ubuntu ✅
+========================================

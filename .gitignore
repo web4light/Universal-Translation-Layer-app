@@ -1,0 +1,42 @@
+# Ada/SPARK build artifacts
+obj/
+bin/
+*.o
+*.ali
+*.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Secrets & keys
+.env
+.env.*
+*.key
+*.pem
+secrets/
+watchdog_baseline.json
+watchdog_threats_*.json
+
+# Node (if any)
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Prometheus data
+prometheus/data/
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*.tmp

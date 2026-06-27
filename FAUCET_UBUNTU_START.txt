@@ -1,0 +1,87 @@
+============================================================================
+🌊 FAUCET START - UBUNTU 26.06
+============================================================================
+
+Jste na Ubuntu! Použijte tyto příkazy:
+
+pan@stars:~$ cd ~/vakuova-mincovna/faucet
+
+# 1. Instalace Python dependencies
+pan@stars:~/vakuova-mincovna/faucet$ sudo apt update
+pan@stars:~/vakuova-mincovna/faucet$ sudo apt install -y python3 python3-pip python3-venv python3-full git
+
+# 2. Vytvoření virtual environment
+pan@stars:~/vakuova-mincovna/faucet$ python3 -m venv venv
+
+# 3. Aktivace venv
+pan@stars:~/vakuova-mincovna/faucet$ source venv/bin/activate
+
+# 4. Upgrade pip
+(venv) pan@stars:~/vakuova-mincovna/faucet$ pip install --upgrade pip
+
+# 5. Git init (Faucet potřebuje Git repo pro versioning)
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git init
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git config user.name "Pan Jeskyne"
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git config user.email "pan@vakuova-mincovna.cz"
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git add .
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git commit -m "Faucet for Vakuova Mincovna"
+(venv) pan@stars:~/vakuova-mincovna/faucet$ git tag v1.0.0
+
+# 6. Instalace Faucet dependencies
+(venv) pan@stars:~/vakuova-mincovna/faucet$ pip install -r requirements.txt
+
+# 7. Instalace eventlet (chybí v requirements)
+(venv) pan@stars:~/vakuova-mincovna/faucet$ pip install eventlet
+
+# 8. Instalace Faucet (editable mode)
+(venv) pan@stars:~/vakuova-mincovna/faucet$ pip install -e .
+
+# 9. Vytvoř config
+(venv) pan@stars:~/vakuova-mincovna/faucet$ mkdir -p etc/faucet
+(venv) pan@stars:~/vakuova-mincovna/faucet$ cat > etc/faucet/faucet.yaml << 'EOF'
+# Vakuová Mincovna - Faucet Config
+# Standard 700: 12g stříbra = 1 mince
+
+vlans:
+    vlan100:
+        vid: 100
+        description: "P2P Network"
+
+dps:
+    switch-1:
+        dp_id: 0x1
+        hardware: "Open vSwitch"
+        interfaces:
+            1:
+                native_vlan: vlan100
+            2:
+                native_vlan: vlan100
+EOF
+
+# 10. Spusť Faucet!
+(venv) pan@stars:~/vakuova-mincovna/faucet$ python3 -m faucet.faucet --verbose
+
+============================================================================
+
+NEBO JEDNODUŠEJI - použij start_faucet.sh:
+
+pan@stars:~$ cd ~/vakuova-mincovna
+pan@stars:~/vakuova-mincovna$ chmod +x start_faucet.sh
+pan@stars:~/vakuova-mincovna$ ./start_faucet.sh
+
+============================================================================
+
+ALTERNATIVA - instalace z PyPI (bez Git problémů):
+
+pan@stars:~$ cd ~/vakuova-mincovna
+pan@stars:~/vakuova-mincovna$ python3 -m venv venv-faucet
+pan@stars:~/vakuova-mincovna$ source venv-faucet/bin/activate
+(venv-faucet) pan@stars:~/vakuova-mincovna$ pip install faucet
+(venv-faucet) pan@stars:~/vakuova-mincovna$ mkdir -p etc/faucet
+(venv-faucet) pan@stars:~/vakuova-mincovna$ nano etc/faucet/faucet.yaml
+# (zkopíruj config výše)
+(venv-faucet) pan@stars:~/vakuova-mincovna$ faucet --verbose
+
+============================================================================
+
+Standard 700: 12g stříbra = 1 mince

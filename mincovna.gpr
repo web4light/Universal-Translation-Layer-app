@@ -1,0 +1,62 @@
+--  ============================================================================
+--  Vakuová Mincovna - Complete System Build
+--  
+--  Komponenty:
+--    1. mincovna.adb         - Core mint logic (Standard 700)
+--    2. faucet_controller.adb - Faucet SDN network controller
+--    3. gemini_bridge.adb     - Gemini AI integration (Tartanskomunikátor)
+--
+--  Build: gprbuild -P mincovna.gpr
+--  Verify: gnatprove -P mincovna.gpr --level=4
+--  
+--  Standard 700: 12g stříbra = 1 mince
+--  Autor: Pan Jeskyně
+--  Asistent: Kiro (Claude Sonnet 4.5)
+--  ============================================================================
+
+project Mincovna is
+
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   
+   --  Všechny executables
+   for Main use (
+      "mincovna.adb",           -- Core mint
+      "faucet_controller.adb",  -- Faucet SDN
+      "gemini_bridge.adb"       -- Gemini AI
+   );
+
+   package Compiler is
+      for Default_Switches ("Ada") use 
+         ("-gnat2022",      -- Ada 2022 standard
+          "-gnatwa",        -- Všechna varování
+          "-gnatwe",        -- Varování jako chyby
+          "-gnato",         -- Overflow checking
+          "-fstack-check",  -- Stack checking
+          "-gnatVa",        -- Validity checking
+          "-gnata",         -- Assertions enabled
+          "-g",             -- Debug info
+          "-O2"             -- Optimization
+         );
+   end Compiler;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-g", "-j0"); -- Debug + parallel build
+   end Builder;
+
+   package Prove is
+      for Proof_Switches ("Ada") use
+         ("--level=4",           -- Nejvyšší úroveň důkazu
+          "--prover=all",        -- Použít všechny provery
+          "--timeout=60",        -- Timeout 60s
+          "--checks=all",        -- All runtime checks
+          "--counterexamples=on" -- Show counterexamples
+         );
+   end Prove;
+   
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es"); -- Symbolic traceback
+   end Binder;
+
+end Mincovna;

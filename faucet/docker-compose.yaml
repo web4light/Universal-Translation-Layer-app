@@ -1,0 +1,58 @@
+---
+services:
+    prometheus:
+        restart: always
+        image: 'prom/prometheus:v3.11.2'
+        user: 'root'
+        ports:
+            - '9090:9090'
+        volumes:
+            - '${FAUCET_PREFIX}/opt/prometheus/:/prometheus'
+            - './etc/prometheus/prometheus-docker-compose.yml:/etc/prometheus/prometheus.yml'
+            - './etc/prometheus/faucet.rules.yml:/etc/prometheus/faucet.rules.yml'
+        links:
+            - faucet
+            - gauge
+
+    grafana:
+        restart: always
+        image: 'grafana/grafana:13.0.0'
+        user: 'root'
+        ports:
+            - '3000:3000'
+        volumes:
+            - '${FAUCET_PREFIX}/opt/grafana:/var/lib/grafana'
+        links:
+            - prometheus
+
+    gauge:
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile.gauge
+        image: 'faucet/gauge:latest'
+        environment:
+            GAUGE_CONFIG: '/etc/faucet/gauge.yaml'
+        volumes:
+            - '${FAUCET_PREFIX}/var/log/faucet:/var/log/faucet'
+            - '${FAUCET_PREFIX}/etc/faucet:/etc/faucet'
+        ports:
+            - '6654:6653'
+            - '9303'
+
+    faucet:
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile.faucet
+        image: 'faucet/faucet:latest'
+        volumes:
+            - '${FAUCET_PREFIX}/var/log/faucet:/var/log/faucet'
+            - '${FAUCET_PREFIX}/etc/faucet:/etc/faucet'
+        ports:
+            - '6653:6653'
+            - '9302'
+        environment:
+            FAUCET_CONFIG_STAT_RELOAD: '${FAUCET_CONFIG_STAT_RELOAD}'
+            FAUCET_EVENT_SOCK: '${FAUCET_EVENT_SOCK}'
+            FAUCET_EVENT_SOCK_HEARTBEAT: '${FAUCET_EVENT_SOCK_HEARTBEAT}'

@@ -1,0 +1,30 @@
+# Karel IV. Python dependencies
+# AsgardLab / web4light.online
+
+# Prometheus metrics
+prometheus-client==0.20.0
+
+# HTTP requests (Shadow Node, Faucet Bridge)
+requests==2.32.3
+
+# Scheduling (Privacy Protocol 4:23)
+schedule==1.2.2
+
+# Process monitoring (Watchdog)
+psutil==6.0.0
+
+# Audio capture
+sounddevice==0.4.7
+soundfile==0.12.1
+
+# Speech-to-text (MIT license, runs locally)
+openai-whisper==20240930
+
+# Google Gemini AI (Apache 2.0)
+google-generativeai==0.8.3
+
+# Text-to-speech with voice cloning (MIT)
+# TTS==0.22.0  # Uncomment when ready (large download ~1GB)
+
+# Numpy (required by Whisper)
+numpy==1.26.4

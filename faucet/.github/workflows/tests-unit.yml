@@ -1,0 +1,91 @@
+name: Unit tests
+
+on: [push, pull_request]
+
+env:
+  FILES_CHANGED: "all"
+  CODECOV_PY_VER: "3.12"
+  PYTYPE_CHECK: "3.10,3.11,3.12"
+  PYRIGHT_CHECK: "3.10,3.11,3.12,3.13,3.14"
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", 3.11, 3.12, 3.13, 3.14]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Setup dependencies for changed files action
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Get file changes
+        id: file_changes
+        uses: tj-actions/changed-files@v47
+        with:
+          json: true
+          escape_json: false
+      - if: ${{ steps.file_changes.outputs.all_changed_files }}
+        name: Compare file changes
+        run: |
+          FILES_ALL="$(echo '${{ steps.file_changes.outputs.all_changed_files }}' | jq -r '.[]' | tr '\n' ' ')"
+          FILES_ADDED="$(echo '${{ steps.file_changes.outputs.added_files }}' | jq -r '.[]' | tr '\n' ' ')"
+          FILES_DELETED="$(echo '${{ steps.file_changes.outputs.deleted_files }}' | jq -r '.[]' | tr '\n' ' ')"
+          FILES_RENAMED="$(echo '${{ steps.file_changes.outputs.renamed_files }}' | jq -r '.[]' | tr '\n' ' ')"
+          FILES_MODIFIED="$(echo '${{ steps.file_changes.outputs.modified_files }}' | jq -r '.[]' | tr '\n' ' ')"
+          FILES_ADDED_MODIFIED="${FILES_ADDED} ${FILES_MODIFIED}"
+          PY_FILES_CHANGED="$(echo ${FILES_ADDED_MODIFIED} | tr ' ' '\n' | grep -E '\.py$' | tr '\n' ' ')"
+          CI_TEST_FILES_CHANGED="$(echo ${FILES_ADDED_MODIFIED} | tr ' ' '\n' | grep -E '(workflows\/tests-.+\.yml$|Dockerfile\.tests$|^docker\/.+$|tests\/.+\.sh$)' | tr '\n' ' ')"
+          RQ_FILES_CHANGED="$(echo ${FILES_ADDED_MODIFIED} | tr ' ' '\n' | grep -E 'requirements(.*)txt$' | tr '\n' ' ')"
+          DOC_FILES_CHANGED="$(echo ${FILES_ADDED_MODIFIED} | tr ' ' '\n' | grep -E '^docs/.+$' | tr '\n' ' ')"
+          if [ ! -z "${CI_TEST_FILES_CHANGED}" ]; then FILES_CHANGED="all"; else FILES_CHANGED="${FILES_ADDED_MODIFIED}"; fi
+          echo "Git added/modified: ${FILES_ADDED_MODIFIED}"
+          echo "CI test files changed: ${CI_TEST_FILES_CHANGED}"
+          echo "Python code changed: ${PY_FILES_CHANGED}"
+          echo "Requirement changes: ${RQ_FILES_CHANGED}"
+          echo "Documentation changes: ${DOC_FILES_CHANGED}"
+          echo "Files changed: ${FILES_CHANGED}"
+          echo "FILES_CHANGED=${FILES_CHANGED}" >> ${GITHUB_ENV}
+          echo "PY_FILES_CHANGED=${PY_FILES_CHANGED}" >> ${GITHUB_ENV}
+          echo "RQ_FILES_CHANGED=${RQ_FILES_CHANGED}" >> ${GITHUB_ENV}
+          echo "DOC_FILES_CHANGED=${DOC_FILES_CHANGED}" >> ${GITHUB_ENV}
+      - name: Set up python-${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          ./docker/pip_deps.sh
+          pip3 install ./
+          pip3 show faucet
+      - name: Run unit tests
+        run: |
+          ./tests/run_unit_tests.sh
+      - if: ${{ matrix.python-version == env.CODECOV_PY_VER }}
+        name: Upload codecov
+        uses: codecov/codecov-action@v6
+      - if: ${{ (env.FILES_CHANGED == 'all' || env.RQ_FILES_CHANGED || env.PY_FILES_CHANGED)
+          && contains(env.PYTYPE_CHECK, matrix.python-version) }}
+        name: Run pytype
+        run: |
+          ./docker/pip_deps.sh --extra-requirements="codecheck-requirements.txt"
+          cd ./tests/codecheck
+          if [[ "${{ env.FILES_CHANGED }}" == "all" || -n "${{ env.RQ_FILES_CHANGED }}" ]]; then
+            echo "Running pytype on everything"
+            ./pytype.sh
+          else
+            echo "Running pytype on ${{ env.PY_FILES_CHANGED }}"
+            ./pytype.sh ${{ env.PY_FILES_CHANGED }}
+          fi
+      - if: ${{ contains(env.PYRIGHT_CHECK, matrix.python-version) }}
+        name: Run pyright
+        # pyright is quite fast, so easier just to run global config every time.
+        run: |
+          ./docker/pip_deps.sh --extra-requirements="codecheck-requirements.txt"
+          pyright

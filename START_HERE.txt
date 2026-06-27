@@ -1,0 +1,96 @@
+================================================================================
+🏗️  VAKUOVÁ MINCOVNA - START HERE
+================================================================================
+
+Standard 700: 12g stříbra = 1 mince
+Autor: Pan Jeskyně + Kiro AI
+
+Jste na OBOU počítačích (Windows + Ubuntu)? Perfektní!
+
+================================================================================
+⚡ RYCHLÝ START
+================================================================================
+
+📌 WINDOWS (Primary Node):
+
+   1. Otevři Git Bash nebo Command Prompt
+   2. Spusť:
+   
+      cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
+      FAUCET_FIX.bat
+      
+   3. Pak:
+   
+      start_faucet_simple.bat
+      
+   4. V dalším terminálu:
+   
+      python src\faucet_bridge.py
+
+
+📌 UBUNTU (Shadow Node):
+
+   1. Otevři terminál
+   2. Spusť automatickou instalaci:
+   
+      cd ~/vakuova-mincovna
+      chmod +x install_ubuntu_complete.sh
+      ./install_ubuntu_complete.sh
+      
+   3. Zadej IP Windows PC když se zeptá
+   
+   4. Po instalaci spusť služby:
+   
+      ./start_faucet.sh        # Terminal 1
+      ./start_shadow.sh        # Terminal 2
+      ./start_watchdog.sh      # Terminal 3
+      ./start_privacy.sh &     # Terminal 4 (background)
+
+================================================================================
+📚 DOKUMENTACE
+================================================================================
+
+├── START_HERE.txt                  ← Jste tady
+├── COMPLETE_SETUP.md               ← Detailní setup pro oba PC
+├── FAUCET_QUICKSTART.md            ← Faucet dokumentace
+├── FAUCET_UBUNTU_START.txt         ← Ubuntu Faucet příkazy
+├── SYSTEM_OVERVIEW.md              ← Celková architektura
+├── BUILD.md                        ← Build instrukce
+├── SHADOW_NODE.md                  ← Shadow Node detaily
+├── SECURITY_WATCHDOG.md            ← Watchdog konfigurace
+├── PRIVACY_PROTOCOL_423.md         ← Privacy detaily
+└── DEPLOY_UBUNTU.md                ← Ubuntu deployment
+
+================================================================================
+🔧 TROUBLESHOOTING
+================================================================================
+
+Windows - Faucet nefunguje:
+   → Spusť: FAUCET_FIX.bat
+   → Nebo: start_faucet_simple.bat
+
+Ubuntu - Permission denied:
+   → chmod +x *.sh
+   → sudo ufw allow 9303/tcp
+
+Network - Počítače se nevidí:
+   → ping <IP_adresa>
+   → Zkontroluj firewall
+
+================================================================================
+🎯 CO DĚLAT DÁLE?
+================================================================================
+
+1. ✅ Rozjeď Primary (Windows)
+2. ✅ Rozjeď Shadow (Ubuntu)  
+3. ✅ Test synchronizace: curl http://<ubuntu_ip>:9303/metrics
+4. ✅ Test failover: Vypni Primary, Shadow převezme kontrolu
+5. ✅ Deploy Gemini AI dubbing
+6. ✅ Integrace Sepolia ETH
+7. ✅ P2P network (každý uživatel 423 Kč/měsíc)
+
+================================================================================
+
+PŘÍŠTÍ KROK: Čti COMPLETE_SETUP.md pro detailní instrukce!
+
+================================================================================

@@ -1,0 +1,186 @@
+;;;;;;;;;;oni ========================================
+BARRIER TROUBLESHOOTING - Krok po kroku
+========================================
+
+PROBLÉM: Barrier nefunguje, PC se nebavějí
+========================================
+
+KROK 1: Zjistit IP adresy
+========================================
+
+Na Windows (i7):
+  ipconfig
+ → Najdi: IPv4 Address
+  → Příklad: 192.168.1.50 
+
+Na Ubuntu (i5):
+  ip addr show
+  → Najdi: inet
+  → Příklad: 192.168.1.100
+
+Zapiš si obě IP!
+
+========================================
+KROK 2: Windows jako SERVER
+========================================
+
+1. Spustit Barrier na Windows
+2. Vybrat: "Server"
+3. Configure Server → kliknout
+4. V pravém horním rohu uvidíš ikonu monitoru
+   - To je tvůj Windows PC
+   - Pojmenován jako hostname (např. "asterisk")
+5. Přetáhnout další monitor ikonu na canvas
+   - VLEVO nebo VPRAVO od Windows monitoru
+   - Dvojklik na něj
+   - Screen name: esprimo (nebo jak chceš)
+   - OK
+6. File → Save configuration
+7. NEKLIKEJ ještě Start!
+
+========================================
+KROK 3: Firewall Windows
+========================================
+
+Win + R → wf.msc → Enter
+
+Inbound Rules → New Rule:
+  - Rule Type: Port
+  - TCP: 24800
+  - Allow connection
+  - Name: Barrier
+
+NEBO v CMD jako Admin:
+netsh advfirewall firewall add rule name="Barrier" dir=in action=allow protocol=TCP localport=24800
+
+========================================
+KROK 4: Ubuntu jako CLIENT
+========================================
+
+1. Spustit Barrier na Ubuntu
+2. Vybrat: "Client"
+3. Server IP: [IP Windows z KROKU 1]
+   Příklad: 192.168.1.50
+4. Screen name: esprimo
+   (MUSÍ být stejné jako v Server config!)
+5. NEKLIKEJ ještě Start!
+
+========================================
+KROK 5: Firewall Ubuntu
+========================================
+
+sudo ufw allow 24800/tcp
+sudo ufw reload
+sudo ufw status
+
+========================================
+KROK 6: PING Test
+========================================
+
+Na Ubuntu:
+  ping 192.168.1.50
+  (IP Windows)
+
+Na Windows:
+  ping 192.168.1.100
+  (IP Ubuntu)
+
+OBA musí fungovat! Pokud ne → network problém
+
+========================================
+KROK 7: Spustit v POŘADÍ
+========================================
+
+1. NEJDŘÍV Windows:
+   Barrier → Start
+
+   Mělo by vypsat:
+   "Barrier is running"
+   "Server listening on :24800"
+
+2. PAK Ubuntu:
+   Barrier → Start
+
+   Mělo by vypsat:
+   "Connected to server"
+
+========================================
+KROK 8: TEST
+========================================
+
+Pohni myší na OKRAJ monitoru:
+  - Windows pravý okraj → Ubuntu by měl převzít
+  - Nebo Windows levý okraj (záleží na layoutu)
+
+========================================
+ČASTÉ PROBLÉMY
+========================================
+
+1. "Cannot connect"
+   → Zkontroluj IP adresu v Ubuntu Client
+   → Zkontroluj firewall (KROK 3 a 5)
+
+2. "SSL error"
+   → Barrier → Edit → Settings
+   → VYPNOUT "Enable SSL"
+   → Restart obou
+
+3. "Screen name mismatch"
+   → Windows Server config: screen name = "esprimo"
+   → Ubuntu Client: screen name = "esprimo"
+   → MUSÍ být stejné!
+
+4. "Connection refused"
+   → Windows Barrier: Run as Administrator
+
+5. Nic se neděje
+   → Zkontroluj layout v Server config
+   → Monitor musí být vedle Windows monitoru
+   → Ne NAD, ne POD (pokud nechceš)
+
+========================================
+DEBUG MODE
+========================================
+
+Windows Barrier:
+  Edit → Settings
+  ✅ Enable logging to file
+  Log file: C:\barrier.log
+
+Ubuntu:
+  barrierc --debug INFO --name esprimo 192.168.1.50:24800
+
+Podívej se do logů co říkají!
+
+========================================
+ALTERNATIVA: TLS vypnuté
+========================================
+
+Windows Server:
+  Edit → Settings
+  ❌ Enable SSL (vypnout!)
+  OK → Restart Server
+
+Ubuntu Client:
+  Edit → Settings
+  ❌ Enable SSL (vypnout!)
+  OK → Restart Client
+
+========================================
+QUICK FIX CHECKLIST
+========================================
+
+✅ Obě PC ve stejné síti (stejná 192.168.x.x)
+✅ Windows = Server
+✅ Ubuntu = Client
+✅ IP adresa v Ubuntu Client = IP Windows
+✅ Screen name stejný v obou
+✅ Firewall port 24800 otevřený (obě strany)
+✅ Ping funguje (obě směry)
+✅ SSL vypnutý (obě strany)
+✅ Windows Barrier jako Admin
+✅ Server config má layout (monitory vedle sebe)
+
+========================================
+
+Zkus to v tomto pořadí a napiš kde to selže!

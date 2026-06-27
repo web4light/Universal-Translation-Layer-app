@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karel IV. — Real-time AI Voice Translator | AsgardLab</title>
+  <meta name="description" content="Speak in any language. Be heard in yours. Karel IV. by AsgardLab translates your voice in real-time, preserving your own voice identity.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c9a84c;
+      --dark: #0d0d0d;
+      --dark2: #1a1a1a;
+      --dark3: #242424;
+      --text: #e8e8e8;
+      --muted: #888;
+      --accent: #c9a84c;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 4rem;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      background: var(--dark);
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    .logo span { color: var(--text); font-weight: normal; }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 2rem;
+      font-size: 0.9rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--gold); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .crown {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: var(--gold);
+      letter-spacing: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero .tagline {
+      font-size: 1.1rem;
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .hero .description {
+      font-size: 1.25rem;
+      color: var(--text);
+      max-width: 650px;
+      margin: 0 auto 3rem;
+      line-height: 1.8;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 0.9rem 2.5rem;
+      border: none;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Helvetica Neue', sans-serif;
+      letter-spacing: 1px;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold);
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--gold);
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Helvetica Neue', sans-serif;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: var(--gold);
+      color: var(--dark);
+    }
+
+    /* HOW IT WORKS */
+    .pipeline {
+      background: var(--dark2);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .pipeline h2 {
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    .pipeline .subtitle {
+      color: var(--muted);
+      margin-bottom: 3rem;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      background: var(--dark3);
+      padding: 1.5rem;
+      width: 160px;
+      text-align: center;
+    }
+
+    .step .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+    .step .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .step .name {
+      font-size: 0.95rem;
+      color: var(--gold);
+      margin-top: 0.3rem;
+    }
+
+    .arrow {
+      color: var(--gold);
+      font-size: 1.5rem;
+      padding: 0 0.5rem;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 3rem;
+      letter-spacing: 2px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--dark2);
+      padding: 2rem;
+      border-left: 3px solid var(--gold);
+    }
+
+    .feature-card h3 {
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* DEMO SECTION */
+    .demo-section {
+      background: var(--dark2);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .demo-section h2 {
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .demo-section p {
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      margin-bottom: 2rem;
+    }
+
+    .demo-box {
+      background: var(--dark3);
+      border: 1px solid #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .lang-select {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .lang-btn {
+      background: var(--dark2);
+      color: var(--text);
+      border: 1px solid #444;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active, .lang-btn:hover {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    .mic-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .mic-btn:hover { transform: scale(1.05); }
+    .mic-btn.recording { opacity: 0.7; animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .demo-status {
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.9rem;
+      min-height: 1.5rem;
+    }
+
+    /* TECH STACK */
+    .tech {
+      padding: 4rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .tech h2 {
+      font-size: 1.5rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .tech-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .pill {
+      background: var(--dark2);
+      border: 1px solid #333;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      color: var(--muted);
+    }
+
+    .pill.highlight {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid #222;
+      padding: 3rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer .logo { font-size: 1.1rem; }
+
+    footer p {
+      color: var(--muted);
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.85rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-size: 0.85rem;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    .footer-links a:hover { color: var(--gold); }
+
+    /* HISTORY BADGE */
+    .history-badge {
+      display: inline-block;
+      background: var(--dark3);
+      border: 1px solid #333;
+      padding: 0.75rem 1.5rem;
+      margin-bottom: 2rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .history-badge strong { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">KAREL <span>IV.</span></div>
+    <div>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#waitlist" class="btn-primary" style="padding: 0.5rem 1.5rem; margin-left: 2rem;">Early Access</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="crown">👑</div>
+    <div class="history-badge">
+      Named after <strong>Charles IV</strong> — King of Bohemia, fluent in <strong>7 languages</strong>. 1316–1378.
+    </div>
+    <h1>KAREL IV.</h1>
+    <div class="tagline">Real-time AI Voice Translation</div>
+    <p class="description">
+      Speak in Czech. Be heard in Japanese.<br>
+      In your own voice. In virtual reality.
+    </p>
+    <div class="cta-group">
+      <a href="#demo" class="btn-primary">Try the Demo</a>
+      <a href="#waitlist" class="btn-secondary">Get Early Access</a>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="pipeline" id="how">
+    <h2>HOW IT WORKS</h2>
+    <p class="subtitle">Six steps. Under 300ms latency.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="icon">🎤</div>
+        <div class="label">Input</div>
+        <div class="name">Microphone</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="icon">🔊</div>
+        <div class="label">Audio</div>
+        <div class="name">Virtual Card</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="icon">📝</div>
+        <div class="label">Speech-to-Text</div>
+        <div class="name">Whisper</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="icon">🔐</div>
+        <div class="label">Validation</div>
+        <div class="name">Ada/SPARK</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="icon">🤖</div>
+        <div class="label">Translation</div>
+        <div class="name">Gemini AI</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="icon">🎧</div>
+        <div class="label">Your Voice</div>
+        <div class="name">Headphones</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <h2>FEATURES</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>🎭 Your Voice. Any Language.</h3>
+        <p>Upload 30 seconds of your voice. Karel IV. clones it and translates everything in your own voice — not a robot.</p>
+      </div>
+      <div class="feature-card">
+        <h3>⚡ Real-time</h3>
+        <p>Sub-300ms pipeline. Whisper STT → Gemini translation → voice synthesis. No lag in conversation.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔐 Mathematically Verified</h3>
+        <p>Core logic verified with Ada/SPARK formal verification. Guaranteed no runtime errors in the translation pipeline.</p>
+      </div>
+      <div class="feature-card">
+        <h3>⛓️ Blockchain Payments</h3>
+        <p>Pay per minute via Ethereum. No subscriptions, no accounts. Just translate and pay.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🌐 7+ Languages</h3>
+        <p>Czech, English, German, French, Japanese, Spanish, Italian — and growing. Like Karel IV. himself.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🥽 Virtual Reality Ready</h3>
+        <p>Walk into a VR meeting speaking Czech, be heard in Japanese. Karel IV. runs in the background — zero latency, zero setup.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🌐 Mesh Network</h3>
+        <p>Every Karel IV. installation contributes idle CPU/GPU to the mesh. More users = more power. Zero cloud costs.</p>
+      </div>
+      <div class="feature-card">
+        <h3>💰 Earn ETH</h3>
+        <p>Share idle hardware with the mesh, earn Sepolia ETH credits. Your hardware pays for your subscription.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔒 Privacy First</h3>
+        <p>Protocol 4:23 — all metadata purged daily at 4:23 AM. Zero cookies. RAM-only sessions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo-section" id="demo">
+    <h2>TRY IT</h2>
+    <p>Select target language and speak. Karel IV. translates in real-time.</p>
+    <div class="demo-box">
+      <div class="lang-select">
+        <button class="lang-btn active" onclick="selectLang(this, 'EN')">🇬🇧 English</button>
+        <button class="lang-btn" onclick="selectLang(this, 'DE')">🇩🇪 German</button>
+        <button class="lang-btn" onclick="selectLang(this, 'FR')">🇫🇷 French</button>
+        <button class="lang-btn" onclick="selectLang(this, 'JA')">🇯🇵 Japanese</button>
+        <button class="lang-btn" onclick="selectLang(this, 'ES')">🇪🇸 Spanish</button>
+      </div>
+      <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
+      <div class="demo-status" id="demoStatus">
+        Click to speak — Karel IV. will translate
+      </div>
+    </div>
+    <p style="margin-top: 1.5rem; font-size: 0.85rem;">
+      * Full API integration coming soon. Join waitlist for early access.
+    </p>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="tech">
+    <h2>Built On Open Source</h2>
+    <div class="tech-pills">
+      <span class="pill highlight">Gemini AI</span>
+      <span class="pill highlight">Ada/SPARK</span>
+      <span class="pill highlight">Whisper STT</span>
+      <span class="pill highlight">Coqui TTS</span>
+      <span class="pill">n8n</span>
+      <span class="pill">Prometheus</span>
+      <span class="pill">Ethereum</span>
+      <span class="pill">Apache 2.0</span>
+      <span class="pill">GPL 3.0</span>
+      <span class="pill">Google Cloud</span>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section style="padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; text-align: center;" id="pricing">
+    <h2 style="color: var(--gold); font-size: 2rem; letter-spacing: 2px; margin-bottom: 0.5rem;">PRICING</h2>
+    <p style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; margin-bottom: 3rem;">
+      Simple. Transparent. Czech prices.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: start;">
+
+      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">PERSONAL ASSISTANT</h3>
+        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">111</div>
+        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
+        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
+          <li>✓ AI personal assistant</li>
+          <li>✓ Czech &amp; English</li>
+          <li>✓ Privacy Protocol 4:23</li>
+          <li>✓ 1 device</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👑</div>
+        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">KAREL IV.</h3>
+        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">222</div>
+        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
+        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
+          <li>✓ Real-time voice translation</li>
+          <li>✓ 7+ languages</li>
+          <li>✓ Your own voice clone</li>
+          <li>✓ Whisper + Gemini pipeline</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎬</div>
+        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">STREAM DUBBING</h3>
+        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">333</div>
+        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
+        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
+          <li>✓ Netflix, YouTube, etc.</li>
+          <li>✓ Real-time dubbing</li>
+          <li>✓ Virtual audio card</li>
+          <li>✓ Any streaming service</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--dark3); padding: 2rem; border: 2px solid var(--gold); position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+                    background: var(--gold); color: var(--dark); padding: 0.2rem 1rem;
+                    font-family: 'Helvetica Neue', sans-serif; font-size: 0.75rem;
+                    font-weight: bold; letter-spacing: 1px;">BEST VALUE</div>
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏠</div>
+        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">FAMILY PLAN</h3>
+        <div style="font-size: 2.5rem; color: var(--gold); font-weight: bold;">423</div>
+        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
+        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
+          <li style="color: var(--text);">✓ Everything included</li>
+          <li style="color: var(--text);">✓ Whole household</li>
+          <li style="color: var(--text);">✓ Unlimited devices</li>
+          <li style="color: var(--text);">✓ Priority support</li>
+          <li>✓ Privacy Protocol 4:23</li>
+        </ul>
+        <a href="#waitlist" class="btn-primary" style="display: block; text-align: center; margin-top: 1.5rem;">
+          Get Started
+        </a>
+      </div>
+
+    </div>
+    <p style="margin-top: 2rem; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem;">
+      Paid via Ethereum · Cancel anytime · No hidden fees
+    </p>
+  </section>
+
+  <!-- WAITLIST -->
+  <section style="background: var(--dark2); padding: 5rem 2rem; text-align: center;" id="waitlist">
+    <h2 style="color: var(--gold); font-size: 2rem; letter-spacing: 2px; margin-bottom: 1rem;">
+      EARLY ACCESS
+    </h2>
+    <p style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+      Karel IV. is in private beta. Join the waitlist and be among the first to speak all languages.
+    </p>
+    <form style="display: flex; gap: 0; max-width: 450px; margin: 0 auto;"
+          onsubmit="joinWaitlist(event)">
+      <input type="email" id="emailInput" placeholder="your@email.com"
+             style="flex: 1; padding: 0.9rem 1rem; background: var(--dark3);
+                    border: 1px solid #444; border-right: none; color: var(--text);
+                    font-family: 'Helvetica Neue', sans-serif; font-size: 1rem;">
+      <button type="submit" class="btn-primary">Join</button>
+    </form>
+    <div id="waitlistMsg" style="color: var(--gold); margin-top: 1rem;
+         font-family: 'Helvetica Neue', sans-serif; min-height: 1.5rem;"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">KAREL <span>IV.</span> <span style="font-size:0.7rem; color: var(--muted); letter-spacing:1px;">by AsgardLab</span></div>
+    <p>© 2026 AsgardLab. GPL 3.0 + Commercial License.</p>
+    <div class="footer-links">
+      <a href="https://github.com">GitHub</a>
+      <a href="#features">Features</a>
+      <a href="mailto:phoenix@web4light.online">phoenix@web4light.online</a>
+      <a href="mailto:arch@web4light.online">arch@web4light.online</a>
+    </div>
+  </footer>
+
+  <script>
+    let selectedLang = 'EN';
+    let isRecording = false;
+
+    function selectLang(btn, lang) {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedLang = lang;
+      document.getElementById('demoStatus').textContent =
+        'Click to speak — Karel IV. will translate to ' + lang;
+    }
+
+    function toggleRecording() {
+      const btn = document.getElementById('micBtn');
+      const status = document.getElementById('demoStatus');
+
+      if (!isRecording) {
+        isRecording = true;
+        btn.classList.add('recording');
+        btn.textContent = '⏹️';
+        status.textContent = '🎙️ Listening... speak now';
+
+        // Simulate translation after 2s
+        setTimeout(() => {
+          status.textContent = '⚙️ Ada/SPARK validating...';
+          setTimeout(() => {
+            status.textContent = '🤖 Gemini translating to ' + selectedLang + '...';
+            setTimeout(() => {
+              status.textContent = '✅ Translation complete — playing in your voice';
+              isRecording = false;
+              btn.classList.remove('recording');
+              btn.textContent = '🎤';
+            }, 800);
+          }, 500);
+        }, 2000);
+      }
+    }
+
+    function joinWaitlist(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailInput').value;
+      if (email) {
+        document.getElementById('waitlistMsg').textContent =
+          '✓ ' + email + ' added to waitlist. Karel IV. will contact you.';
+        document.getElementById('emailInput').value = '';
+      }
+    }
+  </script>
+
+</body>
+</html>
