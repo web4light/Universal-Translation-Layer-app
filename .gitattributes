@@ -1,0 +1,15 @@
+# GitHub language statistics — Ada/SPARK is the primary language
+
+# Vendor/external code — exclude from language stats
+faucet/** linguist-vendored
+docker/** linguist-vendored
+docs/** linguist-documentation
+
+# Python bridge layer — mark as support scripts
+src/faucet_bridge.py linguist-language=Ada
+src/shadow_node.py linguist-language=Ada
+src/karel_iv.py linguist-language=Ada
+
+# Ada/SPARK core — explicitly mark as primary
+src/*.adb linguist-detectable=true
+src/*.ads linguist-detectable=true
