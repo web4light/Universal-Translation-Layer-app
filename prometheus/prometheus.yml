@@ -25,3 +25,24 @@ scrape_configs:
         labels:
           component: 'node-exporter'
           verification: 'faucet-nic'
+
+  - job_name: 'primary-node'
+    static_configs:
+      - targets: ['localhost:9302']
+        labels:
+          component: 'faucet-bridge'
+          role: 'primary'
+
+  - job_name: 'shadow-node'
+    static_configs:
+      - targets: ['localhost:9303']
+        labels:
+          component: 'shadow-node'
+          role: 'shadow'
+
+  - job_name: 'karel-iv-pipeline'
+    static_configs:
+      - targets: ['localhost:9306']
+        labels:
+          component: 'karel-iv'
+          pipeline: 'voice-translation'

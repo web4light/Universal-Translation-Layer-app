@@ -75,7 +75,7 @@ python src\faucet_bridge.py
 # Download Prometheus pro Windows
 # https://prometheus.io/download/
 
-# Spusť
+# **Spurt**
 prometheus.exe --config.file=prometheus\prometheus.yml
 ```
 

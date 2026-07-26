@@ -1,0 +1,10 @@
+# Transkomunikátor — Python dependencies (pinned versions)
+# Install: pip install -r src/transkomunikator/requirements.txt
+
+hypothesis==6.112.1
+pytest==8.3.2
+prometheus_client==0.20.0
+psutil==6.0.0
+requests==2.32.3
+faster-whisper==1.0.3
+TTS==0.22.0

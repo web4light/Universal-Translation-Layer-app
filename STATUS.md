@@ -54,11 +54,13 @@ Shadow Node je kompletně implementovaný a připravený na testování!
 - ✅ `STATUS.md` - Tento soubor
 
 ### Monitoring
+
 - ✅ `prometheus/prometheus.yml` - Prometheus konfigurace
 - ✅ Metriky Primary Node (port 9302)
 - ✅ Metriky Shadow Node (port 9303)
 
 ### Faucet
+
 - ✅ `src/faucet_dns.erl` - Faucet DNS (Erlang)
 - ✅ `faucet/` - Faucet SDN Controller files
 
@@ -67,21 +69,25 @@ Shadow Node je kompletně implementovaný a připravený na testování!
 ## 🚧 TODO (Zbývá implementovat)
 
 ### Python Bridge
+
 - ⏳ `src/faucet_bridge.py` - Chybí implementace
   - **Účel:** Spojit Ada/SPARK Core s Prometheus
   - **Funkce:** Volat Ada executable a exportovat metriky
   - **Port:** 9302 (Primary), 9303 (Shadow)
   
 ### Grafana (volitelné)
+
 - ⏳ Grafana dashboard pro vizualizaci
 - ⏳ Alert management
 
 ### Production Deployment
+
 - ⏳ Deploy Shadow na Ubuntu 26.06
 - ⏳ Network configuration (firewall rules)
 - ⏳ Testování failover v produkci
 
 ### Integrace (budoucnost)
+
 - ⏳ Faucet SDN integrace
 - ⏳ n8n workflow automation
 - ⏳ Sepolia ETH blockchain audit
@@ -181,6 +187,7 @@ Pro kompletní Primary Node funkčnost vytvoř Python bridge který:
 ## 🎯 Milestone checklist
 
 ### Milestone 1: Základní funkčnost ✅ HOTOVO
+
 - [x] Ada/SPARK Core vytvořen
 - [x] Shadow Node implementován
 - [x] Start scripty (Windows + Linux)
@@ -188,18 +195,21 @@ Pro kompletní Primary Node funkčnost vytvoř Python bridge který:
 - [x] Testing guide připraven
 
 ### Milestone 2: Testování ⏳ IN PROGRESS
+
 - [ ] Local testing na Windows
 - [ ] Failover test
 - [ ] Recovery test
 - [ ] Všech 10 testů prošlo
 
 ### Milestone 3: Production ⏳ PENDING
+
 - [ ] Shadow deployed na Ubuntu 26.06
 - [ ] Network testing
 - [ ] Firewall configuration
 - [ ] Production failover test
 
 ### Milestone 4: Integration ⏳ FUTURE
+
 - [ ] Faucet SDN integrace
 - [ ] Grafana dashboard
 - [ ] n8n automation
@@ -265,18 +275,21 @@ DONE! ✨
 ## 💡 Co můžeš udělat HNED TEĎ
 
 ### Option 1: Testuj lokálně (Windows)
+
 ```cmd
 start.bat           # Terminál 1
 start_shadow.bat    # Terminál 2
 ```
 
 ### Option 2: Vytvoř balíček pro Ubuntu
+
 ```cmd
 package.bat
 # → vytvoří ZIP pro transfer
 ```
 
 ### Option 3: Přečti dokumentaci
+
 ```
 INDEX.md            # Přehled všech dokumentů
 SYSTEM_OVERVIEW.md  # Kompletní architektura

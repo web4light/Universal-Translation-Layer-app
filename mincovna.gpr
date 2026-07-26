@@ -4,7 +4,7 @@
 --  Komponenty:
 --    1. mincovna.adb         - Core mint logic (Standard 700)
 --    2. faucet_controller.adb - Faucet SDN network controller
---    3. gemini_bridge.adb     - Gemini AI integration (Tartanskomunikátor)
+--    3. bifrost.adb            - Bifrost: Most Ada/SPARK - Gemini AI
 --
 --  Build: gprbuild -P mincovna.gpr
 --  Verify: gnatprove -P mincovna.gpr --level=4
@@ -22,16 +22,20 @@ project Mincovna is
    
    --  Všechny executables
    for Main use (
-      "mincovna.adb",           -- Core mint
-      "faucet_controller.adb",  -- Faucet SDN
-      "gemini_bridge.adb"       -- Gemini AI
+      "mincovna.adb",                    -- Core mint
+      "faucet_controller.adb",           -- Faucet SDN
+      "bifrost.adb",                     -- Bifrost: Ada/SPARK - Gemini AI
+      "transkomunikator_validator.adb",  -- Karel IV.: Audio PCM validator
+      "pipeline_validator.adb",          -- Karel IV.: text/prompt/response validator
+      "geall_license.adb",              -- Geall: Household license validator
+      "translation_validator.adb"        -- UTL: Translation ratio validator
    );
 
    package Compiler is
       for Default_Switches ("Ada") use 
          ("-gnat2022",      -- Ada 2022 standard
-          "-gnatwa",        -- Všechna varování
-          "-gnatwe",        -- Varování jako chyby
+          "-gnatW8",        -- UTF-8 encoding
+          "-gnatwa",        -- Vsechna varovani
           "-gnato",         -- Overflow checking
           "-fstack-check",  -- Stack checking
           "-gnatVa",        -- Validity checking

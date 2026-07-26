@@ -58,10 +58,57 @@
 
     /* HERO */
     .hero {
+      position: relative;
       text-align: center;
       padding: 8rem 2rem 6rem;
       max-width: 900px;
       margin: 0 auto;
+      overflow: visible;
+    }
+
+    #sunCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .orbiting-text-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orbit-svg {
+      width: 100%;
+      height: 100%;
+      animation: orbitRotate 20s linear infinite;
+    }
+
+    .orbit-text {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 13px;
+      fill: var(--gold);
+      opacity: 0.5;
+      letter-spacing: 3px;
+    }
+
+    @keyframes orbitRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .crown {
@@ -412,19 +459,34 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="crown">👑</div>
-    <div class="history-badge">
-      Named after <strong>Charles IV</strong> — King of Bohemia, fluent in <strong>7 languages</strong>. 1316–1378.
-    </div>
-    <h1>KAREL IV.</h1>
-    <div class="tagline">Real-time AI Voice Translation</div>
-    <p class="description">
-      Speak in Czech. Be heard in Japanese.<br>
-      In your own voice. In virtual reality.
-    </p>
-    <div class="cta-group">
-      <a href="#demo" class="btn-primary">Try the Demo</a>
-      <a href="#waitlist" class="btn-secondary">Get Early Access</a>
+    <canvas id="sunCanvas"></canvas>
+    <div class="hero-content">
+      <div class="orbiting-text-container">
+        <svg viewBox="0 0 300 300" class="orbit-svg">
+          <defs>
+            <path id="orbitPath" d="M 150,150 m -100,0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"/>
+          </defs>
+          <text class="orbit-text">
+            <textPath href="#orbitPath">
+              1+1=3 · WEB4 · MESH · 1+1=3 · WEB4 · MESH · 1+1=3 · WEB4 · MESH ·
+            </textPath>
+          </text>
+        </svg>
+      </div>
+      <div class="crown">👑</div>
+      <div class="history-badge">
+        Named after <strong>Charles IV</strong> — King of Bohemia, fluent in <strong>7 languages</strong>. 1316–1378.
+      </div>
+      <h1>KAREL IV.</h1>
+      <div class="tagline">Real-time AI Voice Translation</div>
+      <p class="description">
+        Speak in Czech. Be heard in Japanese.<br>
+        In your own voice. In virtual reality.
+      </p>
+      <div class="cta-group">
+        <a href="#demo" class="btn-primary">Try the Demo</a>
+        <a href="#waitlist" class="btn-secondary">Get Early Access</a>
+      </div>
     </div>
   </section>
 
@@ -488,24 +550,20 @@
         <p>Core logic verified with Ada/SPARK formal verification. Guaranteed no runtime errors in the translation pipeline.</p>
       </div>
       <div class="feature-card">
-        <h3>⛓️ Blockchain Payments</h3>
-        <p>Pay per minute via Ethereum. No subscriptions, no accounts. Just translate and pay.</p>
+        <h3>⛓️ Platba přes Ethereum</h3>
+        <p>Platba předplatného přes vlastní Geth node. Bez prostředníků, bez banky. Čistá P2P transakce.</p>
       </div>
       <div class="feature-card">
-        <h3>🌐 7+ Languages</h3>
-        <p>Czech, English, German, French, Japanese, Spanish, Italian — and growing. Like Karel IV. himself.</p>
+        <h3>🌐 Všechny jazyky</h3>
+        <p>Gemini AI překládá do jakéhokoliv jazyka na světě — bez omezení. Čeština, japonština, svahilština, arabština. Cokoliv.</p>
       </div>
       <div class="feature-card">
         <h3>🥽 Virtual Reality Ready</h3>
         <p>Walk into a VR meeting speaking Czech, be heard in Japanese. Karel IV. runs in the background — zero latency, zero setup.</p>
       </div>
       <div class="feature-card">
-        <h3>🌐 Mesh Network</h3>
-        <p>Every Karel IV. installation contributes idle CPU/GPU to the mesh. More users = more power. Zero cloud costs.</p>
-      </div>
-      <div class="feature-card">
-        <h3>💰 Earn ETH</h3>
-        <p>Share idle hardware with the mesh, earn Sepolia ETH credits. Your hardware pays for your subscription.</p>
+        <h3>🌐 Mesh síť — Sepolia ETH jako palivo</h3>
+        <p>Každý uzel v síti pohání Sepolia ETH — automaticky, bez nastavení. Čím více uzlů, tím silnější síť. Nikdo to nevidí, všichni z toho těží.</p>
       </div>
       <div class="feature-card">
         <h3>🔒 Privacy First</h3>
@@ -568,7 +626,7 @@
         <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
         <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
           <li>✓ AI personal assistant</li>
-          <li>✓ Czech &amp; English</li>
+          <li>✓ Všechny jazyky</li>
           <li>✓ Privacy Protocol 4:23</li>
           <li>✓ 1 device</li>
         </ul>
@@ -623,7 +681,7 @@
 
     </div>
     <p style="margin-top: 2rem; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem;">
-      Paid via Ethereum · Cancel anytime · No hidden fees
+      Platba přes Geth node · Zrušení kdykoliv · Žádné skryté poplatky
     </p>
   </section>
 
@@ -660,6 +718,90 @@
   </footer>
 
   <script>
+    // ===== ŽHNOUCÍ SLUNCE =====
+    const canvas = document.getElementById('sunCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let time = 0;
+
+    function drawSun() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height * 0.42;
+
+      // Outer glow layers
+      for (let i = 5; i > 0; i--) {
+        const radius = 180 + i * 60 + Math.sin(time * 0.8 + i) * 15;
+        const alpha = 0.03 + i * 0.01;
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        gradient.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
+        gradient.addColorStop(0.5, `rgba(255, 140, 20, ${alpha * 0.5})`);
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+
+      // Corona rays
+      const rayCount = 24;
+      for (let i = 0; i < rayCount; i++) {
+        const angle = (i / rayCount) * Math.PI * 2 + time * 0.3;
+        const rayLen = 120 + Math.sin(time * 1.5 + i * 0.7) * 40;
+        const rayWidth = 2 + Math.sin(time + i) * 1;
+        const alpha = 0.15 + Math.sin(time * 0.5 + i) * 0.08;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        const rayGrad = ctx.createLinearGradient(80, 0, 80 + rayLen, 0);
+        rayGrad.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
+        rayGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
+        ctx.beginPath();
+        ctx.moveTo(80, -rayWidth / 2);
+        ctx.lineTo(80 + rayLen, 0);
+        ctx.lineTo(80, rayWidth / 2);
+        ctx.fillStyle = rayGrad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Core sun
+      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
+      coreGrad.addColorStop(0, 'rgba(255, 255, 220, 0.95)');
+      coreGrad.addColorStop(0.3, 'rgba(255, 200, 50, 0.8)');
+      coreGrad.addColorStop(0.7, 'rgba(255, 140, 20, 0.4)');
+      coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, 90, 0, Math.PI * 2);
+      ctx.fillStyle = coreGrad;
+      ctx.fill();
+
+      // Pulse
+      const pulseR = 75 + Math.sin(time * 2) * 5;
+      const pulseGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseR);
+      pulseGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      pulseGrad.addColorStop(1, 'rgba(255, 220, 80, 0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+      ctx.fillStyle = pulseGrad;
+      ctx.fill();
+
+      time += 0.02;
+      requestAnimationFrame(drawSun);
+    }
+
+    drawSun();
+
+    // ===== LANG / DEMO =====
     let selectedLang = 'EN';
     let isRecording = false;
 
@@ -681,7 +823,6 @@
         btn.textContent = '⏹️';
         status.textContent = '🎙️ Listening... speak now';
 
-        // Simulate translation after 2s
         setTimeout(() => {
           status.textContent = '⚙️ Ada/SPARK validating...';
           setTimeout(() => {

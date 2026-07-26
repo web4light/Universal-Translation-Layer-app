@@ -1,19 +1,19 @@
 --  ============================================================================
 --  Geall License Validator - Ada/SPARK 2022
 --
---  Účel: Validace Household licence (plán 423 Kč/měsíc)
---        Air-gapped — NEKOMUNIKUJE s Vakuovou Mincovnou přímo.
---        Kontroluje Standard 700 silver-gram invariant lokálně.
+--  --el: Validace Household licence (pl-n 423 K-/m-s-c)
+--        Air-gapped - NEKOMUNIKUJE s Vakuovou Mincovnou p--mo.
+--        Kontroluje Standard 700 silver-gram invariant lok-ln-.
 --
---  Standard 700: 12g stříbra = 1 mince
+--  Standard 700: 12g st--bra = 1 mince
 --
---  Použití:
+--  Pou-it-:
 --    geall_license.exe --license-id <id>
 --
---  Výstup (stdout):
+--  V-stup (stdout):
 --    {"active": <bool>, "plan": "<str>", "expires_unix": <float>, "device_count": <int>}
 --
---  Autor: Pan Jeskyně
+--  Autor: Pan Jeskyn-
 --  Asistent: Kiro (Claude Sonnet 4.5)
 --  ============================================================================
 
@@ -32,35 +32,35 @@ is
    --  KONSTANTY - STANDARD 700 & HOUSEHOLD PLAN
    --  ===========================================================================
 
-   STANDARD_700_SILVER  : constant Float   := 12.0;   -- 12g stříbra na minci
-   HOUSEHOLD_PRICE_CZK  : constant Natural := 423;    -- 423 Kč/měsíc
-   HOUSEHOLD_MAX_DEVICES : constant Natural := 10;    -- max zařízení v domácnosti
-   SUBSCRIPTION_SECONDS : constant Float   := 2_592_000.0; -- 30 × 86400 s
+   STANDARD_700_SILVER  : constant Float   := 12.0;   -- 12g st--bra na minci
+   HOUSEHOLD_PRICE_CZK  : constant Natural := 423;    -- 423 K-/m-s-c
+   HOUSEHOLD_MAX_DEVICES : constant Natural := 10;    -- max za--zen- v dom-cnosti
+   SUBSCRIPTION_SECONDS : constant Float   := 2_592_000.0; -- 30 - 86400 s
 
-   --  Simulovaná "aktuální" Unix epocha (při air-gap provozu není síť)
-   --  V produkci by toto bylo čteno z RTC / protected hardware clock.
+   --  Simulovan- "aktu-ln-" Unix epocha (p-i air-gap provozu nen- s--)
+   --  V produkci by toto bylo -teno z RTC / protected hardware clock.
    DEMO_NOW_UNIX        : constant Float   := 1_750_000_000.0;
 
    --  ===========================================================================
    --  TYPY DLE DESIGN DOKUMENTU
    --  ===========================================================================
 
-   --  Počet mincí — nezáporné celé číslo
+   --  Po-et minc- - nez-porn- cel- --slo
    type Coin_Amount is new Natural;
 
-   --  Operační paměť v MB (0 .. 512) — hard ceiling systému
+   --  Opera-n- pam-- v MB (0 .. 512) - hard ceiling syst-mu
    type Memory_MB is new Natural range 0 .. 512;
 
-   --  Silver amount — nezáporné desetinné číslo
+   --  Silver amount - nez-porn- desetinn- --slo
    type Silver_Amount is digits 15 range 0.0 .. 1.0E12;
 
    --  ===========================================================================
-   --  FORMÁLNĚ OVĚŘENÁ FUNKCE — STANDARD 700 INVARIANT
+   --  FORM-LN- OV--EN- FUNKCE - STANDARD 700 INVARIANT
    --  ===========================================================================
 
-   --  Vrátí počet mincí z dané hmotnosti stříbra.
-   --  Pre:  Silver_Grams musí být >= 0.0
-   --  Post: Je-li stříbra méně než 12g, výsledek = 0; jinak výsledek > 0.
+   --  Vr-t- po-et minc- z dan- hmotnosti st--bra.
+   --  Pre:  Silver_Grams mus- b-t >= 0.0
+   --  Post: Je-li st--bra m-n- ne- 12g, v-sledek = 0; jinak v-sledek > 0.
    function Calculate_Coins_From_Silver
       (Silver_Grams : Silver_Amount) return Coin_Amount
    with
@@ -79,20 +79,20 @@ is
    end Calculate_Coins_From_Silver;
 
    --  ===========================================================================
-   --  LICENCE — VALIDACE HOUSEHOLD PLÁNU
+   --  LICENCE - VALIDACE HOUSEHOLD PL-NU
    --  ===========================================================================
 
-   --  Validate_Household zkontroluje silver-gram invariant pro zadané
-   --  license-id a zapíše JSON status řádek na stdout.
+   --  Validate_Household zkontroluje silver-gram invariant pro zadan-
+   --  license-id a zap--e JSON status --dek na stdout.
    --
-   --  Logika (air-gap, bez volání Mincovny):
-   --    1. License-id "HOUSEHOLD-*" → aktivní household plán
-   --    2. Jiné id    → neaktivní / neznámý plán
-   --    3. Standard 700 invariant se ověřuje na symbolické hodnotě
-   --       korespondující s household plánem (1 mince = 12g).
+   --  Logika (air-gap, bez vol-n- Mincovny):
+   --    1. License-id "HOUSEHOLD-*" - aktivn- household pl-n
+   --    2. Jin- id    - neaktivn- / nezn-m- pl-n
+   --    3. Standard 700 invariant se ov--uje na symbolick- hodnot-
+   --       koresponduj-c- s household pl-nem (1 mince = 12g).
    procedure Validate_Household (License_Id : String) is
 
-      --  Symbolická silver hodnota odpovídající 1 household minci
+      --  Symbolick- silver hodnota odpov-daj-c- 1 household minci
       Household_Silver : constant Silver_Amount := Silver_Amount (STANDARD_700_SILVER);
 
       Coins       : Coin_Amount;
@@ -101,14 +101,14 @@ is
       Expires_Unix : Float;
       Device_Count : Natural;
 
-      --  Minimální in-place Boolean → JSON-string konverze
+      --  Minim-ln- in-place Boolean - JSON-string konverze
       function Bool_To_JSON (B : Boolean) return String is
       begin
          if B then return "true"; else return "false"; end if;
       end Bool_To_JSON;
 
    begin
-      --  Standard 700 invariant check — musí projít pro jakékoli kladné id
+      --  Standard 700 invariant check - mus- proj-t pro jak-koli kladn- id
       Coins := Calculate_Coins_From_Silver (Household_Silver);
 
       --  Detekce household licence podle prefixu
@@ -127,7 +127,7 @@ is
          Device_Count := 0;
       end if;
 
-      --  JSON výstup (jedna řádka, bez whitespace navíc — Python subprocess ho parsuje)
+      --  JSON v-stup (jedna --dka, bez whitespace nav-c - Python subprocess ho parsuje)
       Put_Line ("{""active"": " & Bool_To_JSON (Is_Active)
                & ", ""plan"": """ & To_String (Plan_Name) & """"
                & ", ""expires_unix"": " & Float'Image (Expires_Unix)
@@ -136,7 +136,7 @@ is
    end Validate_Household;
 
    --  ===========================================================================
-   --  VSTUPNÍ BOD — CLI ARGUMENT PARSING
+   --  VSTUPN- BOD - CLI ARGUMENT PARSING
    --  ===========================================================================
 
    License_Id_Value : Unbounded_String := To_Unbounded_String ("");
@@ -144,7 +144,7 @@ is
    Arg_Index        : Natural;
 
 begin
-   --  Parsování --license-id <value>
+   --  Parsov-n- --license-id <value>
    Arg_Index := 1;
    while Arg_Index <= Argument_Count loop
       if Argument (Arg_Index) = "--license-id" then
@@ -171,7 +171,7 @@ begin
       return;
    end if;
 
-   --  Validace a JSON výstup
+   --  Validace a JSON v-stup
    Validate_Household (To_String (License_Id_Value));
 
 end Geall_License;

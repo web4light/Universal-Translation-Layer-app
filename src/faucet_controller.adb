@@ -11,7 +11,6 @@
 
 with Ada.Text_IO;
 with Ada.Real_Time;
-with Ada.Numerics.Float_Random;
 
 procedure Faucet_Controller with
    SPARK_Mode => On
@@ -26,7 +25,6 @@ is
    STANDARD_700_SILVER : constant Float := 12.0;  -- 12g stříbra
    MAX_NODES           : constant Natural := 1024; -- Max P2P uzlů
    MAX_STREAMS         : constant Natural := 100;  -- Max concurrent streams
-   FAILOVER_TIMEOUT    : constant Duration := 15.0; -- Shadow failover
    
    --  =========================================================================
    --  TYPY
@@ -36,15 +34,17 @@ is
    type Stream_ID is range 1 .. MAX_STREAMS;
    
    type Node_Status is (Offline, Online, Busy, Failed);
+   pragma Unreferenced (Busy, Failed);
    type Stream_Status is (Idle, Active, Paused, Error);
+   pragma Unreferenced (Paused, Error);
    
    type Network_Node is record
       ID          : Node_ID;
       Status      : Node_Status;
       IP_Address  : String (1 .. 15);  -- IPv4 format
       Port        : Natural range 1024 .. 65535;
-      Silver_Paid : Float;             -- Sepolia ETH → silver
-      Coins       : Natural;           -- Vyražené mince
+      Silver_Paid : Float;             -- Sepolia ETH * silver
+      Coins       : Natural;           -- Vyrazene mince
    end record;
    
    type Dubbing_Stream is record
@@ -129,11 +129,11 @@ is
          Node.Status := Online;
          Active_Nodes := Active_Nodes + 1;
          
-         Put_Line ("[FAUCET] ✓ Node registered: ID=" & Node_ID'Image (Node.ID));
+         Put_Line ("[FAUCET] * Node registered: ID=" & Node_ID'Image (Node.ID));
          Put_Line ("[FAUCET]   Silver: " & Float'Image (Silver) & "g");
          Put_Line ("[FAUCET]   Coins: " & Natural'Image (Coins));
       else
-         Put_Line ("[FAUCET] ✗ Insufficient silver for node registration");
+         Put_Line ("[FAUCET] * Insufficient silver for node registration");
          Node.Status := Offline;
       end if;
    end Register_Node;
@@ -158,15 +158,44 @@ is
       
       Total_Streams := Total_Streams + 1;
       
-      Put_Line ("[FAUCET] ✓ Dubbing stream started");
+      Put_Line ("[FAUCET] * Dubbing stream started");
       Put_Line ("[FAUCET]   Stream ID: " & Stream_ID'Image (Stream.ID));
-      Put_Line ("[FAUCET]   Source→Target: " & 
-                Node_ID'Image (Source) & " → " & 
+      Put_Line ("[FAUCET]   Source*Target: " & 
+                Node_ID'Image (Source) & " * " & 
                 Node_ID'Image (Target));
       Put_Line ("[FAUCET]   Language: " & Lang);
    end Start_Dubbing_Stream;
    
    
+   --  =========================================================================
+   --  IP WHITELIST ACCESS CONTROL
+   --  =========================================================================
+
+   SOVEREIGN_IP : constant String := "216.198.79.1";
+   LOCAL_SUBNET : constant String := "192.168.123.";
+
+   function Verify_IP_Access (IP : String) return Boolean
+     with
+       Pre  => IP'Length >= 7 and IP'Length <= 15,
+       Post => Verify_IP_Access'Result =
+               (IP = SOVEREIGN_IP or else
+                (IP'Length >= LOCAL_SUBNET'Length and then
+                 IP (IP'First .. IP'First + LOCAL_SUBNET'Length - 1) = LOCAL_SUBNET))
+   is
+   begin
+      if IP = SOVEREIGN_IP then
+         return True;
+      end if;
+
+      if IP'Length >= LOCAL_SUBNET'Length and then
+         IP (IP'First .. IP'First + LOCAL_SUBNET'Length - 1) = LOCAL_SUBNET
+      then
+         return True;
+      end if;
+
+      return False;
+   end Verify_IP_Access;
+
    --  =========================================================================
    --  MAIN LOGIC
    --  =========================================================================
@@ -189,6 +218,8 @@ is
       Coins       => 0
    );
    
+   Start_Time : constant Ada.Calendar.Time := Clock;
+
    Stream_1 : Dubbing_Stream := (
       ID          => 1,
       Status      => Idle,
@@ -196,7 +227,7 @@ is
       Target_Node => 2,
       Language    => "cs",
       Quality     => 0,
-      Started_At  => Clock
+      Started_At  => Start_Time
    );
    
    Health : Float;
@@ -204,10 +235,10 @@ is
 begin
    Put_Line ("");
    Put_Line ("============================================================");
-   Put_Line ("🌊 FAUCET CONTROLLER - Ada/SPARK");
+   Put_Line ("** FAUCET CONTROLLER - Ada/SPARK");
    Put_Line ("============================================================");
    Put_Line ("[FAUCET] Standard 700: " & 
-             Float'Image (STANDARD_700_SILVER) & "g stříbra");
+             Float'Image (STANDARD_700_SILVER) & "g stribra");
    Put_Line ("[FAUCET] Max nodes: " & Natural'Image (MAX_NODES));
    Put_Line ("[FAUCET] Max streams: " & Natural'Image (MAX_STREAMS));
    Put_Line ("============================================================");
@@ -222,11 +253,11 @@ begin
    Put_Line ("");
    
    --  Registrace Node 1 (Primary)
-   Register_Node (Node_1, 120.0);  -- 10 mincí
+   Register_Node (Node_1, 120.0);  -- 10 minci
    Put_Line ("");
    
    --  Registrace Node 2 (Shadow)
-   Register_Node (Node_2, 144.0);  -- 12 mincí
+   Register_Node (Node_2, 144.0);  -- 12 minci
    Put_Line ("");
    
    --  Network health check
@@ -241,7 +272,7 @@ begin
    if Is_Node_Available (Node_1) and Is_Node_Available (Node_2) then
       Start_Dubbing_Stream (Stream_1, 1, 2, "cs");
    else
-      Put_Line ("[FAUCET] ✗ Cannot start stream - nodes unavailable");
+      Put_Line ("[FAUCET] * Cannot start stream - nodes unavailable");
    end if;
    
    Put_Line ("");
@@ -253,7 +284,7 @@ begin
    Put_Line ("[FAUCET] Network health: " & Float'Image (Health * 100.0) & "%");
    Put_Line ("============================================================");
    Put_Line ("");
-   Put_Line ("[FAUCET] ✓ Faucet Controller running");
+   Put_Line ("[FAUCET] * Faucet Controller running");
    Put_Line ("[FAUCET] Integration: Gemini AI dubbing engine");
    Put_Line ("");
    

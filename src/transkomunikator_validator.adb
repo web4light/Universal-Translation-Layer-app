@@ -1,20 +1,28 @@
 --  ============================================================================
---  Transkomunikátor Validator - Ada/SPARK audio PCM validator
+--  Transkomunik-tor Validator - Ada/SPARK audio PCM validator
 --
---  Účel: Validates PCM audio file for use in the translation pipeline.
+--  --el: Validates PCM audio file for use in the translation pipeline.
 --        Reads PCM file path from --pcm CLI argument.
 --        Validates:
---          1. Sample rate >= 16000 Hz  (WAV header field)
---          2. Frame integrity          (data chunk size divisible by frame size)
+--          1. Sample rate >= 16000 Hz
+--          2. Frame integrity (data_bytes divisible by frame_size)
+--
+--  CLI:
+--    transkomunikator_validator --pcm <path> [--rate <sample_rate>] [--frame-size <N>]
 --
 --  Exit codes:
---    0 = valid
---    1 = invalid (reason printed to stdout)
+--    0 = valid   (stdout: "OK: PCM valid - sample_rate=NNNNN, frames=N")
+--    1 = invalid (stdout: "INVALID: sample_rate below 16000"
+--                      or "INVALID: data_bytes not aligned to frame_size")
 --    2 = usage error / file not found
 --
---  Standard 700: 12g stříbra = 1 mince
---  Requirements: 1.1, 1.5
---  Autor: Pan Jeskyně
+--  Standard 700: 12g st--bra = 1 mince
+--  Requirements: 3.1, 4.2, 4.4
+--  Property 2 (design.md): For any Audio_Chunk_Meta with sample_rate in
+--    range 0..96000 and frame_size > 0, the SPARK audio validator SHALL
+--    accept if and only if sample_rate >= 16000 AND data_bytes is a whole
+--    multiple of frame_size.
+--  Autor: Pan Jeskyn-
 --  Asistent: Kiro
 --  ============================================================================
 
@@ -22,40 +30,16 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Streams.Stream_IO;
 with Interfaces;
+with Pipeline_Types;
 
 procedure Transkomunikator_Validator with
    SPARK_Mode => On
 is
-   pragma SPARK_Mode (On);
-
    use Ada.Text_IO;
 
    --  =========================================================================
-   --  TYPES
+   --  PURE VALIDATION FUNCTIONS  (SPARK_Mode On - no I/O)
    --  =========================================================================
-
-   --  Range-constrained type: pipeline latency in milliseconds
-   type Latency_Ms is new Natural range 0 .. 10_000;
-
-   --  Fixed-point confidence score in [0.0 .. 1.0]
-   type Confidence_Score is delta 0.01 range 0.0 .. 1.0;
-
-   --  Minimum acceptable sample rate (Hz)
-   MIN_SAMPLE_RATE : constant := 16_000;
-
-   --  =========================================================================
-   --  PURE VALIDATION FUNCTIONS  (SPARK_Mode On — no I/O)
-   --  =========================================================================
-
-   --  True when the supplied sample rate meets the pipeline minimum.
-   function Sample_Rate_Valid (Sample_Rate : Natural) return Boolean
-      with
-         Pre  => Sample_Rate >= 0,
-         Post => Sample_Rate_Valid'Result = (Sample_Rate >= MIN_SAMPLE_RATE)
-   is
-   begin
-      return Sample_Rate >= MIN_SAMPLE_RATE;
-   end Sample_Rate_Valid;
 
    --  True when the data chunk size is a whole multiple of the frame size.
    --  Frame_Size must be > 0 to avoid division by zero (enforced by Pre).
@@ -71,17 +55,39 @@ is
       return Data_Bytes rem Frame_Size = 0;
    end Frames_Integral;
 
+   --  Combined audio PCM validation predicate - Property 2 from design.md:
+   --  "For any Audio_Chunk_Meta with sample_rate in range 0..96000 and
+   --   frame_size > 0, the SPARK audio validator SHALL accept if and only
+   --   if sample_rate >= 16000 AND data_bytes is a whole multiple of
+   --   frame_size."
+   --  Reuses Pipeline_Types.Is_Valid_Sample_Rate rather than redefining the
+   --  minimum-sample-rate constant/check locally.
+   function Validate_Audio_PCM
+      (Sample_Rate : Natural;
+       Data_Bytes  : Natural;
+       Frame_Size  : Positive)
+       return Boolean
+      with
+         Pre  => Frame_Size > 0,
+         Post => Validate_Audio_PCM'Result =
+                 (Pipeline_Types.Is_Valid_Sample_Rate (Sample_Rate) and then
+                  Data_Bytes rem Frame_Size = 0)
+   is
+   begin
+      return Pipeline_Types.Is_Valid_Sample_Rate (Sample_Rate)
+         and then Frames_Integral (Data_Bytes, Frame_Size);
+   end Validate_Audio_PCM;
+
    --  =========================================================================
-   --  WAV HEADER I/O SUBPROGRAMS  (SPARK_Mode Off — OS interaction)
+   --  WAV HEADER I/O SUBPROGRAMS  (SPARK_Mode Off - OS interaction)
    --  =========================================================================
 
    --  Read little-endian 16-bit unsigned value from a byte pair.
    function LE16 (Lo, Hi : Interfaces.Unsigned_8) return Natural
       with SPARK_Mode => Off
    is
-      use Interfaces;
    begin
-      return Natural (Lo) or (Natural (Hi) * 256);
+      return Natural (Lo) + (Natural (Hi) * 256);
    end LE16;
 
    --  Read little-endian 32-bit unsigned value from four bytes.
@@ -90,12 +96,11 @@ is
        return Natural
       with SPARK_Mode => Off
    is
-      use Interfaces;
    begin
       return Natural (B0)
-        or (Natural (B1) * 256)
-        or (Natural (B2) * 65_536)
-        or (Natural (B3) * 16_777_216);
+        + (Natural (B1) * 256)
+        + (Natural (B2) * 65_536)
+        + (Natural (B3) * 16_777_216);
    end LE32;
 
    --  Attempt to parse the 44-byte canonical WAV/RIFF header.
@@ -113,10 +118,11 @@ is
        Data_Bytes      : out Natural)
       with SPARK_Mode => Off
    is
+      use Ada.Streams;
       use Ada.Streams.Stream_IO;
       use Interfaces;
 
-      File    : File_Type;
+      File    : Ada.Streams.Stream_IO.File_Type;
       Buffer  : Ada.Streams.Stream_Element_Array (1 .. 44);
       Last    : Ada.Streams.Stream_Element_Offset;
 
@@ -207,7 +213,7 @@ is
    end Read_Wav_Header;
 
    --  =========================================================================
-   --  CLI ARGUMENT HELPERS  (SPARK_Mode Off — Ada.Command_Line)
+   --  CLI ARGUMENT HELPERS  (SPARK_Mode Off - Ada.Command_Line)
    --  =========================================================================
 
    --  Scan argv for "--pcm" and return the following argument, or "".
@@ -249,14 +255,6 @@ is
    --  Derived frame size (bytes per interleaved sample across all channels)
    Frame_Size      : Natural  := 0;
 
-   --  Confidence score placeholder — assigned after successful validation
-   Confidence      : Confidence_Score := 0.0;
-   pragma Unreferenced (Confidence);
-
-   --  Latency estimate placeholder (not measured at validation stage)
-   Latency         : Latency_Ms := 0;
-   pragma Unreferenced (Latency);
-
 begin
    --  -------------------------------------------------------------------------
    --  Usage check
@@ -285,9 +283,9 @@ begin
    end if;
 
    --  -------------------------------------------------------------------------
-   --  Validate sample rate  (Requirement 1.5: >= 16000 Hz)
+   --  Validate sample rate  (Requirement 3.1: >= 16000 Hz)
    --  -------------------------------------------------------------------------
-   if not Sample_Rate_Valid (Sample_Rate) then
+   if not Pipeline_Types.Is_Valid_Sample_Rate (Sample_Rate) then
       Put_Line
          ("INVALID: sample rate " & Natural'Image (Sample_Rate) &
           " Hz is below minimum 16000 Hz");
@@ -313,7 +311,10 @@ begin
       return;
    end if;
 
-   if not Frames_Integral (Data_Bytes, Frame_Size) then
+   --  Validate_Audio_PCM (Property 2) combines both checks; re-verified
+   --  here individually above so a precise reason can be reported, but the
+   --  combined predicate is the authoritative SPARK-contracted gate below.
+   if not Validate_Audio_PCM (Sample_Rate, Data_Bytes, Frame_Size) then
       Put_Line
          ("INVALID: data chunk size " & Natural'Image (Data_Bytes) &
           " bytes is not a whole multiple of frame size " &
@@ -325,10 +326,7 @@ begin
    --  -------------------------------------------------------------------------
    --  All checks passed
    --  -------------------------------------------------------------------------
-   Confidence := 1.0;
-   Latency    := 0;
-
-   Put_Line ("OK: PCM valid — " &
+   Put_Line ("OK: PCM valid - " &
              Natural'Image (Sample_Rate) & " Hz, " &
              Natural'Image (Channels) & " ch, " &
              Natural'Image (Bits_Per_Sample) & " bit, " &
