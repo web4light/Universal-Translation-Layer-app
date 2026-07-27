@@ -1,853 +1,297 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="la">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karel IV. — Real-time AI Voice Translator | AsgardLab</title>
-  <meta name="description" content="Speak in any language. Be heard in yours. Karel IV. by AsgardLab translates your voice in real-time, preserving your own voice identity.">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Translation Layer — Bifrost Gate</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --gold: #c9a84c;
-      --dark: #0d0d0d;
-      --dark2: #1a1a1a;
-      --dark3: #242424;
-      --text: #e8e8e8;
-      --muted: #888;
-      --accent: #c9a84c;
-    }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #07090E;
+            color: #e8e6e3;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
 
-    body {
-      font-family: 'Georgia', serif;
-      background: var(--dark);
-      color: var(--text);
-      line-height: 
-    /* NAV */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 4rem;
-      border-bottom: 1px solid #222;
-      position: sticky;
-      top: 0;
-      background: var(--dark);
-      z-index: 100;
-    }
+        /* === SPLASH SCREEN === */
+        #splash {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 0.8s ease;
+        }
 
-    .logo {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: var(--gold);
-      letter-spacing: 2px;
-    }
+        #splash.hidden { opacity: 0; pointer-events: none; }
 
-    .logo span { color: var(--text); font-weight: normal; }
+        .splash-title {
+            font-size: clamp(1.4rem, 4vw, 2.8rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            text-align: center;
+            margin-bottom: 0.5em;
+            opacity: 0.9;
+        }
 
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      margin-left: 2rem;
-      font-size: 0.9rem;
-      font-family: 'Helvetica Neue', sans-serif;
-      transition: color 0.2s;
-    }
+        .splash-subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 2em;
+        }
 
-    nav a:hover { color: var(--gold); }
+        .splash-motto {
+            margin: 1.5em 0;
+            text-align: center;
+        }
 
-    /* HERO */
-    .hero {
-      position: relative;
-      text-align: center;
-      padding: 8rem 2rem 6rem;
-      max-width: 900px;
-      margin: 0 auto;
-      overflow: visible;
-    }
+        .splash-motto .latin {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 0.3em;
+        }
 
-    #sunCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      pointer-events: none;
-    }
+        .splash-motto .english {
+            font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+            color: #666;
+            display: block;
+        }
 
-    .hero-content {
-      position: relative;
-      z-index: 1;
-    }
+        /* === LANGUAGE SELECTOR === */
+        #lang-selector {
+            margin-top: 2em;
+            text-align: center;
+        }
 
-    .orbiting-text-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 600px;
-      pointer-events: none;
-      z-index: 0;
-    }
+        #lang-selector label {
+            display: block;
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 0.8em;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
 
-    .orbit-svg {
-      width: 100%;
-      height: 100%;
-      animation: orbitRotate 20s linear infinite;
-    }
+        #lang-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5em;
+            max-width: 600px;
+        }
 
-    .orbit-text {
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 13px;
-      fill: var(--gold);
-      opacity: 0.5;
-      letter-spacing: 3px;
-    }
+        .lang-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+            padding: 0.6em;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.6rem;
+            transition: all 0.3s ease;
+            line-height: 1;
+            width: 3em;
+            height: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    @keyframes orbitRotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+        .lang-btn:hover {
+            border-color: rgba(110, 68, 255, 0.5);
+            background: rgba(110, 68, 255, 0.08);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(110, 68, 255, 0.2);
+        }
 
-    .crown {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
+        /* === BIFROST TUNNEL === */
+        #bifrost {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            perspective: 800px;
+        }
 
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      color: var(--gold);
-      letter-spacing: 4px;
-      margin-bottom: 0.5rem;
-    }
+        #bifrost.active { display: flex; }
 
-    .hero .tagline {
-      font-size: 1.1rem;
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-    }
+        .tunnel {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center,
+                transparent 0%,
+                rgba(110, 68, 255, 0.05) 20%,
+                rgba(0, 212, 255, 0.08) 40%,
+                rgba(110, 68, 255, 0.12) 60%,
+                rgba(255, 184, 0, 0.05) 80%,
+                #07090E 100%
+            );
+            animation: tunnelPulse 0.4s ease-in-out infinite alternate;
+        }
 
-    .hero .description {
-      font-size: 1.25rem;
-      color: var(--text);
-      max-width: 650px;
-      margin: 0 auto 3rem;
-      line-height: 1.8;
-    }
+        @keyframes tunnelPulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
 
-    .cta-group {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+        .tunnel-rings {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .btn-primary {
-      background: var(--gold);
-      color: var(--dark);
-      padding: 0.9rem 2.5rem;
-      border: none;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      font-family: 'Helvetica Neue', sans-serif;
-      letter-spacing: 1px;
-      transition: opacity 0.2s;
-      text-decoration: none;
-    }
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid;
+            animation: ringFly 2s linear infinite;
+            opacity: 0;
+        }
 
-    .btn-primary:hover { opacity: 0.85; }
+        @keyframes ringFly {
+            0% { transform: scale(0.01) translateZ(-500px); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.3; }
+            100% { transform: scale(3) translateZ(200px); opacity: 0; }
+        }
 
-    .btn-secondary {
-      background: transparent;
-      color: var(--gold);
-      padding: 0.9rem 2.5rem;
-      border: 1px solid var(--gold);
-      font-size: 1rem;
-      cursor: pointer;
-      font-family: 'Helvetica Neue', sans-serif;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
+        .morph-text {
+            position: relative;
+            z-index: 5;
+            text-align: center;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #fff;
+            text-shadow: 0 0 20px rgba(110, 68, 255, 0.8);
+            max-width: 80%;
+            line-height: 1.8;
+        }
 
-    .btn-secondary:hover {
-      background: var(--gold);
-      color: var(--dark);
-    }
+        .morph-text .line {
+            display: block;
+            margin: 0.5em 0;
+            transition: opacity 0.3s;
+        }
 
-    /* HOW IT WORKS */
-    .pipeline {
-      background: var(--dark2);
-      padding: 5rem 2rem;
-      text-align: center;
-    }
+        /* === MIDGARD (POST-LANDING) === */
+        #midgard {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
 
-    .pipeline h2 {
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
-      letter-spacing: 2px;
-    }
+        #midgard.active { display: flex; opacity: 1; }
 
-    .pipeline .subtitle {
-      color: var(--muted);
-      margin-bottom: 3rem;
-      font-family: 'Helvetica Neue', sans-serif;
-    }
+        .midgard-title {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5em;
+        }
 
-    .steps {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
+        .midgard-subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: #888;
+            margin-bottom: 2em;
+        }
 
-    .step {
-      background: var(--dark3);
-      padding: 1.5rem;
-      width: 160px;
-      text-align: center;
-    }
+        .midgard-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            justify-content: center;
+        }
 
-    .step .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .midgard-link {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1em 1.5em;
+            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
+            color: #ccc;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
 
-    .step .label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+        .midgard-link:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+            color: #fff;
+        }
 
-    .step .name {
-      font-size: 0.95rem;
-      color: var(--gold);
-      margin-top: 0.3rem;
-    }
+        .midgard-link .icon { font-size: 1.5em; display: block; margin-bottom: 0.3em; }
+        .midgard-link .name { font-size: 0.9em; font-weight: 500; }
 
-    .arrow {
-      color: var(--gold);
-      font-size: 1.5rem;
-      padding: 0 0.5rem;
-    }
-
-    /* FEATURES */
-    .features {
-      padding: 5rem 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .features h2 {
-      text-align: center;
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 3rem;
-      letter-spacing: 2px;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .feature-card {
-      background: var(--dark2);
-      padding: 2rem;
-      border-left: 3px solid var(--gold);
-    }
-
-    .feature-card h3 {
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-      font-size: 1.1rem;
-    }
-
-    .feature-card p {
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    /* DEMO SECTION */
-    .demo-section {
-      background: var(--dark2);
-      padding: 5rem 2rem;
-      text-align: center;
-    }
-
-    .demo-section h2 {
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      letter-spacing: 2px;
-    }
-
-    .demo-section p {
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      margin-bottom: 2rem;
-    }
-
-    .demo-box {
-      background: var(--dark3);
-      border: 1px solid #333;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .lang-select {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-
-    .lang-btn {
-      background: var(--dark2);
-      color: var(--text);
-      border: 1px solid #444;
-      padding: 0.5rem 1.2rem;
-      cursor: pointer;
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-
-    .lang-btn.active, .lang-btn:hover {
-      background: var(--gold);
-      color: var(--dark);
-      border-color: var(--gold);
-    }
-
-    .mic-btn {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: var(--gold);
-      border: none;
-      font-size: 2rem;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-      margin-bottom: 1rem;
-    }
-
-    .mic-btn:hover { transform: scale(1.05); }
-    .mic-btn.recording { opacity: 0.7; animation: pulse 1s infinite; }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .demo-status {
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 0.9rem;
-      min-height: 1.5rem;
-    }
-
-    /* TECH STACK */
-    .tech {
-      padding: 4rem 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .tech h2 {
-      font-size: 1.5rem;
-      color: var(--muted);
-      margin-bottom: 2rem;
-      font-family: 'Helvetica Neue', sans-serif;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .tech-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-    }
-
-    .pill {
-      background: var(--dark2);
-      border: 1px solid #333;
-      padding: 0.4rem 1rem;
-      font-size: 0.85rem;
-      font-family: 'Helvetica Neue', sans-serif;
-      color: var(--muted);
-    }
-
-    .pill.highlight {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    /* FOOTER */
-    footer {
-      border-top: 1px solid #222;
-      padding: 3rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    footer .logo { font-size: 1.1rem; }
-
-    footer p {
-      color: var(--muted);
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 0.85rem;
-    }
-
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      margin-left: 1.5rem;
-      font-size: 0.85rem;
-      font-family: 'Helvetica Neue', sans-serif;
-    }
-
-    .footer-links a:hover { color: var(--gold); }
-
-    /* HISTORY BADGE */
-    .history-badge {
-      display: inline-block;
-      background: var(--dark3);
-      border: 1px solid #333;
-      padding: 0.75rem 1.5rem;
-      margin-bottom: 2rem;
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 0.85rem;
-      color: var(--muted);
-      letter-spacing: 1px;
-    }
-
-    .history-badge strong { color: var(--gold); }
-  </style>
+        .footer {
+            position: absolute;
+            bottom: 1.5em;
+            font-size: 0.75rem;
+            color: #444;
+            letter-spacing: 0.1em;
+        }
+    </style>
 </head>
 <body>
+    <!-- SPLASH: Latin landing -->
+    <div id="splash">
+        <div class="splash-motto">
+            <span class="latin" data-key="motto1">Loquere lingua tua.</span>
+            <span class="english">Speak your language.</span>
+        </div>
+        <div class="splash-motto">
+            <span class="latin" data-key="motto2">Omnes te audient sua lingua.</span>
+            <span class="english">Everyone hears you in theirs.</span>
+        </div>
+        <div class="splash-motto">
+            <span class="latin" data-key="motto3">Tua voce.</span>
+            <span class="english">In your voice.</span>
+        </div>
 
-  <!-- NAV -->
-  <nav>
-    <div class="logo">KAREL <span>IV.</span></div>
-    <div>
-      <a href="#how">How it works</a>
-      <a href="#features">Features</a>
-      <a href="#demo">Demo</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#waitlist" class="btn-primary" style="padding: 0.5rem 1.5rem; margin-left: 2rem;">Early Access</a>
+        <div id="lang-selector">
+            <label>Elige linguam tuam — Choose your language</label>
+            <div id="lang-grid"></div>
+        </div>
+
+        <div class="footer">Mundus Novus · Web 4.23 · Standard 700</div>
     </div>
-  </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <canvas id="sunCanvas"></canvas>
-    <div class="hero-content">
-      <div class="orbiting-text-container">
-        <svg viewBox="0 0 300 300" class="orbit-svg">
-          <defs>
-            <path id="orbitPath" d="M 150,150 m -100,0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"/>
-          </defs>
-          <text class="orbit-text">
-            <textPath href="#orbitPath">
-              1+1=3 · WEB4 · MESH · 1+1=3 · WEB4 · MESH · 1+1=3 · WEB4 · MESH ·
-            </textPath>
-          </text>
-        </svg>
-      </div>
-      <div class="crown">👑</div>
-      <div class="history-badge">
-        Named after <strong>Charles IV</strong> — King of Bohemia, fluent in <strong>7 languages</strong>. 1316–1378.
-      </div>
-      <h1>KAREL IV.</h1>
-      <div class="tagline">Real-time AI Voice Translation</div>
-      <p class="description">
-        Speak in Czech. Be heard in Japanese.<br>
-        In your own voice. In virtual reality.
-      </p>
-      <div class="cta-group">
-        <a href="#demo" class="btn-primary">Try the Demo</a>
-        <a href="#waitlist" class="btn-secondary">Get Early Access</a>
-      </div>
+    <!-- BIFROST TUNNEL -->
+    <div id="bifrost">
+        <div class="tunnel"></div>
+        <div class="tunnel-rings" id="rings-container"></div>
+        <div class="morph-text" id="morph-text">
+            <span class="line" data-key="motto1">Loquere lingua tua.</span>
+            <span class="line" data-key="motto2">Omnes te audient sua lingua.</span>
+            <span class="line" data-key="motto3">Tua voce.</span>
+        </div>
     </div>
-  </section>
 
-  <!-- PIPELINE -->
-  <section class="pipeline" id="how">
-    <h2>HOW IT WORKS</h2>
-    <p class="subtitle">Six steps. Under 300ms latency.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="icon">🎤</div>
-        <div class="label">Input</div>
-        <div class="name">Microphone</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <div class="icon">🔊</div>
-        <div class="label">Audio</div>
-        <div class="name">Virtual Card</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <div class="icon">📝</div>
-        <div class="label">Speech-to-Text</div>
-        <div class="name">Whisper</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <div class="icon">🔐</div>
-        <div class="label">Validation</div>
-        <div class="name">Ada/SPARK</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <div class="icon">🤖</div>
-        <div class="label">Translation</div>
-        <div class="name">Gemini AI</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <div class="icon">🎧</div>
-        <div class="label">Your Voice</div>
-        <div class="name">Headphones</div>
-      </div>
+    <!-- MIDGARD: Post-landing dashboard entry -->
+    <div id="midgard">
+        <div class="midgard-title" id="midgard-title"></div>
+        <div class="midgard-subtitle" id="midgard-subtitle"></div>
+        <div class="midgard-links" id="midgard-links"></div>
+        <div class="footer">Universal Translation Layer · Rebirth Phoenix Foundation</div>
     </div>
-  </section>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <h2>FEATURES</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>🎭 Your Voice. Any Language.</h3>
-        <p>Upload 30 seconds of your voice. Karel IV. clones it and translates everything in your own voice — not a robot.</p>
-      </div>
-      <div class="feature-card">
-        <h3>⚡ Real-time</h3>
-        <p>Sub-300ms pipeline. Whisper STT → Gemini translation → voice synthesis. No lag in conversation.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🔐 Mathematically Verified</h3>
-        <p>Core logic verified with Ada/SPARK formal verification. Guaranteed no runtime errors in the translation pipeline.</p>
-      </div>
-      <div class="feature-card">
-        <h3>⛓️ Platba přes Ethereum</h3>
-        <p>Platba předplatného přes vlastní Geth node. Bez prostředníků, bez banky. Čistá P2P transakce.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🌐 Všechny jazyky</h3>
-        <p>Gemini AI překládá do jakéhokoliv jazyka na světě — bez omezení. Čeština, japonština, svahilština, arabština. Cokoliv.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🥽 Virtual Reality Ready</h3>
-        <p>Walk into a VR meeting speaking Czech, be heard in Japanese. Karel IV. runs in the background — zero latency, zero setup.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🌐 Mesh síť — Sepolia ETH jako palivo</h3>
-        <p>Každý uzel v síti pohání Sepolia ETH — automaticky, bez nastavení. Čím více uzlů, tím silnější síť. Nikdo to nevidí, všichni z toho těží.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🔒 Privacy First</h3>
-        <p>Protocol 4:23 — all metadata purged daily at 4:23 AM. Zero cookies. RAM-only sessions.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- DEMO -->
-  <section class="demo-section" id="demo">
-    <h2>TRY IT</h2>
-    <p>Select target language and speak. Karel IV. translates in real-time.</p>
-    <div class="demo-box">
-      <div class="lang-select">
-        <button class="lang-btn active" onclick="selectLang(this, 'EN')">🇬🇧 English</button>
-        <button class="lang-btn" onclick="selectLang(this, 'DE')">🇩🇪 German</button>
-        <button class="lang-btn" onclick="selectLang(this, 'FR')">🇫🇷 French</button>
-        <button class="lang-btn" onclick="selectLang(this, 'JA')">🇯🇵 Japanese</button>
-        <button class="lang-btn" onclick="selectLang(this, 'ES')">🇪🇸 Spanish</button>
-      </div>
-      <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
-      <div class="demo-status" id="demoStatus">
-        Click to speak — Karel IV. will translate
-      </div>
-    </div>
-    <p style="margin-top: 1.5rem; font-size: 0.85rem;">
-      * Full API integration coming soon. Join waitlist for early access.
-    </p>
-  </section>
-
-  <!-- TECH STACK -->
-  <section class="tech">
-    <h2>Built On Open Source</h2>
-    <div class="tech-pills">
-      <span class="pill highlight">Gemini AI</span>
-      <span class="pill highlight">Ada/SPARK</span>
-      <span class="pill highlight">Whisper STT</span>
-      <span class="pill highlight">Coqui TTS</span>
-      <span class="pill">n8n</span>
-      <span class="pill">Prometheus</span>
-      <span class="pill">Ethereum</span>
-      <span class="pill">Apache 2.0</span>
-      <span class="pill">GPL 3.0</span>
-      <span class="pill">Google Cloud</span>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section style="padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; text-align: center;" id="pricing">
-    <h2 style="color: var(--gold); font-size: 2rem; letter-spacing: 2px; margin-bottom: 0.5rem;">PRICING</h2>
-    <p style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; margin-bottom: 3rem;">
-      Simple. Transparent. Czech prices.
-    </p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: start;">
-
-      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
-        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">PERSONAL ASSISTANT</h3>
-        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">111</div>
-        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
-        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
-          <li>✓ AI personal assistant</li>
-          <li>✓ Všechny jazyky</li>
-          <li>✓ Privacy Protocol 4:23</li>
-          <li>✓ 1 device</li>
-        </ul>
-      </div>
-
-      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👑</div>
-        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">KAREL IV.</h3>
-        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">222</div>
-        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
-        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
-          <li>✓ Real-time voice translation</li>
-          <li>✓ 7+ languages</li>
-          <li>✓ Your own voice clone</li>
-          <li>✓ Whisper + Gemini pipeline</li>
-        </ul>
-      </div>
-
-      <div style="background: var(--dark2); padding: 2rem; border: 1px solid #333;">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎬</div>
-        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">STREAM DUBBING</h3>
-        <div style="font-size: 2.5rem; color: var(--text); font-weight: bold;">333</div>
-        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
-        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
-          <li>✓ Netflix, YouTube, etc.</li>
-          <li>✓ Real-time dubbing</li>
-          <li>✓ Virtual audio card</li>
-          <li>✓ Any streaming service</li>
-        </ul>
-      </div>
-
-      <div style="background: var(--dark3); padding: 2rem; border: 2px solid var(--gold); position: relative;">
-        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-                    background: var(--gold); color: var(--dark); padding: 0.2rem 1rem;
-                    font-family: 'Helvetica Neue', sans-serif; font-size: 0.75rem;
-                    font-weight: bold; letter-spacing: 1px;">BEST VALUE</div>
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏠</div>
-        <h3 style="color: var(--gold); font-size: 1rem; letter-spacing: 2px; margin-bottom: 1rem;">FAMILY PLAN</h3>
-        <div style="font-size: 2.5rem; color: var(--gold); font-weight: bold;">423</div>
-        <div style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem; margin-bottom: 1.5rem;">Kč / month</div>
-        <ul style="list-style: none; text-align: left; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.9rem; line-height: 2;">
-          <li style="color: var(--text);">✓ Everything included</li>
-          <li style="color: var(--text);">✓ Whole household</li>
-          <li style="color: var(--text);">✓ Unlimited devices</li>
-          <li style="color: var(--text);">✓ Priority support</li>
-          <li>✓ Privacy Protocol 4:23</li>
-        </ul>
-        <a href="#waitlist" class="btn-primary" style="display: block; text-align: center; margin-top: 1.5rem;">
-          Get Started
-        </a>
-      </div>
-
-    </div>
-    <p style="margin-top: 2rem; color: var(--muted); font-family: 'Helvetica Neue', sans-serif; font-size: 0.85rem;">
-      Platba přes Geth node · Zrušení kdykoliv · Žádné skryté poplatky
-    </p>
-  </section>
-
-  <!-- WAITLIST -->
-  <section style="background: var(--dark2); padding: 5rem 2rem; text-align: center;" id="waitlist">
-    <h2 style="color: var(--gold); font-size: 2rem; letter-spacing: 2px; margin-bottom: 1rem;">
-      EARLY ACCESS
-    </h2>
-    <p style="color: var(--muted); font-family: 'Helvetica Neue', sans-serif; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-      Karel IV. is in private beta. Join the waitlist and be among the first to speak all languages.
-    </p>
-    <form style="display: flex; gap: 0; max-width: 450px; margin: 0 auto;"
-          onsubmit="joinWaitlist(event)">
-      <input type="email" id="emailInput" placeholder="your@email.com"
-             style="flex: 1; padding: 0.9rem 1rem; background: var(--dark3);
-                    border: 1px solid #444; border-right: none; color: var(--text);
-                    font-family: 'Helvetica Neue', sans-serif; font-size: 1rem;">
-      <button type="submit" class="btn-primary">Join</button>
-    </form>
-    <div id="waitlistMsg" style="color: var(--gold); margin-top: 1rem;
-         font-family: 'Helvetica Neue', sans-serif; min-height: 1.5rem;"></div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="logo">KAREL <span>IV.</span> <span style="font-size:0.7rem; color: var(--muted); letter-spacing:1px;">by AsgardLab</span></div>
-    <p>© 2026 AsgardLab. GPL 3.0 + Commercial License.</p>
-    <div class="footer-links">
-      <a href="https://github.com">GitHub</a>
-      <a href="#features">Features</a>
-      <a href="mailto:phoenix@web4light.online">phoenix@web4light.online</a>
-      <a href="mailto:arch@web4light.online">arch@web4light.online</a>
-    </div>
-  </footer>
-
-  <script>
-    // ===== ŽHNOUCÍ SLUNCE =====
-    const canvas = document.getElementById('sunCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let time = 0;
-
-    function drawSun() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const cx = canvas.width / 2;
-      const cy = canvas.height * 0.42;
-
-      // Outer glow layers
-      for (let i = 5; i > 0; i--) {
-        const radius = 180 + i * 60 + Math.sin(time * 0.8 + i) * 15;
-        const alpha = 0.03 + i * 0.01;
-        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-        gradient.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
-        gradient.addColorStop(0.5, `rgba(255, 140, 20, ${alpha * 0.5})`);
-        gradient.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      }
-
-      // Corona rays
-      const rayCount = 24;
-      for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * Math.PI * 2 + time * 0.3;
-        const rayLen = 120 + Math.sin(time * 1.5 + i * 0.7) * 40;
-        const rayWidth = 2 + Math.sin(time + i) * 1;
-        const alpha = 0.15 + Math.sin(time * 0.5 + i) * 0.08;
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angle);
-        const rayGrad = ctx.createLinearGradient(80, 0, 80 + rayLen, 0);
-        rayGrad.addColorStop(0, `rgba(255, 200, 50, ${alpha})`);
-        rayGrad.addColorStop(1, 'rgba(255, 200, 50, 0)');
-        ctx.beginPath();
-        ctx.moveTo(80, -rayWidth / 2);
-        ctx.lineTo(80 + rayLen, 0);
-        ctx.lineTo(80, rayWidth / 2);
-        ctx.fillStyle = rayGrad;
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Core sun
-      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
-      coreGrad.addColorStop(0, 'rgba(255, 255, 220, 0.95)');
-      coreGrad.addColorStop(0.3, 'rgba(255, 200, 50, 0.8)');
-      coreGrad.addColorStop(0.7, 'rgba(255, 140, 20, 0.4)');
-      coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, 90, 0, Math.PI * 2);
-      ctx.fillStyle = coreGrad;
-      ctx.fill();
-
-      // Pulse
-      const pulseR = 75 + Math.sin(time * 2) * 5;
-      const pulseGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseR);
-      pulseGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-      pulseGrad.addColorStop(1, 'rgba(255, 220, 80, 0)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, pulseR, 0, Math.PI * 2);
-      ctx.fillStyle = pulseGrad;
-      ctx.fill();
-
-      time += 0.02;
-      requestAnimationFrame(drawSun);
-    }
-
-    drawSun();
-
-    // ===== LANG / DEMO =====
-    let selectedLang = 'EN';
-    let isRecording = false;
-
-    function selectLang(btn, lang) {
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedLang = lang;
-      document.getElementById('demoStatus').textContent =
-        'Click to speak — Karel IV. will translate to ' + lang;
-    }
-
-    function toggleRecording() {
-      const btn = document.getElementById('micBtn');
-      const status = document.getElementById('demoStatus');
-
-      if (!isRecording) {
-        isRecording = true;
-        btn.classList.add('recording');
-        btn.textContent = '⏹️';
-        status.textContent = '🎙️ Listening... speak now';
-
-        setTimeout(() => {
-          status.textContent = '⚙️ Ada/SPARK validating...';
-          setTimeout(() => {
-            status.textContent = '🤖 Gemini translating to ' + selectedLang + '...';
-            setTimeout(() => {
-              status.textContent = '✅ Translation complete — playing in your voice';
-              isRecording = false;
-              btn.classList.remove('recording');
-              btn.textContent = '🎤';
-            }, 800);
-          }, 500);
-        }, 2000);
-      }
-    }
-
-    function joinWaitlist(e) {
-      e.preventDefault();
-      const email = document.getElementById('emailInput').value;
-      if (email) {
-        document.getElementById('waitlistMsg').textContent =
-          '✓ ' + email + ' added to waitlist. Karel IV. will contact you.';
-        document.getElementById('emailInput').value = '';
-      }
-    }
-  </script>
-
+    <script src="bifrost.js"></script>
 </body>
 </html>
