@@ -20,7 +20,7 @@ LOG_PREFIX = "[WIRE_TEXT]"
 # === LOCAL IMPORTS ===
 
 from language_detector import LanguageDetector
-from text_interceptor import TextInterceptor
+from text_interceptor import create_interceptor
 from translation_engine import TranslationEngine
 from overlay_renderer import DirectCompositionRenderer, TextStyle, Rect
 
@@ -56,7 +56,7 @@ class TextPipeline:
     def __init__(self, target_lang: str = "cs"):
         self._target_lang = target_lang
         self._detector = LanguageDetector()
-        self._interceptor = TextInterceptor()
+        self._interceptor = create_interceptor(user_language=target_lang)
         self._translator = TranslationEngine()
         self._renderer = DirectCompositionRenderer()
         self._renderer.initialize()
