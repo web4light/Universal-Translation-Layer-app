@@ -1,0 +1,29 @@
+name: asgard_mesh_client
+description: 'Asgard Mesh Client - Universal Translation Layer'
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: '>=3.16.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  http: 1.2.2
+  provider: 6.1.2
+  shared_preferences: 2.3.3
+  flutter_local_notifications: 17.2.4
+  path_provider: 2.1.5
+  intl: 0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
