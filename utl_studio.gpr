@@ -1,0 +1,146 @@
+--  ============================================================================
+--  UTL Studio — GNAT Studio IDE Project
+--
+--  Otevři v GNAT Studio: File → Open Project → utl_studio.gpr
+--
+--  Scénáře (GNAT Studio → scenario variables):
+--    Build_Mode: "Debug" | "Release" | "Prove"
+--
+--  Build (F4 v GNAT Studio):
+--    gprbuild -P utl_studio.gpr -XBuild_Mode=Debug
+--
+--  Prove (SPARK → Prove All):
+--    gnatprove -P utl_studio.gpr --level=4
+--
+--  Komponenty:
+--    1. mincovna.adb                 - Standard 700 core mint
+--    2. faucet_controller.adb        - Faucet SDN mesh controller
+--    3. bifrost.adb                  - Bifrost: Ada/SPARK ↔ Gemini AI bridge
+--    4. transkomunikator_validator.adb - Karel IV.: PCM audio validator
+--    5. pipeline_validator.adb       - Karel IV.: text/prompt/response validator
+--    6. geall_license.adb            - Geall: household license validator
+--    7. translation_validator.adb    - UTL: translation ratio validator
+--    8. soulbound_nft.adb            - Soulbound NFT identity validator
+--    9. gemini_bridge.adb            - Gemini API bridge
+--
+--  Standard 700: 12g stříbra = 1 mince
+--  Autor: Pan Jeskyně
+--  IDE: GNAT Studio 25.x / GNAT Pro / GNAT FSF 14+
+--  ============================================================================
+
+project UTL_Studio is
+
+   --  =========================================================================
+   --  SCENARIO VARIABLES (zobrazí se v GNAT Studio jako dropdown)
+   --  =========================================================================
+
+   type Build_Mode_Type is ("Debug", "Release", "Prove");
+   Build_Mode : Build_Mode_Type := external ("Build_Mode", "Debug");
+
+   --  =========================================================================
+   --  DIRECTORIES
+   --  =========================================================================
+
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj/" & Build_Mode;
+   for Exec_Dir use "bin";
+
+   --  =========================================================================
+   --  MAIN EXECUTABLES
+   --  =========================================================================
+
+   for Main use (
+      "mincovna.adb",
+      "faucet_controller.adb",
+      "bifrost.adb",
+      "transkomunikator_validator.adb",
+      "pipeline_validator.adb",
+      "geall_license.adb",
+      "translation_validator.adb",
+      "soulbound_nft.adb",
+      "gemini_bridge.adb"
+   );
+
+   --  =========================================================================
+   --  COMPILER
+   --  =========================================================================
+
+   package Compiler is
+      Common_Switches := (
+         "-gnat2022",      --  Ada 2022 standard
+         "-gnatW8",        --  UTF-8 encoding
+         "-gnatwa",        --  All warnings enabled
+         "-gnato",         --  Overflow checking
+         "-fstack-check",  --  Stack checking
+         "-gnatVa",        --  Validity checking
+         "-gnata"          --  Assertions enabled (Pre/Post)
+      );
+
+      case Build_Mode is
+         when "Debug" =>
+            for Default_Switches ("Ada") use
+               Common_Switches & ("-g", "-O0", "-gnateE");
+            --  Full debug info + no optimization + extra exception info
+
+         when "Release" =>
+            for Default_Switches ("Ada") use
+               Common_Switches & ("-O2", "-gnatn");
+            --  Optimization + inlining
+
+         when "Prove" =>
+            for Default_Switches ("Ada") use
+               Common_Switches & ("-g", "-O0", "-gnata");
+            --  Debug info, assertions, no optimization for proof
+      end case;
+   end Compiler;
+
+   --  =========================================================================
+   --  BUILDER
+   --  =========================================================================
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-g", "-j0");
+      --  Debug symbols + parallel build (all cores)
+   end Builder;
+
+   --  =========================================================================
+   --  BINDER
+   --  =========================================================================
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es");
+      --  Symbolic traceback on exceptions
+   end Binder;
+
+   --  =========================================================================
+   --  LINKER
+   --  =========================================================================
+
+   package Linker is
+      for Default_Switches ("Ada") use ("-g");
+   end Linker;
+
+   --  =========================================================================
+   --  PROVE (GNATprove / SPARK)
+   --  =========================================================================
+
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "--level=4",            --  Highest proof level
+         "--prover=all",         --  All provers (CVC5, Alt-Ergo, Z3)
+         "--timeout=60",         --  60s timeout per VC
+         "--counterexamples=on", --  Show counterexamples
+         "--warnings=continue"   --  Show warnings but don't abort
+      );
+   end Prove;
+
+   --  =========================================================================
+   --  IDE (GNAT Studio specific settings)
+   --  =========================================================================
+
+   package IDE is
+      for Default_Switches ("adacontrol") use ("");
+      for Documentation_Dir use "docs/ada-book";
+   end IDE;
+
+end UTL_Studio;

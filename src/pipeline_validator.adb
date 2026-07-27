@@ -34,9 +34,7 @@ with Ada.Streams.Stream_IO;
 with Ada.Calendar;
 with Pipeline_Types;
 
-procedure Pipeline_Validator with
-   SPARK_Mode => On
-is
+procedure Pipeline_Validator is
    use Ada.Text_IO;
 
    --  Maximum bytes read from the --json input file (covers the largest

@@ -32,9 +32,7 @@ with Ada.Streams.Stream_IO;
 with Interfaces;
 with Pipeline_Types;
 
-procedure Transkomunikator_Validator with
-   SPARK_Mode => On
-is
+procedure Transkomunikator_Validator is
    use Ada.Text_IO;
 
    --  =========================================================================

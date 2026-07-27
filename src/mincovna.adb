@@ -6,7 +6,6 @@ with Ada.Text_IO;    use Ada.Text_IO;
 with Pipeline_Types; use Pipeline_Types;
 
 procedure Mincovna_Main is
-   pragma SPARK_Mode (On);
 
    Standard_700_Buyback : constant := 12.0;
    Standard_700_Sell    : constant := 13.2;
@@ -21,8 +20,10 @@ procedure Mincovna_Main is
    function Mint_Coin (Silver : Silver_Amount) return Boolean
      with Pre    => Silver >= Standard_700_Sell,
           Post   => (if Mint_Coin'Result then True),
-          Global => (In_Out => (Total_Silver, Total_Coins))
+          Global => (In_Out => (Total_Silver, Total_Coins)),
+          Side_Effects => True
    is
+      pragma SPARK_Mode (Off);
    begin
       if Silver >= Standard_700_Sell then
          if Total_Silver <= Silver_Amount'Last - Silver

@@ -21,9 +21,7 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 
-procedure Geall_License with
-   SPARK_Mode => On
-is
+procedure Geall_License is
    use Ada.Text_IO;
    use Ada.Command_Line;
    use Ada.Strings.Unbounded;

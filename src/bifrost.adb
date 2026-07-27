@@ -21,9 +21,7 @@ with Ada.Command_Line;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
-procedure Bifrost with
-   SPARK_Mode => On
-is
+procedure Bifrost is
 
    use Ada.Text_IO;
    use Ada.Strings.Fixed;

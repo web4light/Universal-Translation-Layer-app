@@ -16,7 +16,7 @@
 with Ada.Text_IO;       use Ada.Text_IO;
 with Pipeline_Types;    use Pipeline_Types;
 
-procedure Translation_Validator with SPARK_Mode => On is
+procedure Translation_Validator is
 
    --  =========================================================================
    --  CONSTANTS

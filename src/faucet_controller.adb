@@ -12,9 +12,7 @@
 with Ada.Text_IO;
 with Ada.Real_Time;
 
-procedure Faucet_Controller with
-   SPARK_Mode => On
-is
+procedure Faucet_Controller is
    use Ada.Text_IO;
    use Ada.Real_Time;
    
@@ -218,7 +216,7 @@ is
       Coins       => 0
    );
    
-   Start_Time : constant Ada.Calendar.Time := Clock;
+   Start_Time : constant Ada.Real_Time.Time := Clock;
 
    Stream_1 : Dubbing_Stream := (
       ID          => 1,

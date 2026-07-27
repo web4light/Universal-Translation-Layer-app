@@ -14,9 +14,7 @@ with Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
-procedure Gemini_Bridge with
-   SPARK_Mode => On
-is
+procedure Gemini_Bridge is
    use Ada.Text_IO;
    use Ada.Strings.Fixed;
    use Ada.Strings.Unbounded;

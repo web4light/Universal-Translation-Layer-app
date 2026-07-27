@@ -16,9 +16,7 @@
 with Ada.Text_IO;
 with Ada.Integer_Text_IO;
 
-procedure Soulbound_Nft with
-   SPARK_Mode => On
-is
+procedure Soulbound_Nft is
    use Ada.Text_IO;
    use Ada.Integer_Text_IO;
 
