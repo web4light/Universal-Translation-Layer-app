@@ -714,5 +714,62 @@ def main():
     print(f"{LOG_PREFIX} All self-tests passed.")
 
 
+def run_daemon(prometheus_port: int = 9304) -> None:
+    """
+    Heimdall Daemon — běží jako systemd služba.
+    Udržuje mesh síť, monitoruje uzly, exportuje Prometheus metriky.
+    Port: 9304 (Spark Watchdog / Heimdall)
+    """
+    import socket
+
+    # Spustit Prometheus HTTP server
+    try:
+        from prometheus_client import start_http_server
+        start_http_server(prometheus_port)
+        logger.info(f"{LOG_PREFIX} Heimdall Prometheus server na portu {prometheus_port}")
+    except Exception as e:
+        logger.warning(f"{LOG_PREFIX} Prometheus server nelze spustit: {e}")
+
+    orchestrator = MeshOrchestrator()
+
+    # Registrovat lokální uzel (asterisk Ubuntu)
+    hostname = socket.gethostname()
+    import psutil
+    try:
+        cpu = psutil.cpu_count(logical=False) or 4
+        ram = int(psutil.virtual_memory().total / 1024 / 1024)
+    except Exception:
+        cpu, ram = 4, 8192
+
+    local_node = orchestrator.register_node(NodeCapabilities(
+        cpu_cores=cpu,
+        gpu_vram_mb=0,
+        ram_mb=ram,
+        bandwidth_mbps=100.0,
+        available_models=["whisper-base", "opus-mt"],
+    ))
+    logger.info(f"{LOG_PREFIX} Heimdall aktivní. Uzel: {local_node} ({hostname})")
+
+    # Hlavní watchdog smyčka
+    cycle = 0
+    while True:
+        try:
+            status = orchestrator.get_status()
+            if cycle % 12 == 0:  # každých ~60s logovat stav
+                logger.info(f"{LOG_PREFIX} Status: {status}")
+            cycle += 1
+            time.sleep(5)
+        except KeyboardInterrupt:
+            logger.info(f"{LOG_PREFIX} Heimdall zastaven.")
+            break
+        except Exception as e:
+            logger.error(f"{LOG_PREFIX} Chyba watchdog smyčky: {e}")
+            time.sleep(10)
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    if '--daemon' in sys.argv:
+        run_daemon()
+    else:
+        main()

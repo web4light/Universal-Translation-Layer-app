@@ -82,7 +82,7 @@ final ThemeData cyberpunkTheme = ThemeData(
     ),
   ),
   cardColor: kCyberpunkCard,
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: kCyberpunkCard,
     elevation: 0,
     shape: RoundedRectangleBorder(

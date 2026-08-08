@@ -82,7 +82,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
           0,
           _TranslationEntry(
             sourceText: text,
-            translatedText: result,
+            translatedText: _translatedText ?? "",
             sourceLanguage: _sourceLanguage,
             targetLanguage: _targetLanguage,
             timestamp: DateTime.now(),

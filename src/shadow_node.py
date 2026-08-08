@@ -21,7 +21,7 @@ SHADOW_PORT = 9303  # Shadow běží na jiném portu než Primary (9302)
 
 # URL Primary Node
 # Lokální test (oba uzly na stejném PC):
-PRIMARY_URL = "http://localhost:9302/metrics"
+PRIMARY_URL = "http://192.168.123.191:9302/metrics"
 
 # Production (asterisk i7 Windows — Ethernet .191, Primary):
 # PRIMARY_URL = "http://192.168.123.191:9302/metrics"

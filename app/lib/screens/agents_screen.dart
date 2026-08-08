@@ -127,7 +127,7 @@ class _AgentsScreenState extends State<AgentsScreen> {
       await n8nService.deployAgent(
         agent.name,
         agent.type.label,
-        agent.config,
+        agent.config.isEmpty ? <String, dynamic>{} : <String, dynamic>{'raw': agent.config},
       );
       setState(() {
         agent.status = AgentStatus.running;
