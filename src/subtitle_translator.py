@@ -28,7 +28,20 @@ from dataclasses import dataclass
 from typing import Optional
 
 import srt
-from google import genai
+
+# === AI ENGINES (Gemini nebo Groq) ===
+
+try:
+    from google import genai
+    _GEMINI_AVAILABLE = True
+except ImportError:
+    _GEMINI_AVAILABLE = False
+
+try:
+    from groq import Groq
+    _GROQ_AVAILABLE = True
+except ImportError:
+    _GROQ_AVAILABLE = False
 
 # === LOGGING ===
 
@@ -177,29 +190,68 @@ def compose_vtt(subtitles: list[srt.Subtitle]) -> str:
 # === GEMINI TRANSLATION ===
 
 class GeminiSubtitleTranslator:
-    """Překladač titulků pomocí Gemini API.
+    """Překladač titulků pomocí Gemini API nebo Groq (fallback).
 
     Přeloží titulky po batchích, zachovává timing a strukturu.
-    Používá google-genai SDK (aktuální, ne deprecated).
+    Pokud Gemini není dostupný, použije Groq (llama-3.3-70b).
     """
 
     def __init__(self, api_key: Optional[str] = None,
-                 model: str = GEMINI_MODEL):
+                 model: str = GEMINI_MODEL,
+                 engine: str = "auto"):
         """Inicializace překladače.
 
         Args:
             api_key: Gemini API klíč. Pokud None, použije env GEMINI_API_KEY.
             model: Gemini model pro překlad.
+            engine: 'gemini', 'groq', nebo 'auto' (zkusí gemini, pak groq).
         """
-        if api_key is None:
-            api_key = self._load_api_key()
-
-        self._client = genai.Client(api_key=api_key)
+        self._engine = engine
+        self._gemini_client = None
+        self._groq_client = None
         self._model = model
-        logger.info(f"Gemini překladač inicializován (model={model})")
+        self._groq_model = "llama-3.3-70b-versatile"
 
-    def _load_api_key(self) -> str:
+        if engine in ("gemini", "auto") and _GEMINI_AVAILABLE:
+            try:
+                if api_key is None:
+                    api_key = self._load_api_key("gemini")
+                self._gemini_client = genai.Client(api_key=api_key)
+                logger.info(f"Gemini překladač inicializován (model={model})")
+            except Exception as e:
+                logger.warning(f"Gemini nedostupný: {e}")
+
+        if engine in ("groq", "auto") and _GROQ_AVAILABLE:
+            try:
+                groq_key = self._load_api_key("groq")
+                os.environ["GROQ_API_KEY"] = groq_key
+                self._groq_client = Groq()
+                logger.info(f"Groq překladač inicializován (model={self._groq_model})")
+            except Exception as e:
+                logger.warning(f"Groq nedostupný: {e}")
+
+        if not self._gemini_client and not self._groq_client:
+            raise ValueError(
+                "Žádný AI engine nedostupný. Nastav GEMINI_API_KEY nebo GROQ_API_KEY."
+            )
+
+    def _load_api_key(self, engine: str = "gemini") -> str:
         """Načte API klíč z env nebo souboru."""
+        if engine == "groq":
+            # 1. Env
+            key = os.environ.get("GROQ_API_KEY")
+            if key:
+                return key
+            # 2. Soubor
+            key_file = Path.home() / ".groq_api_key"
+            if key_file.exists():
+                content = key_file.read_text().strip()
+                if "=" in content:
+                    return content.split("=", 1)[1].strip()
+                return content
+            raise ValueError("Groq API klíč nenalezen")
+
+        # Gemini
         # 1. Environment variable
         key = os.environ.get("GEMINI_API_KEY")
         if key:
@@ -335,16 +387,31 @@ Titulky k překladu:
 {texts_block}"""
 
         try:
-            response = self._client.models.generate_content(
-                model=self._model,
-                contents=prompt,
-            )
+            # Zkusit Gemini, pak Groq
+            if self._gemini_client:
+                try:
+                    response = self._gemini_client.models.generate_content(
+                        model=self._model,
+                        contents=prompt,
+                    )
+                    return self._parse_batch_response(response.text, len(batch))
+                except Exception as e:
+                    logger.warning(f"Gemini selhalo: {e}, zkouším Groq...")
 
-            # Parse odpovědi
-            return self._parse_batch_response(response.text, len(batch))
+            if self._groq_client:
+                response = self._groq_client.chat.completions.create(
+                    model=self._groq_model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=4000,
+                )
+                return self._parse_batch_response(
+                    response.choices[0].message.content, len(batch)
+                )
+
+            return [None] * len(batch)
 
         except Exception as e:
-            logger.error(f"Gemini API chyba: {e}")
+            logger.error(f"AI překlad chyba: {e}")
             # Vrátit None pro všechny v batchi
             return [None] * len(batch)
 
