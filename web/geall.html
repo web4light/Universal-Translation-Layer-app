@@ -68,7 +68,7 @@
     </div>
 </div>
 <script>
-const cmyk = ['#00ffff', '#ff00ff', '#ffff00', '#000000', '#00cccc', '#cc00cc', '#cccc00'];
+const cmyk = ['#1e40af', '#ff00ff', '#c0c0c0', '#000000', '#3b82f6', '#cc00cc', '#e8e8e8'];
 const starfield = document.getElementById('starfield');
 for (let i = 0; i < 80; i++) { const s = document.createElement('div'); s.className = 'streak'; const color = cmyk[Math.floor(Math.random()*cmyk.length)]; Object.assign(s.style, { left: Math.random()*100+'%', height: (30+Math.random()*120)+'px', background: `linear-gradient(to bottom, transparent, ${color}, transparent)`, '--duration': (0.4+Math.random()*0.8)+'s', '--delay': (Math.random()*1.5)+'s', opacity: (0.3+Math.random()*0.7).toString() }); starfield.appendChild(s); }
 const rc = document.getElementById('warp-rings');

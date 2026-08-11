@@ -90,7 +90,7 @@
             position: relative; z-index: 10;
             font-size: clamp(2rem, 5vw, 3.5rem);
             color: #fff; letter-spacing: 0.1em;
-            text-shadow: 0 0 40px rgba(201, 168, 76, 0.8), 0 0 80px rgba(110, 68, 255, 0.5);
+            text-shadow: 0 0 40px rgba(192, 192, 192, 0.8), 0 0 80px rgba(110, 68, 255, 0.5);
             animation: titlePulse 0.5s ease-in-out infinite alternate;
         }
 
@@ -110,13 +110,13 @@
         .back { position: fixed; top: 1.5rem; left: 1.5rem; color: #555; text-decoration: none; font-size: 0.9rem; z-index: 50; }
         .back:hover { color: #e8e6e3; }
         .icon { font-size: 4rem; margin-bottom: 1rem; }
-        h1 { font-size: 2.5rem; letter-spacing: 0.05em; margin-bottom: 0.3em; color: #c9a84c; }
+        h1 { font-size: 2.5rem; letter-spacing: 0.05em; margin-bottom: 0.3em; color: #c0c0c0; }
         .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 3rem; font-style: italic; }
         .story { text-align: left; line-height: 2; font-size: 1.1rem; color: #ccc; margin-bottom: 3rem; }
         .story p { margin-bottom: 1.5em; }
         .story strong { color: #e8e6e3; }
-        .cta { display: inline-block; background: #c9a84c; color: #07090E; padding: 1rem 3rem; font-size: 1.1rem; font-weight: bold; text-decoration: none; letter-spacing: 0.05em; transition: all 0.3s; }
-        .cta:hover { opacity: 0.85; transform: scale(1.05); box-shadow: 0 0 30px rgba(201, 168, 76, 0.4); }
+        .cta { display: inline-block; background: #c0c0c0; color: #07090E; padding: 1rem 3rem; font-size: 1.1rem; font-weight: bold; text-decoration: none; letter-spacing: 0.05em; transition: all 0.3s; }
+        .cta:hover { opacity: 0.85; transform: scale(1.05); box-shadow: 0 0 30px rgba(192, 192, 192, 0.4); }
         .price { color: #888; margin-top: 1rem; font-size: 0.9rem; }
         .footer { margin-top: 4rem; color: #333; font-size: 0.75rem; letter-spacing: 0.1em; }
     </style>
@@ -159,7 +159,7 @@
 <script>
 // === STARFIELD (warp speed streaks) ===
 const starfield = document.getElementById('starfield');
-const cmyk = ['#00ffff', '#ff00ff', '#ffff00', '#000000', '#00cccc', '#cc00cc', '#cccc00'];
+const cmyk = ['#1e40af', '#ff00ff', '#c0c0c0', '#000000', '#3b82f6', '#cc00cc', '#e8e8e8'];
 
 for (let i = 0; i < 80; i++) {
     const streak = document.createElement('div');
