@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officina Monetalis — Vakuová Mincovna</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; background: #07090E; color: #e8e6e3; min-height: 100vh; overflow: hidden; }
+        #warp { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: #000; perspective: 600px; }
+        #warp.collapse { animation: warpCollapse 1.2s cubic-bezier(0.6, 0, 0.4, 1) forwards; }
+        @keyframes warpCollapse { 0% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(0) rotateX(90deg); } }
+        .starfield { position: absolute; inset: 0; overflow: hidden; }
+        .streak { position: absolute; width: 2px; opacity: 0; animation: streakFly var(--duration) linear var(--delay) infinite; }
+        @keyframes streakFly { 0% { transform: translateY(-100vh) scaleY(0.3); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.8; } 100% { transform: translateY(100vh) scaleY(3); opacity: 0; } }
+        .warp-rings { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; }
+        .warp-ring { position: absolute; border-radius: 50%; border: 2px solid; opacity: 0; animation: ringWarp var(--speed) ease-in var(--delay) infinite; }
+        @keyframes ringWarp { 0% { transform: scale(0) rotateX(80deg); opacity: 0; } 15% { opacity: 0.9; } 50% { transform: scale(1.5) rotateX(40deg); opacity: 0.5; } 100% { transform: scale(4) rotateX(0deg); opacity: 0; } }
+        .gravity-lens { position: absolute; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,0,0.4) 0%, rgba(255,0,255,0.2) 30%, rgba(0,255,255,0.1) 60%, transparent 100%); animation: lensDistort 0.8s ease-in-out infinite alternate; box-shadow: 0 0 80px rgba(255,255,0,0.4), 0 0 160px rgba(255,0,255,0.2); }
+        @keyframes lensDistort { 0% { transform: scale(1) rotate(0deg); border-radius: 50%; } 100% { transform: scale(1.3) rotate(5deg); border-radius: 45% 55% 50% 50%; } }
+        .warp-title { position: relative; z-index: 10; font-size: clamp(2rem, 5vw, 3.5rem); color: #fff; letter-spacing: 0.1em; text-shadow: 0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,255,0,0.5); animation: titlePulse 0.5s ease-in-out infinite alternate; }
+        @keyframes titlePulse { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+        #content { opacity: 0; transition: opacity 1.2s ease; overflow-y: auto; height: 100vh; }
+        #content.visible { opacity: 1; }
+        .container { max-width: 700px; margin: 0 auto; padding: 4rem 2rem; text-align: center; }
+        .back { position: fixed; top: 1.5rem; left: 1.5rem; color: #555; text-decoration: none; font-size: 0.9rem; z-index: 50; }
+        .back:hover { color: #e8e6e3; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        h1 { font-size: 2.5rem; letter-spacing: 0.05em; margin-bottom: 0.3em; color: #ffd700; }
+        .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 3rem; font-style: italic; }
+        .story { text-align: left; line-height: 2; font-size: 1.1rem; color: #ccc; margin-bottom: 3rem; }
+        .story p { margin-bottom: 1.5em; }
+        .story strong { color: #e8e6e3; }
+        .cta { display: inline-block; background: #ffd700; color: #07090E; padding: 1rem 3rem; font-size: 1.1rem; font-weight: bold; text-decoration: none; letter-spacing: 0.05em; transition: all 0.3s; }
+        .cta:hover { opacity: 0.85; transform: scale(1.05); box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+        .price { color: #888; margin-top: 1rem; font-size: 0.9rem; }
+        .footer { margin-top: 4rem; color: #333; font-size: 0.75rem; letter-spacing: 0.1em; }
+    </style>
+</head>
+<body>
+<div id="warp">
+    <div class="starfield" id="starfield"></div>
+    <div class="warp-rings" id="warp-rings"></div>
+    <div class="gravity-lens"></div>
+    <div class="warp-title">🏛️ Officina Monetalis</div>
+</div>
+<div id="content">
+    <a href="/" class="back">← Midgard</a>
+    <div class="container">
+        <div class="icon">🏛️</div>
+        <h1>Officina Monetalis</h1>
+        <div class="subtitle">Vakuová Mincovna — Standard 700</div>
+
+        <div class="story">
+            <p><strong>Standard 700.</strong> Jedna mince = 12 gramů stříbra. Neměnné. Matematicky garantované. Jako za Karla IV. — jen místo razidla máš Ada/SPARK formální verifikaci.</p>
+
+            <p>Mincovna běží ve <strong>vakuu</strong>. Nic nevchází zvenčí. Nic neuniká ven. "Faucet nic" — nulová závislost na externích zdrojích. Hermeticky uzavřený prostor kde se razí hodnota z informací.</p>
+
+            <p>Primary Node + Shadow Node = <strong>redundance</strong>. Padne jeden — druhý převezme za 20 sekund. Heimdall hlídá. Geth stínuje blockchain. Ash Sweeper čistí popel spáleného etheru.</p>
+
+            <p>Vakuum ve vakuu. Vakuum². První článek musí být neprůstřelný. Pak se zbytek staví sám.</p>
+        </div>
+
+        <a href="https://app.web4light.online" class="cta">Vstoupit do Mincovny</a>
+        <div class="price">EW = M³</div>
+
+        <div class="footer">Web 4.23 · Standard 700 · Rebirth Phoenix Foundation Charter</div>
+    </div>
+</div>
+<script>
+const cmyk = ['#00ffff', '#ff00ff', '#ffff00', '#000000', '#00cccc', '#cc00cc', '#cccc00'];
+const starfield = document.getElementById('starfield');
+for (let i = 0; i < 80; i++) { const s = document.createElement('div'); s.className = 'streak'; const color = cmyk[Math.floor(Math.random()*cmyk.length)]; Object.assign(s.style, { left: Math.random()*100+'%', height: (30+Math.random()*120)+'px', background: `linear-gradient(to bottom, transparent, ${color}, transparent)`, '--duration': (0.4+Math.random()*0.8)+'s', '--delay': (Math.random()*1.5)+'s', opacity: (0.3+Math.random()*0.7).toString() }); starfield.appendChild(s); }
+const rc = document.getElementById('warp-rings');
+for (let i = 0; i < 15; i++) { const r = document.createElement('div'); r.className = 'warp-ring'; const color = cmyk[i%cmyk.length]; const size = 60+i*30; Object.assign(r.style, { width: size+'px', height: size+'px', borderColor: color, boxShadow: `0 0 15px ${color}, inset 0 0 15px ${color}`, '--speed': (1.5+Math.random()*0.5)+'s', '--delay': (i*0.1)+'s' }); rc.appendChild(r); }
+setTimeout(() => { document.getElementById('warp').classList.add('collapse'); }, 2200);
+setTimeout(() => { document.getElementById('warp').style.display = 'none'; document.getElementById('content').classList.add('visible'); document.body.style.overflow = 'auto'; }, 3400);
+</script>
+</body>
+</html>

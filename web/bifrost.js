@@ -311,11 +311,11 @@ const TRANSLATIONS = {
 
 // Midgard dashboard links (translated would be overkill, keep universal)
 const MIDGARD_LINKS = [
-    { icon: '🗣️', name: 'Karel IV.', href: '#translator' },
-    { icon: '🌐', name: 'Mesh', href: '#mesh' },
-    { icon: '🤖', name: 'Agents', href: '#agents' },
-    { icon: '🏛️', name: 'Mincovna', href: '#mint' },
-    { icon: '🛡️', name: 'Geall', href: '#geall' },
+    { icon: '🗣️', name: 'Karel IV.', href: 'karel.html' },
+    { icon: '🌐', name: 'Mesh', href: 'mesh.html' },
+    { icon: '🤖', name: 'Agents', href: 'agents.html' },
+    { icon: '🏛️', name: 'Mincovna', href: 'mint.html' },
+    { icon: '🛡️', name: 'Geall', href: 'geall.html' },
 ];
 
 // ============================================================================
