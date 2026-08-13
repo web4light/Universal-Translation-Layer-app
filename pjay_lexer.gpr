@@ -1,0 +1,8 @@
+project PJAY_Lexer is
+   for Source_Dirs use ("src");
+   for Main use ("pjay_lexer.adb");
+   for Object_Dir use "obj/spark_pjay";
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatW8", "-gnat2022");
+   end Compiler;
+end PJAY_Lexer;
