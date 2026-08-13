@@ -27,9 +27,9 @@ except ImportError:
     _HTTPX = False
 
 # === CONFIG ===
-XAI_API_URL = "https://api.x.ai/v1/images/generations"
-XAI_CHAT_URL = "https://api.x.ai/v1/chat/completions"
-XAI_MODEL = "grok-4.6"  -- frontier model, 500k context
+XAI_API_URL = "https://api.x.ai/v1/responses"
+XAI_CHAT_URL = "https://api.x.ai/v1/responses"
+XAI_MODEL = "grok-4.6"  # frontier model, 500k context, image gen tool
 
 
 def _get_xai_key() -> str:
@@ -56,7 +56,7 @@ class Lada:
     def generate(self, prompt: str,
                  style: str = "illustration",
                  size: str = "1024x1024") -> dict:
-        """Generuj obrazek pres xAI Grok."""
+        """Generuj obrazek pres xAI Grok (Responses API + image_generation tool)."""
 
         if not prompt or len(prompt) < 3:
             self.failed_count += 1
@@ -74,19 +74,19 @@ class Lada:
             "Content-Type": "application/json"
         }
 
+        # Responses API s image_generation toolem
         payload = {
-            "model": "grok-2-image",
-            "prompt": full_prompt,
-            "n": 1,
-            "size": size,
-            "response_format": "b64_json"
+            "model": XAI_MODEL,
+            "input": f"Generate an image: {full_prompt}",
+            "tools": [
+                {"type": "image_generation", "action": "generate"}
+            ]
         }
 
         try:
             if _HTTPX:
                 client = httpx.Client(timeout=120)
-                resp = client.post(XAI_API_URL, headers=headers,
-                                   json=payload)
+                resp = client.post(XAI_API_URL, headers=headers, json=payload)
                 resp.raise_for_status()
                 data = resp.json()
             else:
@@ -100,11 +100,23 @@ class Lada:
                 with urllib.request.urlopen(req, timeout=120) as resp:
                     data = json.loads(resp.read())
 
+            # Najdi image_generation_call v output
+            img_data = None
+            img_prompt = ""
+            for item in data.get("output", []):
+                if item.get("type") == "image_generation_call":
+                    img_data = item.get("result")
+                    img_prompt = item.get("prompt", "")
+                    break
+
+            if not img_data:
+                self.failed_count += 1
+                return {"status": "failed", "error": "No image in response"}
+
             # Uloz obrazek
             timestamp = int(time.time())
             filename = self.output_dir / f"lada_{timestamp}.png"
-            img_data = base64.b64decode(data["data"][0]["b64_json"])
-            filename.write_bytes(img_data)
+            filename.write_bytes(base64.b64decode(img_data))
 
             self.generated_count += 1
             return {
@@ -112,7 +124,7 @@ class Lada:
                 "file": str(filename),
                 "size": size,
                 "style": style,
-                "prompt": full_prompt[:200]
+                "prompt": img_prompt[:200]
             }
 
         except Exception as e:
@@ -127,29 +139,28 @@ class Lada:
             "Content-Type": "application/json"
         }
 
+        # Responses API
         payload = {
-            "model": "grok-4.6",
-            "messages": [
-                {"role": "system", "content":
+            "model": XAI_MODEL,
+            "input": [
+                {"role": "developer", "content":
                  "Jsi Lada — cesky graficky AI agent. "
                  "Popisujes vizualni navrhy pro weby a aplikace. "
                  "Styl Josefa Lady — vesele, ceske, lidove."},
                 {"role": "user", "content": prompt}
-            ],
-            "max_tokens": 500
+            ]
         }
 
         try:
             if _HTTPX:
                 client = httpx.Client(timeout=30)
-                resp = client.post(XAI_CHAT_URL, headers=headers,
-                                   json=payload)
+                resp = client.post(XAI_API_URL, headers=headers, json=payload)
                 resp.raise_for_status()
                 data = resp.json()
             else:
                 import urllib.request
                 req = urllib.request.Request(
-                    XAI_CHAT_URL,
+                    XAI_API_URL,
                     data=json.dumps(payload).encode(),
                     headers=headers,
                     method="POST"
@@ -157,7 +168,13 @@ class Lada:
                 with urllib.request.urlopen(req, timeout=30) as resp:
                     data = json.loads(resp.read())
 
-            return data["choices"][0]["message"]["content"]
+            # Responses API vraci output_text nebo output[].content
+            for item in data.get("output", []):
+                if item.get("type") == "message":
+                    for content in item.get("content", []):
+                        if content.get("type") == "output_text":
+                            return content.get("text", "")
+            return data.get("output_text", "[Lada: prazdna odpoved]")
         except Exception as e:
             return f"[Lada error: {e}]"
 
