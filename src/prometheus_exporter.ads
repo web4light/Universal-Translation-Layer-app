@@ -14,7 +14,7 @@ pragma SPARK_Mode (On);
 package Prometheus_Exporter is
 
    -- Port pro metrics endpoint
-   Metrics_Port : constant := 9_306;
+   Metrics_Port : constant := 9_307;
 
    -- Maximální délka metrics výstupu
    Max_Output_Length : constant := 8_192;
