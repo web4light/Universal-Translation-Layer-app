@@ -93,4 +93,63 @@ package body Judge_Lab is
       return Rate;
    end Conviction_Rate;
 
+   -- =========================================================
+   --  License_Compatible — formalni matice
+   -- =========================================================
+
+   function License_Compatible (A, B : License_Type) return Boolean is
+   begin
+      -- Charter je kompatibilni se vsim (nase pravidla)
+      if A = Charter or B = Charter then
+         return True;
+      end if;
+
+      -- Public Domain je kompatibilni se vsim
+      if A = Public_Domain or B = Public_Domain then
+         return True;
+      end if;
+
+      -- Stejne licence jsou kompatibilni
+      if A = B then
+         return True;
+      end if;
+
+      -- Permisivni mezi sebou OK
+      if A in Apache_2_0 | MIT | BSD_3
+         and B in Apache_2_0 | MIT | BSD_3
+      then
+         return True;
+      end if;
+
+      -- Permisivni + copyleft = OK
+      if (A in Apache_2_0 | MIT | BSD_3 and B in GPL_3 | LGPL_3 | MPL_2)
+         or (B in Apache_2_0 | MIT | BSD_3 and A in GPL_3 | LGPL_3 | MPL_2)
+      then
+         return True;
+      end if;
+
+      -- LGPL + GPL OK
+      if (A = LGPL_3 and B = GPL_3) or (A = GPL_3 and B = LGPL_3) then
+         return True;
+      end if;
+
+      -- Vse ostatni = NE (Proprietary + copyleft, atd.)
+      return False;
+   end License_Compatible;
+
+   -- =========================================================
+   --  Verify_Standard_700
+   --  1 mince = 12g stribra. Bod.
+   -- =========================================================
+
+   function Verify_Standard_700 (Coins : Natural;
+                                 Silver_Grams : Natural) return Verdict is
+   begin
+      if Silver_Grams >= Coins * Standard_700_Grams then
+         return SIC;
+      else
+         return NON;
+      end if;
+   end Verify_Standard_700;
+
 end Judge_Lab;

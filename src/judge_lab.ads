@@ -124,6 +124,28 @@ package Judge_Lab is
           Post => C.Status = Archived;
 
    -- =========================================================
+   --  Licencni matice (z druheho Kira — Justyna vidi vsechno)
+   -- =========================================================
+
+   type License_Type is (Apache_2_0, MIT, GPL_3, LGPL_3,
+                         BSD_3, MPL_2, Proprietary,
+                         Public_Domain, Charter);
+
+   -- Je licence A kompatibilni s B?
+   function License_Compatible (A, B : License_Type) return Boolean;
+
+   -- Standard 700: 1 mince = 12 gramu stribra
+   Standard_700_Grams : constant := 12;
+
+   -- Verifikuj ze je dost stribra pro razbu
+   function Verify_Standard_700 (Coins : Natural;
+                                 Silver_Grams : Natural) return Verdict
+     with Pre  => Coins <= 99_999_999,
+          Post => (if Silver_Grams >= Coins * Standard_700_Grams
+                   then Verify_Standard_700'Result = SIC
+                   else Verify_Standard_700'Result = NON);
+
+   -- =========================================================
    --  Statistiky
    -- =========================================================
 
