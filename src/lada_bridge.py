@@ -29,6 +29,7 @@ except ImportError:
 # === CONFIG ===
 XAI_API_URL = "https://api.x.ai/v1/images/generations"
 XAI_CHAT_URL = "https://api.x.ai/v1/chat/completions"
+XAI_MODEL = "grok-4.6"  -- frontier model, 500k context
 
 
 def _get_xai_key() -> str:
@@ -54,8 +55,7 @@ class Lada:
 
     def generate(self, prompt: str,
                  style: str = "illustration",
-                 size: str = "1024x1024",
-                 model: str = "grok-2-image") -> dict:
+                 size: str = "1024x1024") -> dict:
         """Generuj obrazek pres xAI Grok."""
 
         if not prompt or len(prompt) < 3:
@@ -75,7 +75,7 @@ class Lada:
         }
 
         payload = {
-            "model": model,
+            "model": "grok-2-image",
             "prompt": full_prompt,
             "n": 1,
             "size": size,
@@ -128,7 +128,7 @@ class Lada:
         }
 
         payload = {
-            "model": "grok-3-mini",
+            "model": "grok-4.6",
             "messages": [
                 {"role": "system", "content":
                  "Jsi Lada — cesky graficky AI agent. "
