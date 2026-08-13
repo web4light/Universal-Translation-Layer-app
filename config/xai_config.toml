@@ -1,0 +1,33 @@
+# xAI / Grok configuration pro Asgard Studio
+# Uloz API klic do ~/.xai_api_key (chmod 600)
+# nebo export XAI_API_KEY="xai-..."
+
+[model]
+name = "grok-4.6"
+context_window = 500000
+reasoning_effort = "high"  # low, medium, high, xhigh
+
+[image]
+model = "grok-imagine-image-quality"
+default_action = "generate"  # generate, edit, auto
+
+[tools]
+image_generation = true
+web_search = false       # nepotrebujeme — faucet nic
+x_search = false         # nepotrebujeme
+code_execution = false   # mame vlastni Ada/SPARK
+
+[mcp]
+# Remote MCP servery co Lada muze volat
+# enabled = true
+# servers = ["https://your-mcp-server.com/mcp"]
+
+[privacy]
+# Zero Data Retention — zadne logy u xAI
+zdr = true
+cache_key = "asgard-studio-session"
+
+[pricing]
+# $2/1M input, $6/1M output
+# Budget limit (v dolarech za den)
+daily_budget_usd = 5.0
