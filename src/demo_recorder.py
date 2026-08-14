@@ -23,11 +23,13 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Script co agent říká (anglicky pro XPRIZE judges)
 SCRIPT = [
-    ("intro", "Čau. Jsem tvůj parťák. Přeložím ti jakékoliv video do jakéhokoliv jazyka. Vlastním hlasem. Pro neslyšící — znakovou řečí. Zdarma. Vždycky."),
-    ("demo", "Koukej. Vložím odkaz na YouTube. Pipeline běží autonomně. Gemini překládá. Dirigent řídí hlasy. Žádný člověk v procesu."),
-    ("tech", "Pod kapotou: Ada SPARK formální verifikace. Tři sta matematických důkazů. Nula runtime chyb. Běží na solární energii."),
-    ("sign", "Znaková řeč se generuje zdarma. Vždycky. Protože přístupnost není funkce. Je to právo."),
-    ("close", "Hoc est via. web4light tečka online."),
+    ("intro", "Dobrý den. Jsem Karel, váš osobní překladatel z Asgard Lab."),
+    ("product", "Náš produkt překládá jakékoliv video do jakéhokoliv jazyka. Vlastním hlasem mluvčího. V reálném čase. Bez lidského zásahu."),
+    ("sign", "Pro neslyšící komunitu generujeme znakovou řeč. Zdarma. Navždy. Protože přístupnost není prémiová funkce. Je to základní lidské právo."),
+    ("impact", "Dva a půl miliardy lidí na světě nemá přístup ke vzdělávání ve svém jazyce. Čtyři sta šedesát šest milionů lidí je neslyšících. Náš produkt tuto bariéru odstraňuje."),
+    ("tech", "Pod kapotou běží Ada SPARK formální verifikace. Tři sta matematických důkazů. Nula chyb za běhu. Systém běží autonomně na solární energii."),
+    ("try_it", "Vyzkoušejte si to sami. Otevřete web4light tečka online. Vložte odkaz na jakékoliv YouTube video. Vyberte jazyk. Klikněte. Hotovo."),
+    ("close", "Hoc est via. Děkuji za pozornost."),
 ]
 
 # Hlas — Antonín (český, Werich styl)
@@ -98,41 +100,57 @@ def merge_audio_video(video_path: Path, audio_path: Path):
 
 async def main():
     print("=" * 50)
-    print("  XPRIZE DEMO RECORDER")
-    print("  Agent mluví sám. Žádný mikrofon.")
+    print("  XPRIZE VIDEO — Agent se představuje")
+    print("  Antonín (Werich styl) + bg video")
     print("=" * 50)
     print()
 
     # 1. Generuj narration
-    print("[1/3] Generating narration (Edge-TTS)...")
+    print("[1/2] Generating narration (Edge-TTS, Antonín)...")
     audio = await generate_narration()
 
+    # 2. Spoj s pozadím (bg.mp4 z webu nebo černý frame)
+    print("\n[2/2] Composing final video...")
+    
+    bg_video = Path(__file__).parent.parent / "static" / "bg.mp4"
+    if not bg_video.exists():
+        # Stáhni z webu
+        print("  Stahuji bg.mp4 z web4light.online...")
+        subprocess.run([
+            "curl", "-sL", "-o", str(bg_video),
+            "https://web4light.github.io/bg.mp4"
+        ])
+    
+    final = OUTPUT_DIR / "xprize_submission.mp4"
+    
     # Zjisti délku audia
     result = subprocess.run([
         "ffprobe", "-v", "error", "-show_entries",
         "format=duration", "-of", "default=noprint_wrappers=1:nokey=1",
         str(audio)
     ], capture_output=True, text=True)
-    duration = int(float(result.stdout.strip())) + 5  # +5s buffer
+    audio_duration = float(result.stdout.strip())
+    
+    # Loop bg video na délku audia + overlay text
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-stream_loop", "-1", "-i", str(bg_video),
+        "-i", str(audio),
+        "-t", str(audio_duration + 3),
+        "-c:v", "libx264", "-preset", "medium", "-crf", "23",
+        "-c:a", "aac", "-b:a", "128k",
+        "-vf", "scale=1920:1080,drawtext=text='web4light.online':fontsize=36:fontcolor=gold:x=(w-text_w)/2:y=h-60:font=Arial",
+        "-shortest",
+        str(final)
+    ], capture_output=True)
 
-    print(f"\n[2/3] Recording screen ({duration}s)...")
-    print("       >>> TEĎ UKAŽ DEMO NA OBRAZOVCE! <<<")
-    print("       >>> Otevři http://localhost:8000 a vlož URL <<<")
-    time.sleep(3)  # 3s na přípravu
-
-    # 2. Nahrávej obrazovku
-    proc, video = record_screen(duration)
-    proc.wait()
-
-    # 3. Sloučit
-    print(f"\n[3/3] Merging video + audio...")
-    final = merge_audio_video(video, audio)
-
+    size_mb = final.stat().st_size / 1024 / 1024
     print(f"\n{'=' * 50}")
     print(f"  HOTOVO!")
     print(f"  Video: {final}")
-    print(f"  Délka: ~{duration}s")
-    print(f"  Nahraj na YouTube a dej link do DevPost.")
+    print(f"  Délka: {audio_duration + 3:.0f}s")
+    print(f"  Velikost: {size_mb:.1f} MB")
+    print(f"  Nahraj na YouTube → link do DevPost.")
     print(f"{'=' * 50}")
 
 
