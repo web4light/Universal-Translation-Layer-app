@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2196F3"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F44336"/>
+    </marker>
+  </defs>
+  
+  <!-- Pozadí -->
+  <rect width="1200" height="800" fill="#E8F5E9" rx="8"/>
+  
+  <!-- Titulek -->
+  <text x="600" y="35" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#1B5E20">ASGARD LAB — SCADA Panel</text>
+  <text x="600" y="55" text-anchor="middle" font-family="Arial" font-size="12" fill="#4CAF50">SCADA — Live Monitoring Panel</text>
+  
+  <!-- Mřížka -->
+  <g opacity="0.1">
+    <line x1="0" y1="0" x2="0" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="50" y1="0" x2="50" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="100" y1="0" x2="100" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="150" y1="0" x2="150" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="250" y1="0" x2="250" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="300" y1="0" x2="300" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="350" y1="0" x2="350" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="400" y1="0" x2="400" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="450" y1="0" x2="450" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="500" y1="0" x2="500" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="550" y1="0" x2="550" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="600" y1="0" x2="600" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="650" y1="0" x2="650" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="700" y1="0" x2="700" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="750" y1="0" x2="750" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="800" y1="0" x2="800" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="850" y1="0" x2="850" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="900" y1="0" x2="900" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="950" y1="0" x2="950" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="1000" y1="0" x2="1000" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="1050" y1="0" x2="1050" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="1100" y1="0" x2="1100" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="1150" y1="0" x2="1150" y2="800" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="50" x2="1200" y2="50" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="100" x2="1200" y2="100" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="150" x2="1200" y2="150" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="200" x2="1200" y2="200" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="250" x2="1200" y2="250" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="300" x2="1200" y2="300" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="350" x2="1200" y2="350" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="400" x2="1200" y2="400" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="450" x2="1200" y2="450" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="500" x2="1200" y2="500" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="550" x2="1200" y2="550" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="600" x2="1200" y2="600" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="650" x2="1200" y2="650" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="700" x2="1200" y2="700" stroke="#000" stroke-width="0.5"/>
+    <line x1="0" y1="750" x2="1200" y2="750" stroke="#000" stroke-width="0.5"/>
+  </g>
+
+  <!-- ASGARD SERVER -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="80" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="65" cy="95" r="6" fill="#4CAF50"/>
+    <text x="80" y="98" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">ASGARD SERVER</text>
+    <text x="60" y="120" font-family="monospace" font-size="10" fill="#333">:8000</text>
+    <text x="60" y="138" font-family="monospace" font-size="11" fill="#1565C0">T: 61 subtitles</text>
+    <text x="60" y="156" font-family="Arial" font-size="9" fill="#666">Translation pipeline</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="35,120 45,110 45,130" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- CAVE LAB -->
+  <g filter="url(#shadow)">
+    <rect x="310" y="80" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="325" cy="95" r="6" fill="#4CAF50"/>
+    <text x="340" y="98" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">CAVE LAB</text>
+    <text x="320" y="120" font-family="monospace" font-size="10" fill="#333">:8001</text>
+    <text x="320" y="138" font-family="monospace" font-size="11" fill="#1565C0">Web generator</text>
+    <text x="320" y="156" font-family="Arial" font-size="9" fill="#666">AI Web Studio</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="295,120 305,110 305,130" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- GEMINI API -->
+  <g filter="url(#shadow)">
+    <rect x="570" y="80" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="585" cy="95" r="6" fill="#4CAF50"/>
+    <text x="600" y="98" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">GEMINI API</text>
+    <text x="580" y="120" font-family="monospace" font-size="10" fill="#333">cloud</text>
+    <text x="580" y="138" font-family="monospace" font-size="11" fill="#1565C0">22+ langs</text>
+    <text x="580" y="156" font-family="Arial" font-size="9" fill="#666">Translation engine</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="555,120 565,110 565,130" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- DIRIGENT -->
+  <g filter="url(#shadow)">
+    <rect x="830" y="80" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="845" cy="95" r="6" fill="#4CAF50"/>
+    <text x="860" y="98" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">DIRIGENT</text>
+    <text x="840" y="120" font-family="monospace" font-size="10" fill="#333">bin/</text>
+    <text x="840" y="138" font-family="monospace" font-size="11" fill="#1565C0">0 overlaps</text>
+    <text x="840" y="156" font-family="Arial" font-size="9" fill="#666">Ada orchestrator (PROVED)</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="815,120 825,110 825,130" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- SHADOW NODE -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="260" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="65" cy="275" r="6" fill="#4CAF50"/>
+    <text x="80" y="278" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">SHADOW NODE</text>
+    <text x="60" y="300" font-family="monospace" font-size="10" fill="#333">:9303</text>
+    <text x="60" y="318" font-family="monospace" font-size="11" fill="#1565C0">failover 20s</text>
+    <text x="60" y="336" font-family="Arial" font-size="9" fill="#666">Hot standby</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="35,300 45,290 45,310" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- WATCHDOG -->
+  <g filter="url(#shadow)">
+    <rect x="310" y="260" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="325" cy="275" r="6" fill="#4CAF50"/>
+    <text x="340" y="278" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">WATCHDOG</text>
+    <text x="320" y="300" font-family="monospace" font-size="10" fill="#333">:9304</text>
+    <text x="320" y="318" font-family="monospace" font-size="11" fill="#1565C0">Heimdall</text>
+    <text x="320" y="336" font-family="Arial" font-size="9" fill="#666">Mesh guardian</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="295,300 305,290 305,310" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- PRIVACY 4:23 -->
+  <g filter="url(#shadow)">
+    <rect x="570" y="260" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="585" cy="275" r="6" fill="#4CAF50"/>
+    <text x="600" y="278" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">PRIVACY 4:23</text>
+    <text x="580" y="300" font-family="monospace" font-size="10" fill="#333">:9305</text>
+    <text x="580" y="318" font-family="monospace" font-size="11" fill="#1565C0">daily purge</text>
+    <text x="580" y="336" font-family="Arial" font-size="9" fill="#666">Metadata cleanup</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="555,300 565,290 565,310" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- PROMETHEUS -->
+  <g filter="url(#shadow)">
+    <rect x="830" y="260" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="845" cy="275" r="6" fill="#4CAF50"/>
+    <text x="860" y="278" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">PROMETHEUS</text>
+    <text x="840" y="300" font-family="monospace" font-size="10" fill="#333">:9307</text>
+    <text x="840" y="318" font-family="monospace" font-size="11" fill="#1565C0">286 checks</text>
+    <text x="840" y="336" font-family="Arial" font-size="9" fill="#666">Ada metrics server</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="815,300 825,290 825,310" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- TTS DUBBER -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="440" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="65" cy="455" r="6" fill="#4CAF50"/>
+    <text x="80" y="458" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">TTS DUBBER</text>
+    <text x="60" y="480" font-family="monospace" font-size="10" fill="#333">gTTS</text>
+    <text x="60" y="498" font-family="monospace" font-size="11" fill="#1565C0">Edge/Spark</text>
+    <text x="60" y="516" font-family="Arial" font-size="9" fill="#666">Voice synthesis</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="35,480 45,470 45,490" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- SIGN LANGUAGE -->
+  <g filter="url(#shadow)">
+    <rect x="310" y="440" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="325" cy="455" r="6" fill="#4CAF50"/>
+    <text x="340" y="458" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">SIGN LANGUAGE</text>
+    <text x="320" y="480" font-family="monospace" font-size="10" fill="#333">CZJ</text>
+    <text x="320" y="498" font-family="monospace" font-size="11" fill="#1565C0">142 glosses</text>
+    <text x="320" y="516" font-family="Arial" font-size="9" fill="#666">FREE forever</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="295,480 305,470 305,490" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- DLP3D AVATAR -->
+  <g filter="url(#shadow)">
+    <rect x="570" y="440" width="220" height="100" fill="#C8E6C9" stroke="#2E7D32" stroke-width="2" rx="6"/>
+    <circle cx="585" cy="455" r="6" fill="#4CAF50"/>
+    <text x="600" y="458" font-family="Arial" font-size="11" font-weight="bold" fill="#2E7D32">DLP3D AVATAR</text>
+    <text x="580" y="480" font-family="monospace" font-size="10" fill="#333">MIT</text>
+    <text x="580" y="498" font-family="monospace" font-size="11" fill="#1565C0">Babylon.js</text>
+    <text x="580" y="516" font-family="Arial" font-size="9" fill="#666">3D sign avatar</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="555,480 565,470 565,490" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+
+  <!-- ETH WALLET -->
+  <g filter="url(#shadow)">
+    <rect x="830" y="440" width="220" height="100" fill="#FFCDD2" stroke="#C62828" stroke-width="2" rx="6"/>
+    <circle cx="845" cy="455" r="6" fill="#F44336"/>
+    <text x="860" y="458" font-family="Arial" font-size="11" font-weight="bold" fill="#C62828">ETH WALLET</text>
+    <text x="840" y="480" font-family="monospace" font-size="10" fill="#333">Sepolia</text>
+    <text x="840" y="498" font-family="monospace" font-size="11" fill="#1565C0">Soulbound NFT</text>
+    <text x="840" y="516" font-family="Arial" font-size="9" fill="#666">KYC/Identity</text>
+  </g>
+  
+  <!-- Ventil (jistič) -->
+  <polygon points="815,480 825,470 825,490" fill="#F44336" stroke="#C62828" stroke-width="1"/>
+
+  <line x1="160" y1="130" x2="680" y2="130" stroke="#2196F3" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="680" y1="130" x2="940" y2="130" stroke="#F44336" stroke-width="2" marker-end="url(#arrow-red)" opacity="0.7"/>
+  <line x1="940" y1="130" x2="160" y2="490" stroke="#F44336" stroke-width="2" marker-end="url(#arrow-red)" opacity="0.7"/>
+  <line x1="940" y1="130" x2="420" y2="490" stroke="#2196F3" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="420" y1="490" x2="680" y2="490" stroke="#2196F3" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="160" y1="130" x2="940" y2="310" stroke="#4CAF50" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="160" y1="310" x2="160" y2="130" stroke="#FF9800" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="420" y1="310" x2="160" y2="310" stroke="#FF9800" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+  <line x1="940" y1="490" x2="160" y2="130" stroke="#9C27B0" stroke-width="2" marker-end="url(#arrow)" opacity="0.7"/>
+
+  <!-- Patička -->
+  <rect x="0" y="760" width="1200" height="40" fill="#1B5E20" opacity="0.9"/>
+  <text x="20" y="785" font-family="monospace" font-size="12" fill="#A5D6A7">SPARK PROVED: 286+ checks | 0 errors | Hoc est via</text>
+  <text x="1000" y="785" font-family="monospace" font-size="12" fill="#A5D6A7">web4light.online</text>
+</svg>
