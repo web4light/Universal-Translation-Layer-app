@@ -151,12 +151,12 @@ button:hover{background:#3a8ff8}
 <input type="url" id="url" placeholder="Paste YouTube URL...">
 <div style="display:flex;gap:.5rem;margin-top:.5rem;justify-content:center">
 <select id="lang">
-<option value="cs">Cestina</option><option value="en">English</option>
-<option value="de">Deutsch</option><option value="fr">Francais</option>
-<option value="es">Espanol</option><option value="ja">Japanese</option>
-<option value="ko">Korean</option><option value="zh">Chinese</option>
-<option value="pl">Polski</option><option value="sk">Slovencina</option>
-<option value="mn">Mongolian</option><option value="la">Latina</option>
+<option value="cs">Čeština</option><option value="en">English</option>
+<option value="de">Deutsch</option><option value="fr">Français</option>
+<option value="es">Español</option><option value="ja">日本語</option>
+<option value="ko">한국어</option><option value="zh">中文</option>
+<option value="pl">Polski</option><option value="sk">Slovenčina</option>
+<option value="mn">Монгол</option><option value="la">Latina</option>
 </select>
 <button onclick="runTranslation()">Translate + Dub + Sign</button>
 </div>
