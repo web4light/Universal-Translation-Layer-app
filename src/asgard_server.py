@@ -54,6 +54,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# === STATIC FILES (SCADA, DLP3D, assets) ===
+_static_dir = Path(__file__).parent.parent / "static"
+_static_dir.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+
+# === DLP3D Avatar (MIT) ===
+_dlp3d_dir = Path(__file__).parent.parent / "dlp3d" / "public"
+if _dlp3d_dir.exists():
+    app.mount("/avatar", StaticFiles(directory=str(_dlp3d_dir)), name="avatar")
+
 # === STRIPE INTEGRATION ===
 from stripe_integration import router as stripe_router
 app.include_router(stripe_router, tags=["payments"])
@@ -238,7 +248,17 @@ async def translate(req: TranslateRequest):
         
         translation_time = time.time() - start_time
         
-        # 3. Dub
+        # 3. Dirigent (Ada orchestrace hlasů)
+        dirigent_bin = Path(__file__).parent.parent / "bin" / "dirigent_main"
+        dirigent_result = None
+        if dirigent_bin.exists():
+            import subprocess as sp
+            dr = sp.run([str(dirigent_bin), "--status"],
+                       capture_output=True, text=True, timeout=5)
+            if dr.returncode == 0:
+                dirigent_result = json.loads(dr.stdout)
+
+        # 4. Dub
         dub_start = time.time()
         dubbed_path = srt_path.replace(".srt", f"_{req.target}_dubbed.mp3")
         dub_file(
@@ -249,7 +269,7 @@ async def translate(req: TranslateRequest):
         )
         dubbing_time = time.time() - dub_start
         
-        # 4. Sign language
+        # 5. Sign language
         sign_start = time.time()
         renderer = SignLanguageRenderer(language=SignLanguage.CZJ, use_gemini=True)
         sign_path = srt_path.replace(".srt", "_signs.json")
