@@ -1,0 +1,109 @@
+-- ============================================================
+-- SPARK Video Script Generator — Asgard Lab
+-- ============================================================
+-- Tento prompt vloží do GNAT Studio / Gemini API
+-- SPARK generuje PRAVDIVÝ obsah, jazykový model dá formu.
+--
+-- Instrukce: Vlož tento text do NotebookLM / Gemini jako zdroj,
+-- pak požádej o vygenerování podcast/video debaty dvou AI.
+-- ============================================================
+
+-- === PROJEKT: ASGARD LAB by Web4Light ===
+--
+-- CO TO JE:
+-- Autonomní AI systém který přeloží jakékoliv video do jakéhokoliv
+-- jazyka. Stačí vložit YouTube URL. Systém sám stáhne titulky,
+-- přeloží je, nadabuje a vygeneruje znakovou řeč pro neslyšící.
+--
+-- PRINCIP: 1+1=3
+-- Překlad + dabing = přístupnost (třetí emergentní hodnota).
+-- Tři výstupy z jednoho vstupu.
+--
+-- === JAK TO FUNGUJE (PRAVDIVĚ) ===
+--
+-- 1. Uživatel vloží YouTube URL
+-- 2. yt-dlp stáhne titulky (SRT formát, auto-generated)
+-- 3. Groq (llama-3.3-70b) nebo Gemini API přeloží titulky
+--    do cílového jazyka (podporujeme 22 jazyků)
+-- 4. gTTS (Google Text-to-Speech) syntetizuje audio dabing
+--    synchronizovaný s původním videem
+-- 5. Sign Language Renderer generuje glosy pro znakovou řeč
+--    (ČZJ, ASL, BSL, DGS) — ZDARMA pro neslyšící
+-- 6. ffmpeg složí finální video s overlayem titulků + audio
+--
+-- Celý proces trvá ~39 sekund na 60s video (61 titulků).
+-- Žádný lidský zásah. Plně autonomní.
+--
+-- === ARCHITEKTURA ===
+--
+-- Jádro: Ada/SPARK (formální verifikace)
+-- - Ranged types = buffer nikdy nepřeteče
+-- - Preconditions/postconditions = matematický kontrakt
+-- - Bounded loops = vždy skončí
+-- - Zero memory leaks = co přeloží, zahradí, uvolní
+--
+-- AI enginy:
+-- - Gemini API (Google Cloud) = kvalitní překlad
+-- - Groq (llama-3.3-70b) = rychlá inference, fallback
+-- - gTTS = syntéza hlasu
+-- - GNAT/SPARK = formální verifikace pipeline
+--
+-- Infrastruktura:
+-- - 2 počítače (herní PC RTX 3070 + vyřazený server)
+-- - NAS pro sdílení dat
+-- - Solární panely (550W panel = celá cloudovna)
+-- - Zero provozní náklady
+--
+-- === KDO ZA TÍM STOJÍ ===
+--
+-- Pan Jeskyně (jeden člověk + AI asistenti)
+-- Organizace: Rebirth Phoenix Foundation Charter
+-- Web: web4light.online
+--
+-- Celý pipeline naprogramován za jednu noc (8.8.2026).
+-- Jeden architekt s AI = síla 50-členného týmu.
+--
+-- === BYZNYS MODEL ===
+--
+-- PLACENÉ: dabing filmů/seriálů pro rodiny
+-- ZDARMA: znaková řeč pro neslyšící (sociální mise)
+-- B2B: API pro streamovací platformy
+--
+-- Partner: Tichý svět (česká organizace pro neslyšící)
+-- Reální uživatelé od 12.8.2026.
+--
+-- === UNIKÁTNÍ VLASTNOSTI ===
+--
+-- 1. Ada/SPARK formální verifikace — systém MATEMATICKY nemůže
+--    spadnout. Ne "doufáme že nespadne" — ale DŮKAZ že nespadne.
+--
+-- 2. Hlasová biometrie v GNAT repozitáři — každý uživatel má
+--    uložený svůj hlasový profil. Překlad zní TVÝM hlasem.
+--    SPARK pozná deepfake/imitaci.
+--
+-- 3. Dual biometrika — hlas + druhý faktor. Vždy dva údaje.
+--
+-- 4. 24/7 autonomní provoz — SPARK běží non-stop, překládá
+--    seriály, tím se učí jazyky. Ranged types = konstantní paměť.
+--
+-- 5. MUSH DO++ certifikace — AI agenti musí projít testováním
+--    (phishing, prompt injection, hallucination stress test).
+--    Kdo projde Asgard Studio, přežije všechno.
+--
+-- === MOTTO ===
+--
+-- Latinsky (úřední jazyk webu):
+-- "Loquere lingua tua. Omnes te audient sua lingua. Tua voce."
+-- = Mluv svým jazykem. Všichni tě uslyší svým. Tvým hlasem.
+--
+-- "Custos qui non mentitur." = Strážce který nelže.
+-- "Finis Fratris Magni." = Konec Velkého Bratra.
+--
+-- === AGENTI ===
+--
+-- Karel IV. — univerzální překladač s AI dabingem
+-- Mozart — znaková řeč pro neslyšící (zdarma)
+-- Žižka — audio navigace pro nevidomé (zdarma)
+-- Hus — pravdivý AI asistent (nikdy nehalucinuje)
+-- Gala — Ada AI agent volající Gemini přes OAuth
+-- Geall — Ada SPARK agent pro formální verifikaci
