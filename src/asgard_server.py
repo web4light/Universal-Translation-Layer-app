@@ -125,35 +125,13 @@ button{background:#2a6fd8;border:none;cursor:pointer;font-weight:bold;font-size:
 button:hover{background:#3a8ff8}
 #output{background:#12141a;border:1px solid #2a3040;border-radius:8px;padding:1.5rem;margin-top:1rem;display:none;white-space:pre-wrap;font-family:monospace;font-size:.85rem}
 .free{color:#6ad86a;text-align:center;margin:.5rem}
-/* Avatar panacek */
-.avatar-wrap{text-align:center;margin:1rem 0}
-.avatar{display:inline-block;position:relative;width:120px;height:180px}
-.avatar .head{width:50px;height:50px;background:#ffd700;border-radius:50%;margin:0 auto;position:relative}
-.avatar .head::after{content:'';position:absolute;top:15px;left:12px;width:8px;height:8px;background:#0a0a0f;border-radius:50%;box-shadow:18px 0 #0a0a0f}
-.avatar .body{width:40px;height:60px;background:#2a3a5a;border-radius:8px;margin:5px auto 0}
-.avatar .arm-l,.avatar .arm-r{width:12px;height:50px;background:#2a3a5a;border-radius:6px;position:absolute;top:60px}
-.avatar .arm-l{left:15px;animation:sign-l 2s ease-in-out infinite}
-.avatar .arm-r{right:15px;animation:sign-r 2s ease-in-out infinite .5s}
-.avatar .hand-l,.avatar .hand-r{width:16px;height:16px;background:#ffd700;border-radius:50%;position:absolute;bottom:-2px;left:-2px}
-@keyframes sign-l{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(30deg)}}
-@keyframes sign-r{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-35deg)}}
 .speech{background:#1a2a3a;border:1px solid #3a5a7a;border-radius:12px;padding:1rem;margin:1rem auto;max-width:500px;text-align:center;font-style:italic;color:#c0d8f0}
 </style></head><body>
 <h1>ASGARD LAB</h1>
 <div class="tagline">Loquere lingua tua. Omnes te audient sua lingua. Tua voce.</div>
 
-<div class="avatar-wrap">
-  <div class="avatar">
-    <div class="head"></div>
-    <div class="body"></div>
-    <div class="arm-l"><div class="hand-l"></div></div>
-    <div class="arm-r"><div class="hand-r"></div></div>
-  </div>
-</div>
-
 <div class="speech" id="speech">
-  Cau. Jsem tvuj partak. Hod mi video — a ja ti ho prelozim.
-  Do cehokoliv. Vlastnim hlasem. Neslysis? Ukazuju ti to rukama. Zdarma. Vzdycky.
+  Vlož YouTube URL. Přeložím, nadabuju, ukážu znakově. Autonomně. Bez lidského zásahu.
 </div>
 
 <div class="principle">1 + 1 = 3</div>
