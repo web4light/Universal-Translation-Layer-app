@@ -1,0 +1,271 @@
+{
+  "name": "Karel 1.0 Crypto Faucet Monitor and Filter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "fac15206-2a9f-4bd5-872a-1b22ccd08a60",
+      "name": "TEP",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://192.168.123.121",
+        "options": {}
+      },
+      "id": "2a1bae46-65c4-4441-9bb4-d672d015664b",
+      "name": "OČI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json }}",
+              "rightValue": "shitcoin",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "id-2",
+              "leftValue": "={{ $json }}",
+              "rightValue": "snipe",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "6811bcd0-b336-4177-b8e5-66313ba54db5",
+      "name": "ROZSUDEK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/data/clean_data.json",
+        "options": {}
+      },
+      "id": "d3707024-a5b7-4776-916b-f7495c07c0a8",
+      "name": "TREZOR",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "id": "7ad69488-1fca-4abc-80f7-818f299aab94",
+      "name": "TEP (Srdce agenta)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://192.168.123.121:9302/metrics",
+        "options": {}
+      },
+      "id": "a6f89db2-aa7d-424e-8832-d6c27422b368",
+      "name": "OČI (Sleduje kohoutek)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c6a2e4b1",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "shitcoin",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a7035cfa-55f0-4189-8fbc-fad49040e809",
+      "name": "ROZSUDEK (Komandování)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### VAKUUM (Smazáno)\nZde končí všechen krypto-odpad.",
+        "height": 140,
+        "width": 200
+      },
+      "id": "375510d2-9122-4868-b324-4c9df6a7d554",
+      "name": "Poznámka",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        656,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "pokladna_enola.json",
+        "options": {
+          "append": true
+        }
+      },
+      "id": "e49f3e3d-4c93-4c17-a37d-ce8ba0747119",
+      "name": "POKLADNA_ENOLA.json",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        656,
+        624
+      ]
+    }
+  ],
+  "connections": {
+    "TEP": {
+      "main": [
+        [
+          {
+            "node": "OČI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OČI": {
+      "main": [
+        [
+          {
+            "node": "ROZSUDEK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ROZSUDEK": {
+      "main": [
+        [],
+        [
+          {
+            "node": "TREZOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEP (Srdce agenta)": {
+      "main": [
+        [
+          {
+            "node": "OČI (Sleduje kohoutek)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OČI (Sleduje kohoutek)": {
+      "main": [
+        [
+          {
+            "node": "ROZSUDEK (Komandování)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ROZSUDEK (Komandování)": {
+      "main": [
+        [
+          {
+            "node": "POKLADNA_ENOLA.json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": null
+}

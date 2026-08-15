@@ -1,0 +1,80 @@
+{
+  "name": "Geall - Web4.23 AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "chat-trigger",
+      "name": "Geall Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "geall-web4-423"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:11434/api/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma3:4b\",\n  \"prompt\": \"{{ $json.chatInput }}\",\n  \"stream\": false\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ollama-request",
+      "name": "Ollama - gemma3:4b",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.response }}"
+      },
+      "id": "respond",
+      "name": "Geall Odpověď",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [720, 300]
+    }
+  ],
+  "connections": {
+    "Geall Chat": {
+      "main": [
+        [
+          {
+            "node": "Ollama - gemma3:4b",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama - gemma3:4b": {
+      "main": [
+        [
+          {
+            "node": "Geall Odpověď",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
