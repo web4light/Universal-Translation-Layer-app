@@ -28,11 +28,16 @@ package body Formal_Safety is
      (Voice_Hash  : in String;
       GNAT_Key    : in String) return Boolean is
    begin
-      -- Dual biometric: oba hashe musí být nenulové
-      -- SPARK precondition garantuje délku 64
+      -- Dual biometric: oba hashe musí být shodné
+      -- Precondition garantuje délku 64 pro oba
+      if Voice_Hash'Length /= GNAT_Key'Length then
+         return False;
+      end if;
       for I in Voice_Hash'Range loop
-         if Voice_Hash (I) /= GNAT_Key (I) then
-            return False;
+         if I in GNAT_Key'Range then
+            if Voice_Hash (I) /= GNAT_Key (I) then
+               return False;
+            end if;
          end if;
       end loop;
       return True;
