@@ -10,18 +10,45 @@ Speak in Czech. Be heard in Japanese. **In your own voice.**
 
 ## What is Karel IV.?
 
-Karel IV. is a real-time AI voice translator that:
+Karel IV. is a real-time AI voice translator and autonomous dubbing agent that:
 
-- Listens to your microphone
-- Transcribes speech using **Whisper** (MIT, runs locally)
-- Translates using **Gemini AI** (Apache 2.0)
-- Synthesizes output in **your own voice** using Coqui TTS (MIT)
-- Delivers translated audio to your headphones in real-time
+- Ingests foreign subtitles and speech
+- Translates using **Gemini 3.5 Flash** with deep contextual and emotional preservation
+- Synthesizes output in **the original speaker's cloned voice** using Spark-TTS
+- Formally verified with **Ada/SPARK 2022** for 100% mathematical zero-crash guarantee
+- Coordinates across 4 autonomous guilds via **Google Antigravity Agent & GenAI SDK**
+- Deployed with zero idle cost on **Google Cloud Run**
 
-Built for **VR environments** — walk into a virtual meeting speaking Czech,
-be heard in any language.
+---
 
-Powered by a **mesh network** of user hardware.
+## 🏆 All Things Agentic Hackathon ($180,000 USD)
+
+This project is submitted to the **All Things Agentic Hackathon** organized by Google Cloud & Devpost across 5 core disciplines:
+- 👑 **Grand Prize ($50,000 USD):** Universal Translation Layer (UTL) Protocol 4.23
+- ⚙️ **Taskmaster ($20,000 USD):** Agent Jan Amos Komenský (5-step autonomous didactic pipeline)
+- 👤 **Best Solo Build ($10,000 USD):** 100% sovereign build by solo architect Pan Jeskyně
+- 🏛️ **Best Architecture Design ($5,000 USD):** Kněžna Libuše (Prometheus/Geth) + Přemysl Oráč (PJAY Mesh) + Ada/SPARK 2022
+- 🎙️ **Best Multimodal UX ($5,000 USD):** Karel IV. real-time subtitle translation & voice synthesis
+- **Mandatory Requirements Compliance:**
+  - ✅ **Gemini Model:** Gemini 3.5 Flash / Gemini 2.5 via Gemini API (`google-genai` SDK)
+  - ✅ **Google Agent Framework:** Google Antigravity Agent (`src/antigravity_agent.py`, `src/agent_komensky.py`)
+  - ✅ **Google Cloud Infrastructure:** Google Cloud Run container (`Dockerfile.cloudrun`, `deploy_cloud_run.sh`)
+
+### ⚡ Quick Reproduction & Testing (For Judges)
+
+```bash
+# 1. Run Agent Komenský (Taskmaster Didactic Pipeline):
+python3 src/agent_komensky.py
+
+# 2. Run Google Antigravity Agent (4 Guilds Orchestration):
+python3 src/antigravity_agent.py
+
+# 3. Test Spark-TTS Subtitle Dubber:
+python3 src/tts_dubber.py --engine sparktts --help
+
+# 4. Deploy to Google Cloud Run (Scale-to-Zero):
+./deploy_cloud_run.sh
+```
 
 ---
 

@@ -1,0 +1,8 @@
+project Autonomous_Departments is
+   for Source_Dirs use ("src");
+   for Main use ("autonomous_departments.adb");
+   for Object_Dir use "obj/spark_depts";
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatW8", "-gnat2022");
+   end Compiler;
+end Autonomous_Departments;

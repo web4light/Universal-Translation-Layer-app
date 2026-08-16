@@ -1,0 +1,34 @@
+-- ============================================================
+--  Agent Přemysl Oráč — Skript v suverénním jazyce PJAY
+--
+--  "Hoc est via." — This is the way.
+--  "Locutus sum." — I have spoken.
+--
+--  Autor: Pan Jeskyně
+--  Standard: 700 / Protokol 4.23
+-- ============================================================
+
+procedura Premysl_Mesh_Orchestrator
+
+Hoc_est_via:
+   Primarius := "Primary-Windows-Workstation";
+   Umbra     := "Shadow-Ubuntu-Guardian";
+   Nubes     := "Google-Cloud-Run-Relay";
+   Portus    := 9302;
+   Failover  := 15;
+
+incipit
+
+   Locutus_sum:
+      Plough_Route (Primarius, Umbra);
+      Harvest_Heartbeat (Portus);
+
+   Ego_sum_Groot:
+      si Heartbeat_OK est SIC tum
+         Latratus! "Mesh brázda tepe v plné síle. Standard 700 zachován."
+      alias
+         Trigger_Failover (Umbra);
+         Latratus! "Primary uzel neodpovídá! Failover aktivován do 15 sekund."
+      finis_si;
+
+finis Premysl_Mesh_Orchestrator;

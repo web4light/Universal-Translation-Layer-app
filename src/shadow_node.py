@@ -20,10 +20,10 @@ from prometheus_client import start_http_server, Counter, Gauge
 SHADOW_PORT = 9303  # Shadow běží na jiném portu než Primary (9302)
 
 # URL Primary Node
-# Lokální test (oba uzly na stejném PC):
-PRIMARY_URL = "http://192.168.123.191:9302/metrics"
+# Primary Node běží na stejném stroji (Ubuntu/asterisk):
+PRIMARY_URL = "http://localhost:9302/metrics"
 
-# Production (asterisk i7 Windows — Ethernet .191, Primary):
+# Starší konfigurace (Windows .191 — nepoužívat):
 # PRIMARY_URL = "http://192.168.123.191:9302/metrics"
 
 # Shadow běží na Esprimo WiFi .172 (AX200 rychlejší než Ethernet):

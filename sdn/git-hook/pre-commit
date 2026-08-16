@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# To install (from this directory):
+#
+#    pip3 install git-pylint-commit-hook mypy
+#    chmod +x pre-commit
+#    rm -f ../.git/hooks/pre-commit
+#    ln -s ../../git-hook/pre-commit ../.git/hooks
+
+git-pylint-commit-hook --limit=9.2
+
+# From .git/hooks
+BASE=`dirname $0`/../..
+cd $BASE || exit 1
+BASE=`pwd`
+for mypy_file in faucet/*.py ; do
+    mypy --ignore-missing-imports $mypy_file || exit 1
+done
+./tests/run_unit_tests.sh || exit 1

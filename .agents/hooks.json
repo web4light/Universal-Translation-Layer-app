@@ -1,0 +1,32 @@
+{
+  "spark-safety-gate": {
+    "enabled": true,
+    "pre_tool_execution": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /.agents/hooks-scripts/check_spark_rules.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "spark-auto-lint": {
+    "enabled": true,
+    "post_tool_execution": [
+      {
+        "matcher": "write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /.agents/hooks-scripts/auto_lint.py",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

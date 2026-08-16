@@ -1,0 +1,130 @@
+name: Build docker images for release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  faucet-docker-image:
+    name: "Build faucet docker image"
+    runs-on: ubuntu-latest
+    environment:
+      name: "release"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - name: Set up qemu
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: all
+      - name: Set up docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          version: latest
+      - name: Login to docker registry
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Run buildx
+        run: |
+          docker buildx build \
+            --tag "faucet/faucet:${GITHUB_REF_NAME}" \
+            --tag faucet/faucet:latest \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x \
+            --output "type=registry" \
+            --file Dockerfile.faucet \
+            .
+
+  gauge-docker-image:
+    name: "Build gauge docker image"
+    runs-on: ubuntu-latest
+    environment:
+      name: "release"
+    needs: faucet-docker-image
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - name: Set up qemu
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: all
+      - name: Set up docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          version: latest
+      - name: Login to docker registry
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Run buildx
+        run: |
+          docker buildx build \
+            --tag "faucet/gauge:${GITHUB_REF_NAME}" \
+            --tag faucet/gauge:latest \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x \
+            --output "type=registry" \
+            --file Dockerfile.gauge \
+            .
+
+  rabbitmq-adapter-docker-image:
+    name: "Build rabbitmq adapter docker image"
+    runs-on: ubuntu-latest
+    environment:
+      name: "release"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - name: Set up qemu
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: all
+      - name: Set up docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          version: latest
+      - name: Login to docker registry
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Run buildx
+        run: |
+          cd adapters/vendors/rabbitmq/
+          docker buildx build \
+            --tag "faucet/event-adapter-rabbitmq:${GITHUB_REF_NAME}" \
+            --tag faucet/event-adapter-rabbitmq:latest \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x \
+            --output "type=registry" \
+            --file Dockerfile \
+            .
+
+  faucetagent-adapter-docker-image:
+    name: "Build faucetagent adapter docker image"
+    runs-on: ubuntu-latest
+    environment:
+      name: "release"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - name: Set up qemu
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: all
+      - name: Set up docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          version: latest
+      - name: Login to docker registry
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Run buildx
+        run: |
+          cd adapters/vendors/faucetagent/
+          docker buildx build \
+            --tag "faucet/event-adapter-faucetagent:${GITHUB_REF_NAME}" \
+            --tag faucet/event-adapter-faucetagent:latest \
+            --platform linux/amd64 \
+            --output "type=registry" \
+            --file Dockerfile \
+            .

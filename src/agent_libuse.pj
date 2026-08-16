@@ -1,0 +1,32 @@
+-- ============================================================
+--  Kněžna Libuše — Skript v suverénním jazyce PJAY
+--  "Vidím město veliké, jehož sláva hvězd se dotýká."
+--  "Hoc est via." — This is the way.
+--  "Locutus sum." — I have spoken.
+--
+--  Autor: Pan Jeskyně
+--  Standard: 700 / Protokol 4.23
+-- ============================================================
+
+procedura Libuse_Oracle_Vision
+
+Hoc_est_via:
+   Prometheus_Port := 9302;
+   Geth_Mirror_Port := 9303;
+   Max_Threshold   := 95;
+
+incipit
+
+   Locutus_sum:
+      Observe_Telemetry (Prometheus_Port);
+      Scrutinize_Vault  (Geth_Mirror_Port);
+
+   Ego_sum_Groot:
+      si Vision_Serene est SIC tum
+         Latratus! "Zlaté orakulum jasné. Síť i pokladna v rovnováze."
+      alias
+         Raise_Alarm ("Anomálie v telemetrii nebo odliv v pokladně!");
+         Latratus! "Výstraha Kněžny Libuše! Nastává zatmění sítě."
+      finis_si;
+
+finis Libuse_Oracle_Vision;

@@ -1,0 +1,15 @@
+-r requirements.txt
+bitstring
+codecov
+concurrencytest
+debian-inspector
+exabgp==4.2.25
+importlab>=0.3.1
+netifaces
+packaging
+psutil==7.2.2
+requests
+requirements-parser
+scapy==2.7.0
+webob
+tinyrpc<1.1.6

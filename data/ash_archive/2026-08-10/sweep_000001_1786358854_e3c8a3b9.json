@@ -1,0 +1,120 @@
+{
+  "sweep_id": "sweep_000001_1786358854",
+  "timestamp": 1786358854.2135992,
+  "sealed_at": "2026-08-10T10:47:34.214380+00:00",
+  "particle_count": 10,
+  "total_burned_eth": 0.01939100667744438,
+  "total_gas_used": 795460,
+  "particles": [
+    {
+      "tx_hash": "c8cfd59e1f5fa7a3aab85e479417e721df3ff4a374aa68353bcfa6f8942a2246",
+      "gas_used": 60849,
+      "gas_price_gwei": 39.52493887368905,
+      "burned_eth": 0.0024050530055251054,
+      "timestamp": 1786358854.2133114,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "c06121cdd6a4841a"
+    },
+    {
+      "tx_hash": "088754cc631c42180af0b143d6aa10ca08ec9b85a0bf4c2ceabe30f76a55c4d2",
+      "gas_used": 67675,
+      "gas_price_gwei": 37.813965767853986,
+      "burned_eth": 0.002559060133339519,
+      "timestamp": 1786358854.2133706,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "dd926e7313b36169"
+    },
+    {
+      "tx_hash": "7c50b7fefe76f6e2262502064e883f59de5fe4fffb6d5ef831cef99395383341",
+      "gas_used": 136982,
+      "gas_price_gwei": 9.584889425931205,
+      "burned_eth": 0.0013129573233429085,
+      "timestamp": 1786358854.213407,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "e7cde6244f3cfc67"
+    },
+    {
+      "tx_hash": "99670e9562b90c692e7af04db1ef996cb268c97bc3a1a5c7fead7dc06cb885ba",
+      "gas_used": 72748,
+      "gas_price_gwei": 6.218475622197477,
+      "burned_eth": 0.00045238166456362214,
+      "timestamp": 1786358854.2134316,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "aa4ba32f5cb0366f"
+    },
+    {
+      "tx_hash": "9e914da7b2188c71a701ded5b906a7216e2606334f30d1c1ad41175c43cf42f6",
+      "gas_used": 125893,
+      "gas_price_gwei": 15.67507375968551,
+      "burned_eth": 0.001973382060828088,
+      "timestamp": 1786358854.2134855,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "2c19667d3aa49e4a"
+    },
+    {
+      "tx_hash": "1f1b78b4da03d5de43a4570f56d71c165401d9f3be4bc9a67023fadc000d80ee",
+      "gas_used": 147967,
+      "gas_price_gwei": 40.001435219208034,
+      "burned_eth": 0.0059188923650805554,
+      "timestamp": 1786358854.2135093,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "de032da4ea997d60"
+    },
+    {
+      "tx_hash": "2eb0c2d3f93c09dc999ec636a888ec8dcbc19d22b08277d5b59e5a11601a44f3",
+      "gas_used": 65994,
+      "gas_price_gwei": 31.03105973901574,
+      "burned_eth": 0.0020478637564166047,
+      "timestamp": 1786358854.213527,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "678a3f7e069055f6"
+    },
+    {
+      "tx_hash": "5e030ac9da51088cc1e618d3c4f83338d52c9a840c4dd23cc64e4ecf233c08d8",
+      "gas_used": 49028,
+      "gas_price_gwei": 11.569490603072182,
+      "burned_eth": 0.0005672289852874231,
+      "timestamp": 1786358854.2135434,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "fe9697e5026776ac"
+    },
+    {
+      "tx_hash": "7fdbc7b40e444fed796fb0fdbb12d4ca422d7ff37f2dd547096199cbb950dd7a",
+      "gas_used": 42068,
+      "gas_price_gwei": 33.28620770385322,
+      "burned_eth": 0.0014002841856856974,
+      "timestamp": 1786358854.21356,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "7a6fe06e4370f924"
+    },
+    {
+      "tx_hash": "a41dbefd921143cbe30846ef76c302f5dbc59407ee9a0550bf10c167a61de0a4",
+      "gas_used": 26256,
+      "gas_price_gwei": 28.713558705623722,
+      "burned_eth": 0.0007539031973748565,
+      "timestamp": 1786358854.213577,
+      "source": "shadow_node_sim",
+      "block_number": 0,
+      "swept": false,
+      "ash_id": "9536f152a8313258"
+    }
+  ]
+}

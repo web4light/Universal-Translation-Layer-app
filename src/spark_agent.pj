@@ -1,0 +1,35 @@
+-- ============================================================
+--  SPARK Agent — Skript v suverénním jazyce PJAY
+--  Formálně verifikovaná definice autonomního SPARK agenta
+--
+--  "Hoc est via." — This is the way.
+--  "Locutus sum." — I have spoken.
+--
+--  Autor: Pan Jeskyně
+--  Standard: 700 / Protokol 4.23
+-- ============================================================
+
+procedura Spark_Autonomous_Agent
+
+Hoc_est_via:
+   Max_Steps := 100;
+   Max_Tools := 16;
+   SPARK_Mode_Strict := SIC;
+
+incipit
+
+   Locutus_sum:
+      Initialize_Context ();
+      Execute_Reasoning_Cycle (Max_Steps);
+      Enforce_Formal_Contracts ();
+      Invoke_Gnatprove_Verification ();
+
+   Ego_sum_Groot:
+      si Formal_Proof_Clean est SIC tum
+         Latratus! "100% formální verifikace SPARK_Mode (On) dosažena. Žádné chyby, žádné kompromisy."
+      alias
+         Rollback_State ("Důkaz neprošel! Návrat do bezpečného stavu.");
+         Latratus! "Detekována chyba v kontraktech! Spuštěna automatická korekce."
+      finis_si;
+
+finis Spark_Autonomous_Agent;

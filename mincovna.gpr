@@ -28,7 +28,8 @@ project Mincovna is
       "transkomunikator_validator.adb",  -- Karel IV.: Audio PCM validator
       "pipeline_validator.adb",          -- Karel IV.: text/prompt/response validator
       "geall_license.adb",              -- Geall: Household license validator
-      "translation_validator.adb"        -- UTL: Translation ratio validator
+      "translation_validator.adb",       -- UTL: Translation ratio validator
+      "asgard_orchestrator_main.adb"     -- Asgard: Master Orchestra Core
    );
 
    package Compiler is

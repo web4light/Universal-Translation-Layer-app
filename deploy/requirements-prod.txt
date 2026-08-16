@@ -1,0 +1,9 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+google-genai==1.14.0
+groq==0.11.0
+gtts==2.5.3
+yt-dlp==2024.8.6
+pydantic==2.9.0
+prometheus-client==0.21.0
+httpx==0.27.2

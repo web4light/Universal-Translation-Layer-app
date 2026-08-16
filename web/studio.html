@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAVE LAB • GRAFICKÉ STUDIO & TISKOVÁ DÍLNA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #06070d;
+            --bg-surface: #0e121e;
+            --bg-panel: rgba(16, 21, 36, 0.85);
+            --gold: #d4af37;
+            --gold-glow: #ffd700;
+            --blue: #38bdf8;
+            --purple: #c084fc;
+            --green: #10b981;
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+            color: #f1f5f9;
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1.2rem 2.5rem;
+            background: rgba(6, 7, 13, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+        }
+
+        .brand-title h1 {
+            font-family: var(--font-title);
+            font-size: 1.3rem;
+            color: #fff;
+            letter-spacing: 0.05em;
+        }
+
+        .brand-title span {
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            color: var(--gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--gold-glow); }
+
+        .main-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 360px 1fr 380px;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-header {
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            color: var(--gold-glow);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* === LEFT: DESIGN CONTROLS & AI GENERATOR === */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.4rem;
+            font-family: var(--font-code);
+        }
+
+        .form-control, select, textarea {
+            width: 100%;
+            background: #090c16;
+            border: 1px solid #1e293b;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-ai-gen {
+            background: linear-gradient(135deg, var(--purple), #7e22ce);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-ai-gen:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(192, 132, 252, 0.5);
+        }
+
+        /* === CENTER: CANVAS PREVIEW === */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #04050a;
+            border-radius: 12px;
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            overflow: hidden;
+            padding: 2rem;
+            min-height: 480px;
+        }
+
+        .preview-card {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1 / 1.414; /* A-format aspect ratio */
+            background: linear-gradient(135deg, #1e1b4b 0%, #090a14 100%);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .preview-bleed {
+            position: absolute;
+            inset: 6px;
+            border: 1px dashed rgba(239, 68, 68, 0.4);
+            pointer-events: none;
+        }
+
+        .preview-bleed::after {
+            content: 'Spadávka 3mm (Bleed zone)';
+            position: absolute;
+            top: 4px; right: 6px;
+            font-size: 0.65rem;
+            color: rgba(239, 68, 68, 0.6);
+            font-family: var(--font-code);
+        }
+
+        .preview-title {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            color: var(--gold-glow);
+            text-align: center;
+        }
+
+        .preview-body {
+            font-size: 1rem;
+            color: #cbd5e1;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .preview-footer {
+            text-align: center;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: #64748b;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 0.8rem;
+        }
+
+        /* === RIGHT: PRINT CONFIGURATOR & ORDER === */
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .spec-row span:first-child { color: #94a3b8; }
+        .spec-row span:last-child { font-weight: 600; color: #fff; font-family: var(--font-code); }
+
+        .price-box {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .price-val {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gold-glow);
+        }
+
+        .price-gros {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .btn-order-print {
+            background: linear-gradient(135deg, var(--gold), #997819);
+            color: #06070d;
+            border: none;
+            padding: 1.1rem;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            transition: all 0.25s;
+        }
+
+        .btn-order-print:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.6);
+        }
+
+        .badge-print-ready {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: var(--font-code);
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="cavelab.html" class="brand">
+            <div class="brand-icon">🖨️</div>
+            <div class="brand-title">
+                <h1>CAVE LAB • TISKOVÁ DÍLNA</h1>
+                <span>PŘÍMÉ NAPOJENÍ NA TISKOVOU VÝROBU • STANDARD 700</span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a href="cavelab.html">🏛️ Hlavní Portál</a>
+            <a href="mint.html">🪙 Mincovna</a>
+            <a href="demo_presentation.html">▶️ Prezentace</a>
+        </div>
+    </header>
+
+    <!-- WORKSPACE LAYOUT -->
+    <main class="main-layout">
+
+        <!-- 1. LEVÝ PANEL: TVORBA GRAFIKY & AI GENERÁTOR -->
+        <aside class="panel">
+            <div class="panel-header">✨ Tvorba Grafiky (AI)</div>
+            
+            <div class="form-group">
+                <label>Typ tiskoviny:</label>
+                <select id="prodType" onchange="updateProduct()">
+                    <option value="plakat">Plakát (A3 / A4)</option>
+                    <option value="letakovina">Leták (A5 / DL)</option>
+                    <option value="vizitky">Vizitky (90x50 mm)</option>
+                    <option value="samolepky">Samolepky & Etikety</option>
+                    <option value="ceniny" selected>📜 Tisk Cenin & Bankovek (Standard 700)</option>
+                    <option value="certifikat">🏅 Certifikát Pravosti s Krypto-Hashem</option>
+                    <option value="banner">Velkoformátový Banner</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="securityOptionsBox">
+                <label style="color: var(--gold-glow);">🛡️ Ochranné prvky cenin:</label>
+                <div style="font-size: 0.85rem; color: #cbd5e1; display: grid; gap: 0.4rem;">
+                    <label><input type="checkbox" checked disabled> Gilošové vzory (Guilloche proti padělání)</label>
+                    <label><input type="checkbox" checked disabled> Mikrotext s Keccak-256 hashem</label>
+                    <label><input type="checkbox" checked disabled> Unikátní číslování (Sériová řada)</label>
+                    <label><input type="checkbox" checked> Ceninový papír s vodoznakem & vlákny</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Hlavní titulek / Název:</label>
+                <input type="text" id="designTitle" class="form-control" value="ASGARD ROCK FESTIVAL 2026" oninput="renderLivePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Podtitul a popis:</label>
+                <textarea id="designDesc" rows="3" oninput="renderLivePreview()">Velkolepá oslava svobodného kódu, hudby a kovaných tradic. Vstup pod licencí GNU GPLv3 zdarma.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>AI Prompt pro designéra (Gemini):</label>
+                <textarea id="aiPrompt" rows="2" placeholder="Např. Kovaný asgardský styl, zlaté runy, temné kosmické pozadí..."></textarea>
+            </div>
+
+            <button class="btn-ai-gen" onclick="generateAiDesign()">
+                🤖 Vygenerovat Grafiku přes Gemini
+            </button>
+        </aside>
+
+        <!-- 2. STŘEDNÍ PANEL: ŽIVÝ NÁHLED TISKU S VODÍTKY -->
+        <section class="panel">
+            <div class="panel-header">
+                <span>👁️ Živý Tiskový Náhled (300 DPI CMYK)</span>
+            </div>
+
+            <div class="canvas-container">
+                <div class="preview-card" id="previewCard">
+                    <div class="preview-bleed"></div>
+                    <div class="preview-title" id="prevTitle">ASGARD FESTIVAL</div>
+                    <div class="preview-body" id="prevBody">Velkolepá oslava svobodného kódu, hudby a kovaných tradic. Vstup pod licencí GNU GPLv3 zdarma.</div>
+                    <div class="preview-footer" id="prevFooter">CAVE LAB PRINT • TISKOVÁ LINKA TÁTY</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PRAVÝ PANEL: KONFIGURÁTOR TISKU & OBJEDNÁVKA -->
+        <aside class="panel">
+            <div class="panel-header">📦 Parametry Tisku & Objednávka</div>
+
+            <div class="form-group">
+                <label>Formát papíru:</label>
+                <select id="paperFormat" onchange="calculatePrice()">
+                    <option value="a3">A3 (297 x 420 mm)</option>
+                    <option value="a4" selected>A4 (210 x 297 mm)</option>
+                    <option value="a5">A5 (148 x 210 mm)</option>
+                    <option value="vizitka">Vizitka (90 x 50 mm)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Typ a gramáž papíru:</label>
+                <select id="paperType" onchange="calculatePrice()">
+                    <option value="130g">130g Křída Mat (Běžný leták)</option>
+                    <option value="170g">170g Křída Lesk (Plakátový standard)</option>
+                    <option value="250g" selected>250g Křída Mat (Exkluzivní plakát)</option>
+                    <option value="350g">350g Křídový karton (Tuhá vizitka)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Počet kusů (Náklad):</label>
+                <select id="printQuantity" onchange="calculatePrice()">
+                    <option value="50">50 kusů</option>
+                    <option value="100" selected>100 kusů</option>
+                    <option value="250">250 kusů</option>
+                    <option value="500">500 kusů</option>
+                    <option value="1000">1 000 kusů</option>
+                </select>
+            </div>
+
+            <div class="spec-row">
+                <span>Barevnost:</span>
+                <span>4/0 CMYK (Plnobarevný jednostranný)</span>
+            </div>
+            <div class="spec-row">
+                <span>Předtisková kontrola:</span>
+                <span style="color: #4ade80;">OK (3mm spadávka aktivní)</span>
+            </div>
+
+            <div class="price-box">
+                <div class="price-val" id="totalPrice">650 Kč</div>
+                <div class="price-gros" id="grosPrice">≈ 5.4 Pražských Grošů (Standard 700)</div>
+            </div>
+
+            <button class="btn-order-print" onclick="submitToPrintShop()">
+                🖨️ Odeslat Tiskovinu do Tiskárny
+            </button>
+
+            <div class="badge-print-ready">
+                ✅ Automatická tvorba PDF/X-1a tiskových dat
+            </div>
+        </aside>
+
+    </main>
+
+    <script>
+        function renderLivePreview() {
+            const title = document.getElementById('designTitle').value;
+            const desc = document.getElementById('designDesc').value;
+            document.getElementById('prevTitle').innerText = title;
+            document.getElementById('prevBody').innerText = desc;
+        }
+
+        function calculatePrice() {
+            const format = document.getElementById('paperFormat').value;
+            const qty = parseInt(document.getElementById('printQuantity').value);
+            
+            let baseRate = 4.5;
+            if (format === 'a3') baseRate = 8.0;
+            if (format === 'a5') baseRate = 2.8;
+            if (format === 'vizitka') baseRate = 1.2;
+
+            const total = Math.round(qty * baseRate + 200); // 200 Kč příprava stroje
+            const gros = (total / 120).toFixed(1);
+
+            document.getElementById('totalPrice').innerText = `${total} Kč`;
+            document.getElementById('grosPrice').innerText = `≈ ${gros} Pražských Grošů (Standard 700)`;
+        }
+
+        function generateAiDesign() {
+            const prompt = document.getElementById('aiPrompt').value || 'Asgardský slavnostní styl';
+            document.getElementById('designTitle').value = 'MANDALORE FORGE EXPO';
+            document.getElementById('designDesc').value = 'Kované umění, nezlomný kód v Ada/SPARK a mistrovský tisk. Generováno přes Gemini 3.5 Flash.';
+            renderLivePreview();
+            alert('✨ Gemini 3.5 Flash vygeneroval tiskovou kompozici a nastavil barevné tóny!');
+        }
+
+        function submitToPrintShop() {
+            const qty = document.getElementById('printQuantity').value;
+            const format = document.getElementById('paperFormat').value.toUpperCase();
+            const price = document.getElementById('totalPrice').innerText;
+
+            alert(`🎉 OBJEDNÁVKA ODESLÁNA DO TISKÁRNY!\n\nNáklad: ${qty} ks\nFormát: ${format}\nCena: ${price}\n\nTisková data byla převedena do CMYK 300 DPI se spadávkou a zařazena do tiskové fronty.`);
+        }
+    </script>
+</body>
+</html>

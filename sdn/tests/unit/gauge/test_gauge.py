@@ -1,0 +1,757 @@
+"""Unit tests for gauge"""
+
+# pylint: disable=protected-access
+# pylint: disable=too-many-lines
+
+from collections import namedtuple
+import random
+import re
+import shutil
+import tempfile
+import threading
+import time
+import os
+import unittest
+from unittest import mock
+
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+import requests
+from requests.exceptions import ReadTimeout
+
+from os_ken.controller.ofp_event import EventOFPMsgBase
+from os_ken.lib import type_desc
+from os_ken.lib import hub
+from os_ken.ofproto import ofproto_v1_3 as ofproto
+from os_ken.ofproto import ofproto_v1_3_parser as parser
+
+from prometheus_client import CollectorRegistry
+
+from faucet import gauge, gauge_prom, gauge_pollers, watcher, valve_util
+from faucet.config_parser_util import yaml_load
+
+
+def create_mock_datapath(num_ports):
+    """Mock a datapath by creating mocked datapath ports."""
+
+    dp_id = random.randint(1, 5000)
+    dp_name = mock.PropertyMock(return_value="datapath")
+
+    def table_by_id(i):
+        """Mock a table by id"""
+
+        table = mock.Mock()
+        table_name = mock.PropertyMock(return_value="table" + str(i))
+        type(table).name = table_name
+        return table
+
+    def port_labels(port_no):
+        """Provide labels for a port"""
+
+        return {
+            "port": "port%u" % port_no,
+            "port_description": "port%u" % port_no,
+            "dp_id": hex(dp_id),
+            "dp_name": dp_name,
+        }
+
+    ports = {}
+    for i in range(1, num_ports + 1):
+        port = mock.Mock()
+        port_name = mock.PropertyMock(return_value="port" + str(i))
+        type(port).name = port_name
+        ports[i] = port
+
+    datapath = mock.Mock(
+        ports=ports, dp_id=dp_id, port_labels=port_labels, table_by_id=table_by_id
+    )
+    type(datapath).name = dp_name
+    return datapath
+
+
+def start_server(handler):
+    """Starts a HTTPServer and runs it as a daemon thread"""
+
+    server = HTTPServer(("", 0), handler)
+    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread.daemon = True
+    server_thread.start()
+    return server
+
+
+def port_state_msg(datapath, port_num, reason, status=0):
+    """Create an OFPPortStatus message with random values."""
+
+    port = parser.OFPPort(
+        port_num,
+        "00:00:00:d0:00:0" + str(port_num),
+        datapath.ports[port_num].name,
+        0,
+        status,
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+    )
+
+    return parser.OFPPortStatus(datapath, reason, port)
+
+
+def port_stats_msg(datapath):
+    """Create an OFPPortStatsReply with random values."""
+
+    stats = []
+    sec = random.randint(1, 10000)
+    nsec = random.randint(0, 10000)
+    for port_num in datapath.ports:
+        port_stats = parser.OFPPortStats(
+            port_num,
+            random.randint(1, 10000),
+            random.randint(1, 10000),
+            random.randint(1, 10000),
+            random.randint(1, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            random.randint(0, 10000),
+            sec,
+            nsec,
+        )
+        stats.append(port_stats)
+    return parser.OFPPortStatsReply(datapath, body=stats)
+
+
+def flow_stats_msg(datapath, instructions):
+    """Create an OFPFlowStatsReply with random values."""
+
+    matches = generate_all_matches()
+    flow_stats = parser.OFPFlowStats(
+        random.randint(0, 9),
+        random.randint(1, 10000),
+        random.randint(0, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        0,
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        random.randint(1, 10000),
+        matches,
+        instructions,
+    )
+
+    return parser.OFPFlowStatsReply(datapath, body=[flow_stats])
+
+
+def generate_all_matches():
+    """
+    Generate all OpenFlow Extensible Matches (oxm) and return
+    a single OFPMatch with all of these oxms. The value for each
+    oxm is the largest value possible for the data type. For
+    example, the largest number for a 4 bit int is 15.
+    """
+    matches = dict()
+    for oxm_type in ofproto.oxm_types:
+        if oxm_type.type == type_desc.MacAddr:
+            value = "ff:ff:ff:ff:ff:ff"
+        elif oxm_type.type == type_desc.IPv4Addr:
+            value = "255.255.255.255"
+        elif oxm_type.type == type_desc.IPv6Addr:
+            value = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+        elif isinstance(oxm_type.type, type_desc.IntDescr):
+            value = 2**oxm_type.type.size - 1
+        else:
+            continue
+
+        matches[oxm_type.name] = value
+
+    return parser.OFPMatch(**matches)
+
+
+def logger_to_ofp(port_stats):
+    """Translates between the logger stat name and the OpenFlow stat name"""
+
+    return {
+        "packets_out": port_stats.tx_packets,
+        "packets_in": port_stats.rx_packets,
+        "bytes_out": port_stats.tx_bytes,
+        "bytes_in": port_stats.rx_bytes,
+        "dropped_out": port_stats.tx_dropped,
+        "dropped_in": port_stats.rx_dropped,
+        "errors_out": port_stats.tx_errors,
+        "errors_in": port_stats.rx_errors,
+    }
+
+
+def get_matches(match_dict):
+    """Create a set of match name and value tuples"""
+    return {
+        (entry["OXMTlv"]["field"], entry["OXMTlv"]["value"]) for entry in match_dict
+    }
+
+
+def check_instructions(original_inst, logger_inst, test):
+    """
+    Check that the original instructions matches the
+    instructions from the logger
+    """
+    for inst_type, inst in logger_inst[0].items():
+        test.assertEqual(original_inst[0].__class__.__name__, inst_type)
+        for attr_name, attr_val in inst.items():
+            original_val = getattr(original_inst[0], attr_name)
+            test.assertEqual(original_val, attr_val)
+
+
+def compare_flow_msg(flow_msg, flow_dict, test):
+    """
+    Compare the body section of an OFPFlowStatsReply
+    message to a dict representation of it
+    """
+    for stat_name, stat_val in flow_dict.items():
+        if stat_name == "match":
+            match_set = get_matches(stat_val["OFPMatch"]["oxm_fields"])
+            test.assertEqual(match_set, set(flow_msg.body[0].match.items()))
+        elif stat_name == "instructions":
+            check_instructions(flow_msg.body[0].instructions, stat_val, test)
+        else:
+            test.assertEqual(getattr(flow_msg.body[0], stat_name), stat_val)
+
+
+class GaugePrometheusTests(unittest.TestCase):  # pytype: disable=module-attr
+    """Tests the GaugePortStatsPrometheusPoller update method"""
+
+    prom_client = gauge_prom.GaugePrometheusClient(reg=CollectorRegistry())
+
+    @staticmethod
+    def parse_prom_output(output):
+        """Parses the port stats from prometheus into a dictionary"""
+
+        parsed_output = {}
+        for line in output.split("\n"):
+            # discard comments and stats not related to port stats
+            if line.startswith("#") or not line.startswith(gauge_prom.PROM_PORT_PREFIX):
+                continue
+
+            index = line.find("{")
+            # get the stat name e.g. of_port_rx_bytes and strip 'of_port_'
+            prefix = gauge_prom.PROM_PORT_PREFIX + gauge_prom.PROM_PREFIX_DELIM
+            stat_name = line[0:index].replace(prefix, "")
+            # get the labels within {}
+            x, y = index + 1, line.find("}")
+            labels = line[x:y].split(",")
+
+            for label in labels:
+                lab_name, lab_val = label.split("=", 1)
+                lab_val = lab_val.replace('"', "")
+                if lab_name == "dp_id":
+                    dp_id = int(lab_val, 16)
+                elif lab_name == "port":
+                    port_name = lab_val
+
+            key = (dp_id, port_name)
+            stat_val = line.split(" ")[-1]
+            if key not in parsed_output:
+                parsed_output[key] = []
+
+            parsed_output[key].append((stat_name, float(stat_val)))
+
+        return parsed_output
+
+    @staticmethod
+    def get_prometheus_stats(addr, port):
+        """Attempts to contact the prometheus server
+        at the address to grab port stats."""
+
+        url = "http://{}:{}".format(addr, port)
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=10)
+        session.mount("http://", adapter)
+        return session.get(url).text
+
+    def test_poller(self):
+        """Test the update method to see if it pushes port stats"""
+
+        datapath = create_mock_datapath(2)
+
+        conf = mock.Mock(
+            dp=datapath,
+            type="",
+            interval=1,
+            prometheus_port=9303,
+            prometheus_addr="localhost",
+            use_test_thread=True,
+        )
+
+        prom_poller = gauge_prom.GaugePortStatsPrometheusPoller(
+            conf, "__name__", self.prom_client
+        )
+        prom_poller._running = True
+        msg = port_stats_msg(datapath)
+        prom_poller.update(time.time(), msg)
+
+        prom_lines = self.get_prometheus_stats(
+            conf.prometheus_addr, conf.prometheus_port
+        )
+        prom_lines = self.parse_prom_output(prom_lines)
+
+        for port_num, port in datapath.ports.items():
+            port_stats = msg.body[int(port_num) - 1]
+            stats = prom_lines[(datapath.dp_id, port.name)]
+            stats_found = set()
+
+            for stat_name, stat_val in stats:
+                self.assertAlmostEqual(stat_val, getattr(port_stats, stat_name))
+                stats_found.add(stat_name)
+
+            self.assertEqual(stats_found, set(gauge_prom.PROM_PORT_VARS))
+
+    def test_port_state(self):
+        """Test the update method to see if it pushes port state"""
+
+        datapath = create_mock_datapath(2)
+
+        conf = mock.Mock(
+            dp=datapath,
+            type="",
+            interval=1,
+            prometheus_port=9303,
+            prometheus_addr="localhost",
+            use_test_thread=True,
+        )
+
+        prom_poller = gauge_prom.GaugePortStatePrometheusPoller(
+            conf, "__name__", self.prom_client
+        )
+        prom_poller._running = True
+        reasons = [ofproto.OFPPR_ADD, ofproto.OFPPR_DELETE, ofproto.OFPPR_MODIFY]
+        for i in range(1, len(conf.dp.ports) + 1):
+            msg = port_state_msg(conf.dp, i, reasons[i - 1])
+            port_name = conf.dp.ports[i].name
+            rcv_time = int(time.time())
+            prom_poller.update(rcv_time, msg)
+
+            prom_lines = self.get_prometheus_stats(
+                conf.prometheus_addr, conf.prometheus_port
+            )
+            prom_lines = self.parse_prom_output(prom_lines)
+
+            stats = prom_lines[(datapath.dp_id, port_name)]
+            stats_found = set()
+
+            for stat_name, stat_val in stats:
+                msg_data = msg if stat_name == "reason" else msg.desc
+                self.assertAlmostEqual(stat_val, getattr(msg_data, stat_name))
+                stats_found.add(stat_name)
+
+            self.assertEqual(stats_found, set(gauge_prom.PROM_PORT_STATE_VARS))
+
+    def test_flow_stats(self):
+        """Check the update method of the GaugeFlowTablePrometheusPoller class"""
+
+        datapath = create_mock_datapath(2)
+
+        conf = mock.Mock(
+            dp=datapath,
+            type="",
+            interval=1,
+            prometheus_port=9303,
+            prometheus_addr="localhost",
+            use_test_thread=True,
+        )
+
+        prom_poller = gauge_prom.GaugeFlowTablePrometheusPoller(
+            conf, "__name__", self.prom_client
+        )
+        rcv_time = int(time.time())
+        instructions = [parser.OFPInstructionGotoTable(1)]
+        msg = flow_stats_msg(conf.dp, instructions)
+        prom_poller.update(rcv_time, msg)
+
+
+class GaugeThreadPollerTest(unittest.TestCase):  # pytype: disable=module-attr
+    """Tests the methods in the GaugeThreadPoller class"""
+
+    def setUp(self):
+        """Creates a gauge poller and initialises class variables"""
+        self.interval = 1
+        conf = mock.Mock(interval=self.interval)
+        self.poller = gauge_pollers.GaugeThreadPoller(conf, "__name__", mock.Mock())
+        self.send_called = False
+
+    def fake_send_req(self):
+        """This should be called instead of the send_req method in the
+        GaugeThreadPoller class, which just throws an error"""
+        self.send_called = True
+
+    def test_start(self):
+        """Checks if the poller is started"""
+        self.poller.send_req = self.fake_send_req
+
+        self.poller.start(mock.Mock(), active=True)
+        poller_thread = self.poller.thread
+        hub.sleep(self.interval + 1)
+        self.assertTrue(self.send_called)
+        self.assertFalse(poller_thread.dead)
+
+    def test_stop(self):
+        """Check if a poller can be stopped"""
+        self.poller.send_req = self.fake_send_req
+
+        self.poller.start(mock.Mock(), active=True)
+        poller_thread = self.poller.thread
+        self.poller.stop()
+        hub.sleep(self.interval + 1)
+
+        self.assertFalse(self.send_called)
+        self.assertTrue(poller_thread.dead)
+
+    def test_active(self):
+        """Check if active reflects the state of the poller"""
+        self.assertFalse(self.poller.is_active())
+        self.assertFalse(self.poller.running())
+        self.poller.start(mock.Mock(), active=True)
+        self.assertTrue(self.poller.is_active())
+        self.assertTrue(self.poller.running())
+        self.poller.stop()
+        self.assertFalse(self.poller.is_active())
+        self.assertFalse(self.poller.running())
+        self.poller.start(mock.Mock(), active=False)
+        self.assertFalse(self.poller.is_active())
+        self.assertTrue(self.poller.running())
+        self.poller.stop()
+        self.assertFalse(self.poller.is_active())
+        self.assertFalse(self.poller.running())
+
+
+class GaugePollerTest(unittest.TestCase):  # pytype: disable=module-attr
+    """Checks the send_req and no_response methods in a Gauge Poller"""
+
+    def check_send_req(self, poller, msg_class):
+        """Check that the message being sent matches the expected one"""
+        datapath = mock.Mock(ofproto=ofproto, ofproto_parser=parser)
+        poller.start(datapath, active=True)
+        poller.stop()
+        poller.send_req()
+        for method_call in datapath.mock_calls:
+            arg = method_call[1][0]
+            self.assertTrue(isinstance(arg, msg_class))
+
+    def check_no_response(self, poller):
+        """Check that no exception occurs when the no_response method is called"""
+        try:
+            poller.no_response()
+        except Exception as err:  # pylint: disable=broad-except
+            self.fail("Code threw an exception: {}".format(err))
+
+
+class GaugePortStatsPollerTest(GaugePollerTest):
+    """Checks the GaugePortStatsPoller class"""
+
+    def test_send_req(self):
+        """Check that the poller sends a port stats request"""
+        conf = mock.Mock(interval=1)
+        poller = gauge_pollers.GaugePortStatsPoller(conf, "__name__", mock.Mock())
+        self.check_send_req(poller, parser.OFPPortStatsRequest)
+
+    def test_no_response(self):
+        """Check that the poller doesnt throw an exception"""
+        poller = gauge_pollers.GaugePortStatsPoller(
+            mock.Mock(), "__name__", mock.Mock()
+        )
+        self.check_no_response(poller)
+
+
+class GaugeFlowTablePollerTest(GaugePollerTest):
+    """Checks the GaugeFlowTablePoller class"""
+
+    def test_send_req(self):
+        """Check that the poller sends a flow stats request"""
+        conf = mock.Mock(interval=1)
+        poller = gauge_pollers.GaugeFlowTablePoller(conf, "__name__", mock.Mock())
+        self.check_send_req(poller, parser.OFPFlowStatsRequest)
+
+    def test_no_response(self):
+        """Check that the poller doesnt throw an exception"""
+        poller = gauge_pollers.GaugeFlowTablePoller(
+            mock.Mock(), "__name__", mock.Mock()
+        )
+        self.check_no_response(poller)
+
+
+class GaugeWatcherTest(unittest.TestCase):  # pytype: disable=module-attr
+    """Checks the loggers in watcher.py."""
+
+    conf = None
+    temp_path = None
+    tmp_filename = "tmp_filename"
+
+    def setUp(self):
+        """Creates a temporary file and directory and a mocked conf object"""
+        self.temp_path = tempfile.mkdtemp()
+        self.conf = mock.Mock(
+            file=os.path.join(self.temp_path, self.tmp_filename),
+            path=self.temp_path,
+            compress=False,
+        )
+
+    def tearDown(self):
+        """Removes the temporary directory and its contents"""
+        shutil.rmtree(self.temp_path)
+
+    def get_file_contents(self, filename=tmp_filename):
+        """Return the contents of the temporary file and clear it"""
+        filename = os.path.join(self.temp_path, filename)
+        with open(filename, "r+", encoding="utf-8") as file_:
+            contents = file_.read()
+            file_.seek(0, 0)
+            file_.truncate()
+        return contents
+
+    def test_port_state(self):
+        """Check the update method in the GaugePortStateLogger class"""
+
+        reasons = {
+            "unknown": 5,
+            "add": ofproto.OFPPR_ADD,
+            "delete": ofproto.OFPPR_DELETE,
+            "up": ofproto.OFPPR_MODIFY,
+            "down": ofproto.OFPPR_MODIFY,
+        }
+
+        # add an ofproto attribute to the datapath
+        datapath = create_mock_datapath(1)
+        ofp_attr = {"ofproto": ofproto}
+        datapath.configure_mock(**ofp_attr)
+        self.conf.dp = datapath
+        logger = watcher.GaugePortStateLogger(self.conf, "__name__", mock.Mock())
+        logger._running = True
+
+        for reason, ofppr in reasons.items():
+            state = 0
+            if reason == "down":
+                state = ofproto.OFPPS_LINK_DOWN
+
+            msg = port_state_msg(datapath, 1, ofppr, state)
+            logger.update(time.time(), msg)
+
+            log_str = self.get_file_contents().lower()
+            self.assertTrue(reason in log_str)
+            self.assertTrue(
+                msg.desc.name in log_str or "port " + str(msg.desc.port_no) in log_str
+            )
+
+            hexs = re.findall(r"0x[0-9A-Fa-f]+", log_str)
+            hexs = [int(num, 16) for num in hexs]
+            self.assertTrue(datapath.dp_id in hexs or str(datapath.dp_id) in log_str)
+
+    def test_port_stats(self):
+        """Check the update method in the GaugePortStatsLogger class"""
+
+        # add an ofproto attribute to the datapath
+        datapath = create_mock_datapath(2)
+        ofp_attr = {"ofproto": ofproto}
+        datapath.configure_mock(**ofp_attr)
+
+        # add the datapath as an attribute to the config
+        dp_attr = {"dp": datapath}
+        self.conf.configure_mock(**dp_attr)
+
+        logger = watcher.GaugePortStatsLogger(self.conf, "__name__", mock.Mock())
+        logger._running = True
+        msg = port_stats_msg(datapath)
+
+        original_stats = []
+        for body in msg.body:
+            original_stats.append(logger_to_ofp(body))
+
+        logger.update(time.time(), msg)
+
+        log_str = self.get_file_contents()
+        for stat_name in original_stats[0]:
+            stat_name = stat_name.split("_")
+            # grab any lines that mention the stat_name
+            pattern = r"^.*{}.{}.*$".format(stat_name[0], stat_name[1])
+            stats_list = re.findall(pattern, log_str, re.MULTILINE)
+
+            for line in stats_list:
+                self.assertTrue(datapath.name in line)
+                # grab the port number (only works for single digit port nums)
+                index = line.find("port")
+                port_num = int(line[index + 4])
+                # grab the number at the end of the line
+                last_n = re.search(r"(\d+)$", line)
+                assert last_n
+                val = int(last_n.group())
+                logger_stat_name = "_".join((stat_name[0], stat_name[1]))
+                original_val = original_stats[port_num - 1][logger_stat_name]
+                self.assertEqual(original_val, val)
+
+    def test_flow_stats(self):
+        """Check the update method in the GaugeFlowStatsLogger class"""
+
+        # add an ofproto attribute to the datapath
+        datapath = create_mock_datapath(0)
+        ofp_attr = {"ofproto": ofproto}
+        datapath.configure_mock(**ofp_attr)
+
+        # add the datapath as an attribute to the config
+        dp_attr = {"dp": datapath}
+        self.conf.configure_mock(**dp_attr)
+
+        logger = watcher.GaugeFlowTableLogger(self.conf, "__name__", mock.Mock())
+        logger._running = True
+        instructions = [parser.OFPInstructionGotoTable(1)]
+
+        msg = flow_stats_msg(datapath, instructions)
+        rcv_time = time.time()
+        rcv_time_str = logger._rcv_time(rcv_time)
+        logger.update(rcv_time, msg)
+        log_str = self.get_file_contents(
+            "{}--flowtable--{}.json".format(datapath.name, rcv_time_str)
+        )
+
+        yaml_dict = yaml_load(log_str)["OFPFlowStatsReply"]["body"][0]["OFPFlowStats"]
+
+        compare_flow_msg(msg, yaml_dict, self)
+
+
+class OSKenAppSmokeTest(unittest.TestCase):  # pytype: disable=module-attr
+    """Test Gauge Ryu app."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        os.environ["GAUGE_LOG"] = os.path.join(self.tmpdir, "gauge.log")
+        os.environ["GAUGE_EXCEPTION_LOG"] = os.path.join(
+            self.tmpdir, "gauge-exception.log"
+        )
+        self.os_ken_app = None
+
+    def tearDown(self):
+        valve_util.close_logger(self.os_ken_app.logger)
+        valve_util.close_logger(self.os_ken_app.exc_logger)
+        shutil.rmtree(self.tmpdir)
+
+    @staticmethod
+    def _fake_dp():
+        datapath = namedtuple("datapath", ["id", "close"])(0, lambda: None)
+        return datapath
+
+    def _fake_event(self):
+        datapath = self._fake_dp()
+        msg = namedtuple("msg", ["datapath"])(datapath)
+        event = EventOFPMsgBase(msg=msg)
+        event.dp = msg.datapath
+        return event
+
+    @staticmethod
+    def _write_config(config_file_name, config):
+        with open(config_file_name, "w", encoding="utf-8") as config_file:
+            config_file.write(config)
+
+    def test_gauge(self):
+        """Test Gauge can be initialized."""
+        os.environ["GAUGE_CONFIG"] = "/dev/null"
+        self.os_ken_app = gauge.Gauge(dpset={}, reg=CollectorRegistry())
+        self.os_ken_app.reload_config(None)
+        self.assertFalse(self.os_ken_app._config_files_changed())
+        self.os_ken_app._update_watcher(None, self._fake_event())
+        self.os_ken_app._start_watchers(self._fake_dp(), {}, time.time())
+        for event_handler in (
+            self.os_ken_app._datapath_connect,
+            self.os_ken_app._datapath_disconnect,
+        ):
+            event_handler(self._fake_event())
+
+    def test_gauge_config(self):
+        """Test Gauge minimal config."""
+        faucet_conf1 = """
+vlans:
+   100:
+       description: "100"
+dps:
+   dp1:
+       dp_id: 0x1
+       interfaces:
+           1:
+               description: "1"
+               native_vlan: 100
+"""
+        faucet_conf2 = """
+vlans:
+   100:
+       description: "200"
+dps:
+   dp1:
+       dp_id: 0x1
+       interfaces:
+           2:
+               description: "2"
+               native_vlan: 100
+"""
+        os.environ["FAUCET_CONFIG"] = os.path.join(self.tmpdir, "faucet.yaml")
+        self._write_config(os.environ["FAUCET_CONFIG"], faucet_conf1)
+        os.environ["GAUGE_CONFIG"] = os.path.join(self.tmpdir, "gauge.yaml")
+        gauge_conf = (
+            """
+faucet_configs:
+   - '%s'
+watchers:
+    port_status_poller:
+        type: 'port_state'
+        all_dps: True
+        db: 'prometheus'
+    port_stats_poller:
+        type: 'port_stats'
+        all_dps: True
+        interval: 10
+        db: 'prometheus'
+    flow_table_poller:
+        type: 'flow_table'
+        all_dps: True
+        interval: 60
+        db: 'prometheus'
+dbs:
+    prometheus:
+        type: 'prometheus'
+        prometheus_addr: '0.0.0.0'
+        prometheus_port: 0
+"""
+            % os.environ["FAUCET_CONFIG"]
+        )
+        self._write_config(os.environ["GAUGE_CONFIG"], gauge_conf)
+        self.os_ken_app = gauge.Gauge(dpset={}, reg=CollectorRegistry())
+        self.os_ken_app.reload_config(None)
+        self.assertFalse(self.os_ken_app._config_files_changed())
+        self.assertTrue(self.os_ken_app.watchers)
+        self.os_ken_app.reload_config(None)
+        self.assertTrue(self.os_ken_app.watchers)
+        self.assertFalse(self.os_ken_app._config_files_changed())
+        # Load a new FAUCET config.
+        self._write_config(os.environ["FAUCET_CONFIG"], faucet_conf2)
+        self.assertTrue(self.os_ken_app._config_files_changed())
+        self.os_ken_app.reload_config(None)
+        self.assertTrue(self.os_ken_app.watchers)
+        self.assertFalse(self.os_ken_app._config_files_changed())
+        # Load an invalid Gauge config
+        self._write_config(os.environ["GAUGE_CONFIG"], "invalid")
+        self.assertTrue(self.os_ken_app._config_files_changed())
+        self.os_ken_app.reload_config(None)
+        self.assertTrue(self.os_ken_app.watchers)
+        # Keep trying to load a valid version.
+        self.assertTrue(self.os_ken_app._config_files_changed())
+        # Load good Gauge config back
+        self._write_config(os.environ["GAUGE_CONFIG"], gauge_conf)
+        self.assertTrue(self.os_ken_app._config_files_changed())
+        self.os_ken_app.reload_config(None)
+        self.assertTrue(self.os_ken_app.watchers)
+        self.assertFalse(self.os_ken_app._config_files_changed())
+
+
+if __name__ == "__main__":
+    unittest.main()  # pytype: disable=module-attr

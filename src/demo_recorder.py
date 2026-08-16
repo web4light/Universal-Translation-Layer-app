@@ -28,7 +28,7 @@ SCRIPT = [
     ("sign", "Pro neslyšící komunitu generujeme znakovou řeč. Zdarma. Navždy. Protože přístupnost není prémiová funkce. Je to základní lidské právo."),
     ("impact", "Dva a půl miliardy lidí na světě nemá přístup ke vzdělávání ve svém jazyce. Čtyři sta šedesát šest milionů lidí je neslyšících. Náš produkt tuto bariéru odstraňuje."),
     ("tech", "Pod kapotou běží Ada SPARK formální verifikace. Tři sta matematických důkazů. Nula chyb za běhu. Systém běží autonomně na solární energii."),
-    ("try_it", "Vyzkoušejte si to sami. Otevřete web4light tečka online. Vložte odkaz na jakékoliv YouTube video. Vyberte jazyk. Klikněte. Hotovo."),
+    ("try_it", "Vyzkoušejte si to sami. Otevřete veb čtyři lajt tečka onlajn. Vložte odkaz na jakékoliv YouTube video. Vyberte jazyk. Klikněte. Hotovo."),
     ("close", "Hoc est via. Děkuji za pozornost."),
 ]
 

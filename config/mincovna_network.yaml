@@ -1,0 +1,91 @@
+# Vakuová Mincovna — Konfigurace horní vrstvy
+# Definuje CO se má v síti dít (logika)
+# Spodní vrstva (faucet.yaml) definuje JAK to provést
+
+# Principy:
+#   - "Faucet nic" — nulová závislost na externích zdrojích
+#   - Formální verifikace — Ada/SPARK rozhoduje o bezpečnosti
+#   - Vakuum — izolace mezi vrstvami
+
+mincovna:
+  standard: 700
+  silver_per_coin_grams: 12
+
+  # Bezpečnostní politika sítě
+  network_policy:
+    # Povolené porty pro komunikaci
+    allowed_ports:
+      - 9302  # Primary Node (Prometheus)
+      - 9303  # Shadow Node
+      - 9304  # Heimdall Watchdog
+      - 9305  # Privacy Purge
+      - 8080  # Faucet DNS (Erlang)
+      - 4423  # SDN Bridge socket (Ada → Python)
+      - 8423  # SDN Bridge REST API
+      - 6653  # OpenFlow (Faucet ↔ switch)
+
+    # Blokované rozsahy (vakuum — nic zvenčí)
+    blocked_external:
+      - 0.0.0.0/0  # Vše mimo LAN blokováno
+    
+    # Povolená LAN
+    trusted_network: 192.168.123.0/24
+
+    # VLANy
+    vlans:
+      mincovna_control:
+        vid: 100
+        description: "Řídící VLAN — Mincovna + SDN Bridge"
+        members: [primary, shadow, watchdog]
+      
+      mincovna_data:
+        vid: 200
+        description: "Datová VLAN — ražba, metriky"
+        members: [primary, prometheus, grafana]
+      
+      faucet_mgmt:
+        vid: 300
+        description: "Management VLAN — Faucet OpenFlow"
+        members: [faucet, switches]
+
+  # Uzly v síti
+  nodes:
+    primary:
+      ip: 192.168.123.169
+      port: 9302
+      role: "Primary Node — Ada/SPARK Core"
+      vlan: [100, 200]
+
+    shadow:
+      ip: 192.168.123.169
+      port: 9303
+      role: "Shadow Node — failover"
+      vlan: [100]
+
+    watchdog:
+      ip: 192.168.123.169
+      port: 9304
+      role: "Heimdall Mesh Watchdog"
+      vlan: [100]
+
+    nas:
+      ip: 192.168.123.121
+      role: "NAS — úložiště, zálohy"
+      vlan: [200]
+
+  # Rozhodovací pravidla (Ada/SPARK implementuje)
+  decisions:
+    - name: "auto_isolate"
+      description: "Automaticky izoluj uzel při detekci anomálie"
+      trigger: "health < 0.5"
+      action: "block_port"
+
+    - name: "failover_promote"  
+      description: "Shadow převezme při výpadku Primary"
+      trigger: "primary_timeout > 20s"
+      action: "promote_shadow"
+
+    - name: "vacuum_seal"
+      description: "Uzavři vakuum — blokuj veškerý externí provoz"
+      trigger: "external_connection_detected"
+      action: "block_all_external"

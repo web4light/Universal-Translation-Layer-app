@@ -36,7 +36,18 @@ from dataclasses import dataclass
 from typing import Optional
 from enum import Enum
 
-import srt
+# Auto-include local .venv site-packages if available
+_venv_lib = Path(__file__).resolve().parent.parent / ".venv" / "lib"
+if _venv_lib.is_dir():
+    for _p in _venv_lib.glob("python*/site-packages"):
+        if str(_p) not in sys.path:
+            sys.path.insert(0, str(_p))
+
+try:
+    import srt
+    _SRT_AVAILABLE = True
+except ImportError:
+    _SRT_AVAILABLE = False
 
 # === LOGGING ===
 
@@ -66,6 +77,17 @@ try:
 except ImportError:
     _COQUI_AVAILABLE = False
 
+try:
+    # Spark-TTS — Zero-shot Voice Cloning (SparkAudio)
+    try:
+        from sparktts.models import SparkTTS
+        _SPARK_TTS_AVAILABLE = True
+    except ImportError:
+        from cli.SparkTTS import SparkTTS
+        _SPARK_TTS_AVAILABLE = True
+except ImportError:
+    _SPARK_TTS_AVAILABLE = False
+
 
 # === CONSTANTS ===
 
@@ -77,9 +99,10 @@ DEFAULT_SILENCE_PADDING_MS = 100  # Pauza mezi segmenty
 
 class TTSEngine(Enum):
     """Dostupné TTS enginy."""
-    GTTS = "gtts"       # Google TTS (online, zdarma)
-    COQUI = "coqui"     # Coqui XTTS (lokální, kvalitní)
-    GEMINI = "gemini"   # Gemini API TTS (plánováno)
+    GTTS = "gtts"           # Google TTS (online, zdarma)
+    COQUI = "coqui"         # Coqui XTTS (lokální, kvalitní)
+    SPARK_TTS = "sparktts"  # Spark-TTS (Zero-shot klonování hlasu herce)
+    GEMINI = "gemini"       # Gemini API TTS (plánováno)
 
 
 # === DATA MODELS ===
@@ -209,6 +232,106 @@ class CoquiEngine:
         return "wav"
 
 
+class SparkTTSEngine:
+    """Spark-TTS engine — Zero-shot Voice Cloning hlasu herce.
+
+    Využívá referenční audio herce (prompt speech, ~3-5s) pro věrné naklonování
+    jeho barvy hlasu, intonace a emocí do češtiny nebo jiného cílového jazyka.
+    """
+
+    def __init__(
+        self,
+        lang: str = "cs",
+        prompt_speech: Optional[str] = None,
+        prompt_text: Optional[str] = None,
+        model_dir: Optional[str] = None,
+        device: str = "auto",
+    ):
+        self._lang = lang
+        self._prompt_speech = prompt_speech
+        self._prompt_text = prompt_text
+        self._model = None
+        self._device = device
+
+        if _SPARK_TTS_AVAILABLE:
+            try:
+                import torch
+                dev = "cuda:0" if torch.cuda.is_available() and device != "cpu" else "cpu"
+                logger.info(f"Inicializuji Spark-TTS model na zařízení: {dev}")
+                m_dir = model_dir or "SparkAudio/Spark-TTS-0.5B"
+                self._model = SparkTTS(m_dir, device=dev)
+                logger.info("✓ Spark-TTS model úspěšně načten")
+            except Exception as e:
+                logger.warning(f"Inicializace Spark-TTS selhala: {e}")
+                self._model = None
+        else:
+            logger.info("Spark-TTS není nainstalován — aktivován inteligentní fallback režim")
+
+    def set_reference_voice(self, prompt_speech: str, prompt_text: Optional[str] = None):
+        """Nastaví referenční hlas herce pro syntézu."""
+        self._prompt_speech = prompt_speech
+        if prompt_text is not None:
+            self._prompt_text = prompt_text
+
+    def synthesize(
+        self,
+        text: str,
+        prompt_speech: Optional[str] = None,
+        prompt_text: Optional[str] = None,
+    ) -> bytes:
+        """Syntetizuj text s klonováním hlasu herce.
+
+        Args:
+            text: Text k přečtení v cílovém jazyce (např. čeština).
+            prompt_speech: Cesta k WAV souboru s hlasem herce (override).
+            prompt_text: Text odpovídající prompt_speech (volitelné).
+
+        Returns:
+            WAV audio data jako bytes.
+        """
+        ref_speech = prompt_speech or self._prompt_speech
+        ref_text = prompt_text or self._prompt_text
+
+        # Pokud je Spark-TTS dostupný a načtený
+        if self._model is not None:
+            try:
+                import torch
+                import soundfile as sf
+                with torch.no_grad():
+                    wav = self._model.inference(
+                        text=text,
+                        prompt_speech_path=ref_speech,
+                        prompt_text=ref_text,
+                    )
+                buffer = io.BytesIO()
+                sf.write(buffer, wav, DEFAULT_SAMPLE_RATE, format="WAV")
+                buffer.seek(0)
+                return buffer.read()
+            except Exception as e:
+                logger.warning(f"Spark-TTS inference selhala ({e}), přecházím na fallback...")
+
+        # Fallback na Coqui nebo gTTS
+        if _COQUI_AVAILABLE:
+            try:
+                coqui = CoquiEngine(lang=self._lang)
+                return coqui.synthesize(text)
+            except Exception:
+                pass
+
+        if _GTTS_AVAILABLE:
+            gtts = GTTSEngine(lang=self._lang)
+            return gtts.synthesize(text)
+
+        raise RuntimeError(
+            "Žádný TTS engine není dostupný pro syntézu. "
+            "Nainstaluj: pip install spark-tts gtts"
+        )
+
+    @property
+    def format(self) -> str:
+        return "wav"
+
+
 # === MAIN DUBBER ===
 
 class TTSDubber:
@@ -216,26 +339,52 @@ class TTSDubber:
 
     Načte přeložené titulky, syntetizuje audio pro každý segment
     a poskládá do jednoho výstupního souboru se správným timingem.
+    Podporuje zero-shot klonování hlasu herců přes Spark-TTS.
     """
 
-    def __init__(self, engine: TTSEngine = TTSEngine.GTTS, lang: str = "cs"):
+    def __init__(
+        self,
+        engine: TTSEngine = TTSEngine.GTTS,
+        lang: str = "cs",
+        ref_audio: Optional[str] = None,
+        ref_text: Optional[str] = None,
+        speaker_voice_map: Optional[dict] = None,
+    ):
         """Inicializace dubberu.
 
         Args:
             engine: Který TTS engine použít.
             lang: Cílový jazyk pro syntézu.
+            ref_audio: Výchozí referenční audio herce pro Spark-TTS.
+            ref_text: Text referenčního audia.
+            speaker_voice_map: Mapa mluvčí -> referenční audio soubor.
         """
         self._engine_type = engine
         self._lang = lang
-        self._engine = self._create_engine(engine, lang)
+        self._ref_audio = ref_audio
+        self._ref_text = ref_text
+        self._speaker_voice_map = speaker_voice_map or {}
+        self._engine = self._create_engine(engine, lang, ref_audio, ref_text)
         logger.info(f"TTS Dubber inicializován (engine={engine.value}, lang={lang})")
 
-    def _create_engine(self, engine: TTSEngine, lang: str):
+    def _create_engine(
+        self,
+        engine: TTSEngine,
+        lang: str,
+        ref_audio: Optional[str] = None,
+        ref_text: Optional[str] = None,
+    ):
         """Vytvoř TTS engine instanci."""
         if engine == TTSEngine.GTTS:
             return GTTSEngine(lang=lang)
         elif engine == TTSEngine.COQUI:
             return CoquiEngine(lang=lang)
+        elif engine == TTSEngine.SPARK_TTS:
+            return SparkTTSEngine(
+                lang=lang,
+                prompt_speech=ref_audio,
+                prompt_text=ref_text,
+            )
         elif engine == TTSEngine.GEMINI:
             # TODO: Implementovat Gemini TTS až bude API dostupné
             logger.warning("Gemini TTS zatím nedostupný, fallback na gTTS")
@@ -286,7 +435,22 @@ class TTSDubber:
 
         # Syntetizovat a vložit každý segment
         for i, sub in enumerate(subtitles):
-            text = sub.content.strip()
+            raw_text = sub.content.strip()
+
+            # Detekce mluvčího pro multi-voice / 7-hlasý dabing
+            speaker_ref_audio = self._ref_audio
+            import re
+            speaker_match = re.search(r'^(?:\[([^\]]+)\]|>>\s*([^:]+):)', raw_text)
+            if speaker_match:
+                speaker_id = (speaker_match.group(1) or speaker_match.group(2)).strip()
+                if speaker_id in self._speaker_voice_map:
+                    speaker_ref_audio = self._speaker_voice_map[speaker_id]
+
+            # Odstranit nečitelné znaky (speaker markers, sound effects)
+            text = re.sub(r'>>', '', raw_text)
+            text = re.sub(r'\[.*?\]', '', text)  # [křik], [smích]
+            text = re.sub(r'♪[^♪]*♪?', '', text)  # hudba
+            text = re.sub(r'\s+', ' ', text).strip()
             if not text:
                 continue
 
@@ -301,8 +465,15 @@ class TTSDubber:
             )
 
             try:
-                # Syntetizuj segment
-                audio_bytes = self._engine.synthesize(text)
+                # Syntetizuj segment s příslušným hlasem/engine
+                if isinstance(self._engine, SparkTTSEngine):
+                    audio_bytes = self._engine.synthesize(
+                        text,
+                        prompt_speech=speaker_ref_audio,
+                        prompt_text=self._ref_text,
+                    )
+                else:
+                    audio_bytes = self._engine.synthesize(text)
 
                 # Konvertovat na AudioSegment
                 fmt = self._engine.format
@@ -407,14 +578,20 @@ def dub_file(
     output_path: Optional[str] = None,
     engine: str = "gtts",
     lang: str = "cs",
+    ref_audio: Optional[str] = None,
+    ref_text: Optional[str] = None,
+    speaker_map: Optional[dict] = None,
 ) -> DubbingStats:
     """Hlavní pipeline: načti titulky → syntetizuj → ulož audio.
 
     Args:
         input_path: Cesta k přeloženým titulkům (SRT/VTT).
         output_path: Výstupní audio soubor. Pokud None, generuje se.
-        engine: TTS engine ('gtts', 'coqui', 'gemini').
+        engine: TTS engine ('gtts', 'coqui', 'sparktts', 'gemini').
         lang: Jazyk pro TTS syntézu.
+        ref_audio: Referenční audio herce pro Spark-TTS.
+        ref_text: Text referenčního audia.
+        speaker_map: Slovník mapující ID mluvčích na audio vzorky.
 
     Returns:
         DubbingStats se statistikami.
@@ -438,7 +615,13 @@ def dub_file(
 
     # 3. Dabuj
     tts_engine = TTSEngine(engine)
-    dubber = TTSDubber(engine=tts_engine, lang=lang)
+    dubber = TTSDubber(
+        engine=tts_engine,
+        lang=lang,
+        ref_audio=ref_audio,
+        ref_text=ref_text,
+        speaker_voice_map=speaker_map,
+    )
     stats = dubber.dub_subtitles(subtitles, output_path)
 
     logger.info(f"✓ {stats.summary()}")
@@ -452,8 +635,8 @@ def dub_file(
 def main():
     """CLI entry point pro TTS dabing."""
     parser = argparse.ArgumentParser(
-        description="Asgard Lab — TTS Dubber: Přeloží titulky na mluvené slovo",
-        epilog="Příklad: python tts_dubber.py film_cs.srt --engine gtts --lang cs"
+        description="Asgard Lab — TTS Dubber: Přeloží titulky na mluvené slovo s klonováním hlasu",
+        epilog="Příklad: python tts_dubber.py film_cs.srt --engine sparktts --ref-audio herec.wav --lang cs"
     )
     parser.add_argument(
         "input",
@@ -466,7 +649,7 @@ def main():
     )
     parser.add_argument(
         "--engine", "-e",
-        choices=["gtts", "coqui", "gemini"],
+        choices=["gtts", "coqui", "sparktts", "gemini"],
         default="gtts",
         help="TTS engine (výchozí: gtts)"
     )
@@ -475,14 +658,37 @@ def main():
         default="cs",
         help="Jazyk pro TTS syntézu (výchozí: cs)"
     )
+    parser.add_argument(
+        "--ref-audio", "-r",
+        default=None,
+        help="Cesta k referenčnímu audio vzorku herce pro Spark-TTS (WAV/MP3)"
+    )
+    parser.add_argument(
+        "--ref-text",
+        default=None,
+        help="Volitelný text referenčního audia pro lepší zarovnání"
+    )
+    parser.add_argument(
+        "--speaker-map",
+        default=None,
+        help="Mapa mluvčích ve formátu '1=herec1.wav,2=herec2.wav'"
+    )
 
     args = parser.parse_args()
 
     print("═══════════════════════════════════════════════")
-    print("  🎙️  Asgard Lab — TTS Dubber")
-    print("  Subtitle-to-Speech Pipeline")
+    print("  🎙️  Asgard Lab — TTS Dubber (Spark-TTS Ready)")
+    print("  Subtitle-to-Speech Voice Cloning Pipeline")
     print("═══════════════════════════════════════════════")
     print()
+
+    # Parsování speaker mapy pokud byla zadána
+    speaker_map = {}
+    if args.speaker_map:
+        for pair in args.speaker_map.split(","):
+            if "=" in pair:
+                spk, path = pair.split("=", 1)
+                speaker_map[spk.strip()] = path.strip()
 
     # Kontrola závislostí
     if not _GTTS_AVAILABLE and args.engine == "gtts":
@@ -499,6 +705,9 @@ def main():
             output_path=args.output,
             engine=args.engine,
             lang=args.lang,
+            ref_audio=args.ref_audio,
+            ref_text=args.ref_text,
+            speaker_map=speaker_map,
         )
         print()
         print(f"  ✓ Hotovo! {stats.summary()}")

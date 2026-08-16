@@ -1,0 +1,33 @@
+-- ============================================================
+--  Agent Jan Amos Komenský — Skript v suverénním jazyce PJAY
+--  "Omnia sponte fluant, absit violentia rebus."
+--  "Hoc est via." — This is the way.
+--  "Locutus sum." — I have spoken.
+--
+--  Autor: Pan Jeskyně
+--  Standard: 700 / Protokol 4.23
+-- ============================================================
+
+procedura Komensky_Taskmaster
+
+Hoc_est_via:
+   Task_Limit := 50;
+   Max_Steps  := 5;
+   Max_Chars  := 1000;
+
+incipit
+
+   Locutus_sum:
+      Decompose_Task ("Janua_Linguarum_Dubbing");
+      Assign_Worker   ("Agent_Premysl_Mesh");
+      Verify_Contract ("Formal_Safety_700");
+
+   Ego_sum_Groot:
+      si Task_Verified est SIC tum
+         Latratus! "Úloha systematicky rozložena a formálně zajištěna. Komenský schvaluje."
+      alias
+         Reject_Plan ("Porušení didaktického řádu a bezpečnosti.");
+         Latratus! "Kritická chyba v dekompozici úlohy! Plán odmítnut."
+      finis_si;
+
+finis Komensky_Taskmaster;

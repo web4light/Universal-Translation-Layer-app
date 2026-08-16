@@ -1,0 +1,96 @@
+# Faucet SDN — Konfigurace spodní vrstvy
+# Definuje JAK síť funguje (OpenFlow flow tables)
+# Řízeno horní vrstvou (Mincovna Ada/SPARK) přes SDN Bridge
+
+# Tento soubor čte Faucet SDN controller.
+# Změny se aplikují přes SIGHUP nebo SDN Bridge reload příkaz.
+
+vlans:
+  mincovna_control:
+    vid: 100
+    description: "Řídící VLAN — Mincovna komponenty"
+    max_hosts: 10
+    
+  mincovna_data:
+    vid: 200
+    description: "Datová VLAN — metriky a monitoring"
+    max_hosts: 20
+    
+  faucet_mgmt:
+    vid: 300
+    description: "Management VLAN — OpenFlow řízení"
+    max_hosts: 5
+
+acls:
+  # Vakuum — blokuj vše externí
+  vacuum_seal:
+    - rule:
+        dl_type: 0x800
+        ipv4_src: 192.168.123.0/24
+        actions:
+          allow: 1
+    - rule:
+        dl_type: 0x800
+        actions:
+          allow: 0
+          # Vše mimo LAN = zahozeno (vakuum)
+
+  # Povolit pouze Mincovna porty
+  mincovna_ports:
+    - rule:
+        dl_type: 0x800
+        tcp_dst: 9302
+        actions:
+          allow: 1
+    - rule:
+        dl_type: 0x800
+        tcp_dst: 9303
+        actions:
+          allow: 1
+    - rule:
+        dl_type: 0x800
+        tcp_dst: 4423
+        actions:
+          allow: 1
+    - rule:
+        dl_type: 0x800
+        tcp_dst: 6653
+        actions:
+          allow: 1
+
+dps:
+  mincovna-switch:
+    dp_id: 0x1
+    hardware: "Open vSwitch"
+    description: "Virtuální switch pro Vakuovou Mincovnu"
+    interfaces:
+      1:
+        name: "primary_node"
+        description: "Primary Node (port 9302)"
+        native_vlan: mincovna_control
+        tagged_vlans: [mincovna_data]
+        acls_in: [vacuum_seal, mincovna_ports]
+      2:
+        name: "shadow_node"
+        description: "Shadow Node (port 9303)"
+        native_vlan: mincovna_control
+        acls_in: [vacuum_seal]
+      3:
+        name: "watchdog"
+        description: "Heimdall Watchdog (port 9304)"
+        native_vlan: mincovna_control
+        acls_in: [vacuum_seal]
+      4:
+        name: "nas_storage"
+        description: "NAS úložiště (192.168.123.121)"
+        native_vlan: mincovna_data
+        acls_in: [vacuum_seal]
+      5:
+        name: "monitoring"
+        description: "Prometheus + Grafana"
+        native_vlan: mincovna_data
+        tagged_vlans: [mincovna_control]
+      6:
+        name: "openflow_mgmt"
+        description: "OpenFlow management"
+        native_vlan: faucet_mgmt

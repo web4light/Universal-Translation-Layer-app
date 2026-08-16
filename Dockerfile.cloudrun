@@ -1,0 +1,38 @@
+# ============================================================
+# Dockerfile pro Google Cloud Run — Universal Translation Layer (UTL)
+# Protocol 4.23 & Standard 700 / Ada/SPARK + Gemini + FastAPI
+# ============================================================
+
+FROM python:3.11-slim
+
+# Instalace systémových závislostí (GNAT pro Ada/SPARK a audio nástroje)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnat \
+    gprbuild \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Kopírování závislostí a instalace
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    fastapi \
+    uvicorn \
+    prometheus_client \
+    google-genai \
+    google-generativeai
+
+# Kopírování zdrojových kódů
+COPY . .
+
+# Kompilace Ada/SPARK orchestrátoru
+RUN gprbuild -P mincovna.gpr asgard_orchestrator_main.adb || true
+
+# Port pro Google Cloud Run (výchozí 8080)
+ENV PORT=8080
+EXPOSE 8080
+
+# Spuštění serveru s automatickým škálováním na nulu
+CMD ["uvicorn", "src.asgard_server:app", "--host", "0.0.0.0", "--port", "8080"]

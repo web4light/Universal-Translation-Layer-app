@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAVE LAB & ASGARD CITADEL — Universal Translation Layer (Protocol 4.23)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #06070d;
+            --bg-surface: #0e111d;
+            --bg-glass: rgba(17, 22, 37, 0.75);
+            --gold-primary: #d4af37;
+            --gold-glow: #ffd700;
+            --beskar-silver: #c5d0dc;
+            --accent-purple: #9333ea;
+            --accent-blue: #2563eb;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --border-gold: rgba(212, 175, 55, 0.35);
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.05) 0%, transparent 60%);
+            color: #e2e8f0;
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* === TOP NAVIGATION === */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            background: rgba(6, 7, 13, 0.85);
+            border-bottom: 1px solid var(--border-gold);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--gold-glow) 0%, var(--gold-primary) 70%, #8a6d1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #06070d;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .brand-text h1 {
+            font-family: var(--font-title);
+            font-size: 1.25rem;
+            color: #fff;
+            letter-spacing: 0.08em;
+        }
+
+        .brand-text span {
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            color: var(--gold-primary);
+            letter-spacing: 0.15em;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--gold-glow);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-live {
+            background: linear-gradient(135deg, var(--gold-primary), #b38f28);
+            color: #06070d;
+            padding: 0.6rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-live:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+
+        /* === HERO BANNER === */
+        .hero {
+            padding: 6rem 2rem 4rem;
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold-primary);
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--gold-glow);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+        }
+
+        .hero-title {
+            font-family: var(--font-title);
+            font-size: clamp(2.2rem, 5vw, 4.2rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 30%, var(--gold-glow) 70%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: 0.03em;
+        }
+
+        .hero-latin {
+            font-family: var(--font-title);
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            color: var(--beskar-silver);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-desc {
+            max-width: 850px;
+            margin: 0 auto 2.5rem;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), #997819);
+            color: #06070d;
+            padding: 0.9rem 2.2rem;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            text-decoration: none;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+            transition: all 0.25s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.9rem 2.2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--gold-primary);
+        }
+
+        /* === AGENTS PANTHEON === */
+        .section-container {
+            max-width: 1300px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-title);
+            font-size: 2.4rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .pantheon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .agent-card {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2.2rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--agent-accent, var(--gold-primary));
+        }
+
+        .agent-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--agent-accent, var(--gold-primary));
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(var(--agent-glow), 0.2);
+        }
+
+        .agent-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+        }
+
+        .agent-name {
+            font-family: var(--font-title);
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .agent-role {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--agent-accent, var(--gold-primary));
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.2rem;
+        }
+
+        .agent-desc {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-stats {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1rem;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* === 6-LAYER ARCHITECTURE VISUALIZER === */
+        .arch-box {
+            background: var(--bg-glass);
+            border: 2px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .layer-row {
+            background: #090c16;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 6px solid var(--lcolor);
+            border-radius: 10px;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .layer-row:hover, .layer-row.active {
+            background: #121829;
+            transform: translateX(6px);
+            border-color: var(--lcolor);
+            box-shadow: 0 0 20px rgba(var(--lglow), 0.25);
+        }
+
+        .layer-info h4 {
+            font-family: var(--font-code);
+            font-size: 1.05rem;
+            color: var(--lcolor);
+            margin-bottom: 0.2rem;
+        }
+
+        .layer-info p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .layer-badge {
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--lcolor);
+            border: 1px solid var(--lcolor);
+        }
+
+        /* === LIVE TERMINAL SIMULATOR === */
+        .terminal-container {
+            background: #05070e;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+            font-family: var(--font-code);
+            margin-top: 3rem;
+        }
+
+        .term-header {
+            background: #0d111e;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .term-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .term-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .term-title {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .term-body {
+            padding: 1.5rem;
+            min-height: 260px;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #4ade80;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .term-body .log-info { color: #38bdf8; }
+        .term-body .log-gold { color: #ffd700; }
+        .term-body .log-purple { color: #c084fc; }
+
+        /* === FOOTER === */
+        footer {
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            background: #040508;
+            padding: 3.5rem 2rem 2rem;
+            margin-top: 6rem;
+            text-align: center;
+        }
+
+        .footer-motto {
+            font-family: var(--font-title);
+            font-size: 1.3rem;
+            color: var(--gold-glow);
+            margin-bottom: 1rem;
+        }
+
+        .footer-legal {
+            color: #64748b;
+            font-size: 0.9rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--gold-primary); }
+    </style>
+</head>
+<body>
+
+    <!-- === HEADER NAVIGATION === -->
+    <header>
+        <a href="#" class="brand">
+            <div class="brand-logo">⚔️</div>
+            <div class="brand-text">
+                <h1>CAVE LAB • ASGARD</h1>
+                <span>PROTOCOL 4.23 • STANDARD 700</span>
+            </div>
+        </a>
+        <nav>
+            <a href="studio.html" style="color: var(--gold-glow); font-weight: 700;">🖨️ Tiskové Studio</a>
+            <a href="#pantheon">Panteon Agentů</a>
+            <a href="#architecture">6-Vrstvá Architektura</a>
+            <a href="#console">Živá Konzole</a>
+            <a href="demo_presentation.html" class="btn-live">▶️ Mluvící Demo</a>
+        </nav>
+    </header>
+
+    <!-- === HERO SECTION === -->
+    <section class="hero">
+        <div class="hero-badge">⚡ ALL THINGS AGENTIC HACKATHON 2026</div>
+        <h1 class="hero-title">UNIVERSAL TRANSLATION LAYER</h1>
+        <div class="hero-latin">„Loquere lingua tua. Omnes te audient sua lingua. Tua voce.“</div>
+        <p class="hero-desc">
+            Suverénní, matematicky dokázaný multi-agentní ekosystém kovaný od křemíkového jádra v 
+            <strong>Ada/SPARK 2022</strong> přes vlastní jazyk <strong>PJAY</strong> až po cloudovou inteligenci 
+            <strong>Google Gemini 3.5 Flash</strong> a <strong>Google Cloud Run</strong>.
+        </p>
+        <div class="hero-actions">
+            <a href="https://devpost.com/software/universal-translation-layer-protocol-4-23" target="_blank" class="btn-primary">🏆 Zobrazit na Devpostu</a>
+            <a href="https://github.com/Rebirth-Phoenix-Foundation-Charter/Universal-Translation-Layer" target="_blank" class="btn-secondary">💻 GitHub Repozitář (GNU GPLv3)</a>
+        </div>
+    </section>
+
+    <!-- === AGENT PANTHEON === -->
+    <section class="section-container" id="pantheon">
+        <div class="section-header">
+            <h2>Svatá Trojice & Panteon Agentů</h2>
+            <p>Autonomní entity řídící didaktiku, telemetrii, síťový mesh a multimodální hlas.</p>
+        </div>
+
+        <div class="pantheon-grid">
+            <!-- Komenský -->
+            <div class="agent-card" style="--agent-accent: #38bdf8; --agent-glow: 56, 189, 248;">
+                <div class="agent-icon">🎓</div>
+                <h3 class="agent-name">Jan Amos Komenský</h3>
+                <div class="agent-role">Nejvyšší Dozorce Úkolů (Taskmaster)</div>
+                <p class="agent-desc">
+                    Řídí 5 didaktických fází překladu: <em>Labyrint $\rightarrow$ Janua $\rightarrow$ Orbis $\rightarrow$ SPARK $\rightarrow$ Ráj</em>. 
+                    Autonomně dekomponuje úlohy a volá Gemini 3.5 Flash s nulovým lidským zásahem.
+                </p>
+                <div class="agent-stats">
+                    <span>Model: Gemini 3.5 Flash</span>
+                    <span>Cena: Taskmaster ($20k)</span>
+                </div>
+            </div>
+
+            <!-- Libuše -->
+            <div class="agent-card" style="--agent-accent: #ffd700; --agent-glow: 255, 215, 0;">
+                <div class="agent-icon">🔮</div>
+                <h3 class="agent-name">Kněžna Libuše</h3>
+                <div class="agent-role">Věštkyně & Strážkyně Telemetrie</div>
+                <p class="agent-desc">
+                    Zlatá tvář pevnosti. Nepřetržitě nahlíží do Prometheus telemetrie (:9302/:9303) a prověřuje čistotu zrcadleného Geth Etherea pod Standardem 700.
+                </p>
+                <div class="agent-stats">
+                    <span>Prometheus: :9302 / :9303</span>
+                    <span>Stav: Serene Golden</span>
+                </div>
+            </div>
+
+            <!-- Přemysl -->
+            <div class="agent-card" style="--agent-accent: #c084fc; --agent-glow: 192, 132, 252;">
+                <div class="agent-icon">🌾</div>
+                <h3 class="agent-name">Přemysl Oráč</h3>
+                <div class="agent-role">Tichý Oráč Sítě (Mesh Engine)</div>
+                <p class="agent-desc">
+                    Neviditelný motor v pozadí napsaný v suverénním jazyce <strong>PJAY (.pj)</strong>. 
+                    Orá SDN trasy, připojuje uzly a garantuje 15sekundový automatický failover.
+                </p>
+                <div class="agent-stats">
+                    <span>Jazyk: PJAY (Hoc est via)</span>
+                    <span>Failover: 15s Max</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- === 6-LAYER ARCHITECTURE === -->
+    <section class="section-container" id="architecture">
+        <div class="section-header">
+            <h2>6-Vrstvá Suverénní Architektura</h2>
+            <p>Od neprůstřelného matematického jádra až po elastický serverless cloud.</p>
+        </div>
+
+        <div class="arch-box">
+            <div class="layer-row active" style="--lcolor: #c084fc; --lglow: 192, 132, 252;">
+                <div class="layer-info">
+                    <h4>VRSTVA 1: DUCH A SUVERÉNNÍ JAZYK (PJAY)</h4>
+                    <p>Jazyk PJAY (.pj) — „Hoc est via. Locutus sum.“ | Agent Přemysl Oráč</p>
+                </div>
+                <span class="layer-badge">PJAY Bytecode</span>
+            </div>
+
+            <div class="layer-row" style="--lcolor: #38bdf8; --lglow: 56, 189, 248;">
+                <div class="layer-info">
+                    <h4>VRSTVA 2: AUTONOMNÍ DIDAKTICKÝ TASKMASTER</h4>
+                    <p>Agent Jan Amos Komenský — 5 Didaktických Fází s modelem Gemini 3.5 Flash</p>
+                </div>
+                <span class="layer-badge">Gemini 3.5 Flash</span>
+            </div>
+
+            <div class="layer-row" style="--lcolor: #10b981; --lglow: 16, 185, 129;">
+                <div class="layer-info">
+                    <h4>VRSTVA 3: FORMÁLNÍ MATEMATICKÁ VERIFIKACE</h4>
+                    <p>Ada/SPARK 2022 Core — GNATprove Level 4 | 0% pádů, 0 Heap alokací, Hippokratova přísaha</p>
+                </div>
+                <span class="layer-badge">Ada/SPARK 2022</span>
+            </div>
+
+            <div class="layer-row" style="--lcolor: #f59e0b; --lglow: 245, 158, 11;">
+                <div class="layer-info">
+                    <h4>VRSTVA 4: SÍŤOVÉ ORAKULUM A TELEMETRIE</h4>
+                    <p>Kněžna Libuše — Prometheus (:9302/:9303) & Zrcadlový Geth stav (Keccak-256 / Standard 700)</p>
+                </div>
+                <span class="layer-badge">Prometheus :9302</span>
+            </div>
+
+            <div class="layer-row" style="--lcolor: #06b6d4; --lglow: 6, 182, 212;">
+                <div class="layer-info">
+                    <h4>VRSTVA 5: ON-DEVICE INTERAKČNÍ PAMĚŤOVÁ BANKA</h4>
+                    <p>Lokální SQLite trezor na zařízení uživatele | 1 GB = 8 let života | Nulový únik do cloudu</p>
+                </div>
+                <span class="layer-badge">1 GB = 8 Let</span>
+            </div>
+
+            <div class="layer-row" style="--lcolor: #ef4444; --lglow: 239, 68, 68;">
+                <div class="layer-info">
+                    <h4>VRSTVA 6: SERVERLESS CLOUDOVÉ NASAZENÍ</h4>
+                    <p>Google Cloud Run (Bezstavový kontejner Dockerfile.cloudrun) | Scale-to-Zero ($0.00 Idle Cost)</p>
+                </div>
+                <span class="layer-badge">Scale-to-Zero $0</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- === LIVE CONSOLE SIMULATOR === -->
+    <section class="section-container" id="console">
+        <div class="section-header">
+            <h2>Živá Řídicí Konzole Systému</h2>
+            <p>Reálný výpis telemetrie, stavu sítě a exekuce Agenta Komenského.</p>
+        </div>
+
+        <div class="terminal-container">
+            <div class="term-header">
+                <div class="term-dots">
+                    <div class="term-dot dot-red"></div>
+                    <div class="term-dot dot-yellow"></div>
+                    <div class="term-dot dot-green"></div>
+                </div>
+                <div class="term-title">asgard@citadel:~/utl_protocol_423</div>
+                <span style="color: #4ade80; font-size: 0.8rem;">● LIVE RUNNING</span>
+            </div>
+            <div class="term-body" id="termLogs">
+                <div>[SYSTEM] Inicilizace Asgard Citadel UTL Protocol 4.23...</div>
+                <div class="log-info">[MEMORY_VAULT] 🧠 Interakční Paměťová Banka aktivní (data/interaction_vault.sqlite)</div>
+                <div class="log-gold">[LIBUŠE] 🔮 Kněžna Libuše: Všechny uzly v normě (Prometheus :9302 / :9303)</div>
+                <div class="log-purple">[PŘEMYSL] 🌾 Přemysl Oráč: Mesh brázdy vyorány. 3 aktivní uzly. Failover připraven.</div>
+                <div>[KOMENSKÝ] 🎓 Agent Komenský připraven k plnění didaktických úloh (Gemini 3.5 Flash).</div>
+                <div style="color: #ffd700;">> STAV SYSTÉMU: 100% OPERATIONAL • STANDARD 700 ENFORCED</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- === FOOTER === -->
+    <footer>
+        <div class="footer-motto">„DĚLÁME PRO VŠECHNY, ALE NE S NĚKÝM.“</div>
+        <p class="footer-legal">
+            Universal Translation Layer (Protocol 4.23) je nezávislé suverénní dílo vyvinuté pod licencí 
+            <strong>GNU General Public License v3.0 (GNU GPLv3)</strong>.<br>
+            Autor & Sólový Architekt: <strong>Pan Jeskyně</strong> • Rebirth Phoenix Foundation Charter.
+        </p>
+        <div class="footer-links">
+            <a href="https://devpost.com/software/universal-translation-layer-protocol-4-23" target="_blank">Devpost Přihláška</a>
+            <a href="https://github.com/Rebirth-Phoenix-Foundation-Charter/Universal-Translation-Layer" target="_blank">GitHub</a>
+            <a href="demo_presentation.html">Mluvící Prezentace</a>
+            <a href="index.html">Bifrost Brána</a>
+        </div>
+    </footer>
+
+</body>
+</html>

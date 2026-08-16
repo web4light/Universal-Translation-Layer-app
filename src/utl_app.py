@@ -12,29 +12,46 @@ import sys
 import time
 import threading
 import argparse
-import psutil
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
 from typing import Optional
-from prometheus_client import start_http_server, Gauge, Histogram
 
 # === PROMETHEUS METRICS ===
 
-utl_app_startup_seconds = Histogram(
-    'utl_app_startup_seconds',
-    'Application startup time',
-    buckets=[1, 5, 10, 15, 20, 25, 30]
-)
-utl_app_cpu_usage_percent = Gauge(
-    'utl_app_cpu_usage_percent',
-    'Current CPU usage percent'
-)
-utl_app_ram_usage_bytes = Gauge(
-    'utl_app_ram_usage_bytes',
-    'Current RAM usage in bytes'
-)
-utl_app_status = Gauge(
-    'utl_app_status',
-    'App status (0=stopped, 1=starting, 2=running, 3=low_power)'
-)
+try:
+    from prometheus_client import start_http_server, Gauge, Histogram
+
+    utl_app_startup_seconds = Histogram(
+        'utl_app_startup_seconds',
+        'Application startup time',
+        buckets=[1, 5, 10, 15, 20, 25, 30]
+    )
+    utl_app_cpu_usage_percent = Gauge(
+        'utl_app_cpu_usage_percent',
+        'Current CPU usage percent'
+    )
+    utl_app_ram_usage_bytes = Gauge(
+        'utl_app_ram_usage_bytes',
+        'Current RAM usage in bytes'
+    )
+    utl_app_status = Gauge(
+        'utl_app_status',
+        'App status (0=stopped, 1=starting, 2=running, 3=low_power)'
+    )
+except ImportError:
+    start_http_server = None
+
+    class _DummyMetric:
+        def set(self, *args, **kwargs): pass
+        def observe(self, *args, **kwargs): pass
+
+    utl_app_startup_seconds = _DummyMetric()
+    utl_app_cpu_usage_percent = _DummyMetric()
+    utl_app_ram_usage_bytes = _DummyMetric()
+    utl_app_status = _DummyMetric()
 
 # === CONFIGURATION ===
 
@@ -98,11 +115,14 @@ class UTLApp:
         print("[UTL] Starting components...")
 
         # Start Prometheus metrics server
-        try:
-            start_http_server(self.metrics_port)
-            print(f"[UTL] Prometheus metrics on port {self.metrics_port}")
-        except OSError:
-            print(f"[UTL] Port {self.metrics_port} already in use — metrics skipped")
+        if start_http_server is not None:
+            try:
+                start_http_server(self.metrics_port)
+                print(f"[UTL] Prometheus metrics on port {self.metrics_port}")
+            except OSError:
+                print(f"[UTL] Port {self.metrics_port} already in use — metrics skipped")
+        else:
+            print(f"[UTL] Prometheus client not installed — metrics server skipped")
 
         # Initialize components in order
         self._init_privacy_protocol()
@@ -189,6 +209,9 @@ class UTLApp:
 
     def _resource_monitor_loop(self):
         """Monitor CPU/RAM usage and enforce limits."""
+        if psutil is None:
+            return
+
         process = psutil.Process(os.getpid())
 
         while self._running:
