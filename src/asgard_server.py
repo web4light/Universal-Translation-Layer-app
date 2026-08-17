@@ -173,6 +173,13 @@ async function runTranslation(){
         'Sign Language: '+d.sign_language_glosses+' glosses (FREE)\\n'+
         'Total: '+d.total_time_s.toFixed(1)+'s\\n\\n'+
         'Files:\\n'+JSON.stringify(d.files,null,2);
+      // Zobrazit glosses
+      if(d.sign_language_glosses>0){
+        const signDiv=document.createElement('div');
+        signDiv.style='margin-top:1rem;padding:1rem;background:#0a2a0a;border:2px solid #22c55e;border-radius:8px;color:#22c55e;font-size:1.2rem;text-align:center';
+        signDiv.innerHTML='<b>SIGN LANGUAGE (FREE)</b><br>'+d.sign_language_glosses+' glosses generated<br><small style=\"color:#6ad86a\">Czech Sign Language (CZJ) + ASL + BSL + DGS</small>';
+        out.parentNode.insertBefore(signDiv,out.nextSibling);
+      }
     }else{
       speech.textContent='Hmm, neco se nepovedlo. Zkus to znova.';
       out.textContent='Error: '+JSON.stringify(d);
@@ -187,6 +194,27 @@ async function runTranslation(){
 Ada/SPARK verified | Gemini + Groq | Solar powered<br>
 Hoc est via. | <a href="https://web4light.online" style="color:#5a8fd8">web4light.online</a> | XPRIZE 2026
 </p></body></html>"""
+
+
+@app.get("/pricing")
+async def pricing():
+    return {
+        "standard_700": "1 GROS = 12g silver",
+        "tiers": {
+            "free": {"price": "0", "features": ["Sign language (CZJ, ASL, BSL, DGS)", "Audio navigation for blind"]},
+            "gros_1": {"price": "111 CZK / 1 GROS", "features": ["AI assistant", "5 videos/day"]},
+            "gros_2": {"price": "222 CZK / 2 GROS", "features": ["Translation + voice dubbing", "Unlimited"]},
+            "gros_3": {"price": "333 CZK / 3 GROS", "features": ["Stream dubbing", "Real-time"]},
+            "gros_4": {"price": "423 CZK / 4 GROS", "features": ["Everything", "Whole family", "Charter member"]}
+        },
+        "payment": {
+            "network": "Sepolia ETH (testnet)",
+            "contract": "PrazskyGros.sol (ERC-20)",
+            "wallet": "Connect MetaMask to pay with GROS"
+        },
+        "free_forever": ["Sign language for deaf", "Audio navigation for blind"],
+        "principle": "1+1=3"
+    }
 
 
 @app.get("/status")
