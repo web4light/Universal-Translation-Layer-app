@@ -1,10 +1,9 @@
-name: Deploy Karel IV. to GitHub Pages
+name: Deploy Flutter App to GitHub Pages
 
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'web/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,23 +15,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies & Build Web
+        run: |
+          cd app
+          flutter pub get
+          flutter build web --release --base-href "/Universal-Translation-Layer-app/"
+
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './web'
+          path: 'app/build/web'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
