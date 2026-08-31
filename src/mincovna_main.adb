@@ -5,13 +5,12 @@ pragma SPARK_Mode (On);
 --  Ada/SPARK 2022 — Formálně verifikovaný kód
 --
 --  Autor: Pan Jeskyně
---  Pravidlo: 12g stříbra = 1 mince
+--  Pravidlo: 13.4g stříbra = 1 mince (1.4g poplatek, 12g jistina)
 -- ============================================================
 
 with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Fixed;
-with Pipeline_Types; use Pipeline_Types;
 
 procedure Mincovna_Main is
 
@@ -19,10 +18,8 @@ procedure Mincovna_Main is
    -- KONSTANTY A TYPY
    -- ==========================================================
 
-   Standard_700_Buyback : constant := 12.0;
-   Standard_700_Sell    : constant := 13.2;
+   Standard_700_Mint_Cost : constant := 13.4;
 
-   type Silver_Amount is digits 15 range 0.0 .. 1.0E12;
    subtype Coin_Count is Natural range 0 .. 1_000_000_000;
 
    -- ==========================================================
@@ -32,43 +29,19 @@ procedure Mincovna_Main is
    function Calculate_Coins (Silver_Grams : Float) return Coin_Count
      with
        Pre  => Silver_Grams >= 0.0 and Silver_Grams <= 1.0E10,
-       Post => (if Silver_Grams < 12.0
+       Post => (if Silver_Grams < Standard_700_Mint_Cost
                 then Calculate_Coins'Result = 0
                 else Calculate_Coins'Result >= 0)
    is
-      Tier1_Limit : constant := 10;
-      Tier2_Limit : constant := 1000;
-      Tier1_Price : constant := 13.2;   -- Maloobchod: 1-9 mincí
-      Tier2_Price : constant := 12.2;   -- Velkoobchod: 10-999 mincí
-      Tier3_Price : constant := 12.05;  -- VIP: 1000+ mincí
-
-      Tier1_Total : constant Float := Float (Tier1_Limit) * Tier1_Price;
-      Tier2_Count : constant := Tier2_Limit - Tier1_Limit;
-      Tier2_Total : constant Float := Float (Tier2_Count) * Tier2_Price;
-
-      Remainder : Float;
-      Result    : Natural;
+      Result : Natural;
    begin
-      if Silver_Grams < Standard_700_Buyback then
+      if Silver_Grams < Standard_700_Mint_Cost then
          return 0;
       end if;
 
-      -- Úroveň 1: Maloobchod
-      if Silver_Grams < Tier1_Total then
-         Result := Natural (Float'Floor (Silver_Grams / Tier1_Price));
-         return (if Result <= Coin_Count'Last then Result else Coin_Count'Last);
-      end if;
+      -- Striktni kurz: 13.4g Ag = 1 mince (1.4g provoz, 12.0g jistina)
+      Result := Natural (Float'Floor (Silver_Grams / Standard_700_Mint_Cost));
 
-      -- Úroveň 2: Velkoobchod
-      Remainder := Silver_Grams - Tier1_Total;
-      if Remainder < Tier2_Total then
-         Result := Tier1_Limit + Natural (Float'Floor (Remainder / Tier2_Price));
-         return (if Result <= Coin_Count'Last then Result else Coin_Count'Last);
-      end if;
-
-      -- Úroveň 3: VIP
-      Remainder := Remainder - Tier2_Total;
-      Result := Tier2_Limit + Natural (Float'Floor (Remainder / Tier3_Price));
       return (if Result <= Coin_Count'Last then Result else Coin_Count'Last);
    end Calculate_Coins;
 
@@ -87,8 +60,8 @@ procedure Mincovna_Main is
          Put_Line ("--- VAKUOVA MINCOVNA - INICIALIZOVANO ---");
          Put_Line ("[GNAT] Formalni verifikace aktivni");
          Put_Line ("[SPARK] Matematicka jistota: AKTIVNI");
-         Put_Line ("[MINCOVNA] Standard 700 (12g Ag)");
-         Put_Line ("[TEST] 120.0g Ag -> " & Natural'Image (Calculate_Coins (120.0)) & " minci");
+         Put_Line ("[MINCOVNA] Standard 700 (12.0g Ag + 1.4g Fee = 13.4g Total)");
+         Put_Line ("[TEST] 134.0g Ag -> " & Natural'Image (Calculate_Coins (134.0)) & " minci");
          Put_Line ("--- SYSTEM PRIPRAVEN K AUTONOMNIMU PROVOZU ---");
       else
          -- Cisty vystup pro Python Bridge

@@ -18,9 +18,8 @@ else
     echo "  ... Pokus o pripojeni NAS ($NAS_IP) pres SMB/CIFS ..."
 
     if ping -c 1 "$NAS_IP" &> /dev/null; then
-        # Zkusime mount s cifs
-        # POZNÁMKA: Vyžaduje sudo práva. Pokud selže, zkuste zadat heslo v terminálu.
-        sudo mount -t cifs "$NAS_SHARE" "$MOUNT_POINT" -o username="$USER",password="$PASS",uid=$(id -u),gid=$(id -g),iocharset=utf8 2>/dev/null
+        # Zkusime mount s cifs (non-interactive sudo)
+        sudo -n mount -t cifs "$NAS_SHARE" "$MOUNT_POINT" -o username="$USER",password="$PASS",uid=$(id -u),gid=$(id -g),iocharset=utf8 2>/dev/null
 
         if mountpoint -q "$MOUNT_POINT"; then
             echo "  ✓ NAS uspesne pripojen"

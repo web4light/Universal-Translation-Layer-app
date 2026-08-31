@@ -25,7 +25,7 @@ from prometheus_client import start_http_server, Counter, Gauge
 # ============================================================================
 
 PRIMARY_PORT = 9302
-STANDARD_700_GRAMS = 12.0  # 12g stříbra = 1 mince
+STANDARD_700_GRAMS = 13.4  # 13.4g celkem (1.4g poplatek + 12g jistina)
 
 # NAS logging configuration
 NAS_LOG_DIR = "/mnt/nas/logs"
@@ -234,32 +234,7 @@ def main():
     print("="*60)
     print()
 
-    # Demo minting batches
-    demo_batches = [
-        ("Batch 1", 120.0),
-        ("Batch 2", 36.0),
-        ("Batch 3", 240.0),
-        ("Batch 4", 6.0),
-        ("Batch 5", 144.0),
-    ]
-
-    for name, silver in demo_batches:
-        print(f"[PRIMARY] {name}: {silver}g silver")
-        coins = bridge.mint_coins(silver)
-        print(f"[PRIMARY] → {coins} coins minted")
-        print()
-        time.sleep(2)
-
-    print("="*60)
-    status = bridge.get_status()
-    print(f"[PRIMARY] Total minted: {status['total_coins']} coins")
-    print(f"[PRIMARY] Total silver: {status['total_silver_grams']}g")
-    print(f"[PRIMARY] Health: {status['health']}")
-    ada_status = 'ACTIVE' if status['ada_spark_available'] else 'DEMO'
-    print(f"[PRIMARY] Ada/SPARK: {ada_status}")
-    print("="*60)
-    print()
-
+    print("[PRIMARY] Cekam na prikazy k razbe...")
     print("[PRIMARY] Server running... (Ctrl+C to stop)")
     print("[PRIMARY] Shadow Node can now sync state")
     print()
