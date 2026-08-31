@@ -22,7 +22,7 @@ project Mincovna is
    
    --  Všechny executables
    for Main use (
-      "mincovna.adb",                    -- Core mint
+      "mincovna_main.adb",               -- Core mint
       "faucet_controller.adb",           -- Faucet SDN
       "bifrost.adb",                     -- Bifrost: Ada/SPARK - Gemini AI
       "transkomunikator_validator.adb",  -- Karel IV.: Audio PCM validator

@@ -16,6 +16,8 @@ import os
 import subprocess
 import sys
 import time
+import logging
+from logging.handlers import RotatingFileHandler
 from prometheus_client import start_http_server, Counter, Gauge
 
 # ============================================================================
@@ -24,6 +26,29 @@ from prometheus_client import start_http_server, Counter, Gauge
 
 PRIMARY_PORT = 9302
 STANDARD_700_GRAMS = 12.0  # 12g stříbra = 1 mince
+
+# NAS logging configuration
+NAS_LOG_DIR = "/mnt/nas/logs"
+LOCAL_LOG_DIR = "./logs"
+LOG_FILE_NAME = "primary_node.log"
+
+if os.path.exists(NAS_LOG_DIR):
+    LOG_PATH = os.path.join(NAS_LOG_DIR, LOG_FILE_NAME)
+else:
+    os.makedirs(LOCAL_LOG_DIR, exist_ok=True)
+    LOG_PATH = os.path.join(LOCAL_LOG_DIR, LOG_FILE_NAME)
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('Mincovna')
+try:
+    handler = RotatingFileHandler(LOG_PATH, maxBytes=10*1024*1024, backupCount=5)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    print(f"[BRIDGE] Logging to: {LOG_PATH}")
+except Exception as e:
+    print(f"[BRIDGE] Logging setup error: {e}. Using console only.")
 
 # ============================================================================
 # PROMETHEUS METRIKY
@@ -65,15 +90,16 @@ class MincovnaBridge:
         system_health.set(1.0)
         formal_verification.set(1.0)
 
+        logger.info("[BRIDGE] Inicializace dokončena")
         print("[BRIDGE] Inicializace dokončena")
 
     def _find_mincovna_executable(self):
         """Find Ada/SPARK executable. Returns path or None."""
         candidates = [
-            "bin/mincovna.exe",
-            "bin/mincovna",
-            "obj/mincovna.exe",
-            "obj/mincovna",
+            "bin/mincovna_main.exe",
+            "bin/mincovna_main",
+            "obj/mincovna_main.exe",
+            "obj/mincovna_main",
         ]
 
         for path in candidates:

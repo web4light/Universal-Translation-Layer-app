@@ -50,7 +50,7 @@ project UTL_Studio is
    --  =========================================================================
 
    for Main use (
-      "mincovna.adb",
+      "mincovna_main.adb",
       "faucet_controller.adb",
       "bifrost.adb",
       "transkomunikator_validator.adb",
