@@ -65,7 +65,7 @@ package body Eth_Wallet is
       TX.Status    := Draft;
       TX.Nonce     := W.Nonce;
       TX.Gas_Limit := Default_Gas_Limit;
-      TX.Gas_Price := 1_000_000_000;  -- 1 Gwei (Sepolia testnet)
+      TX.Gas_Price := 1_000_000;  -- 1 Gwei (Sepolia testnet)
       TX.Value     := Value;
       TX.Chain_ID  := Sepolia_Chain_ID;
    end Build_TX;
@@ -146,9 +146,17 @@ package body Eth_Wallet is
                               RLP_Buf, RLP_Len);
 
       --  Keccak-256 hash transakce
-      Eth_Keccak.Hash
-        (Input  => Eth_RLP.Byte_Array (RLP_Buf (1 .. RLP_Len)),
-         Output => TX_Hash);
+      --  Konverze RLP_Buf na Keccak Byte_Array
+      declare
+         Keccak_Input : Eth_Keccak.Byte_Array (1 .. RLP_Len);
+      begin
+         for I in 1 .. RLP_Len loop
+            Keccak_Input (I) := Eth_Keccak.Byte (RLP_Buf (I));
+         end loop;
+         Eth_Keccak.Hash
+           (Input  => Keccak_Input,
+            Output => TX_Hash);
+      end;
 
       --  Podepis hash privatnim klicem (secp256k1)
       --  Pozn: Priv_Key musi byt nacten z bezpecneho uloziste

@@ -87,7 +87,7 @@ package Eth_Wallet is
       Status    : TX_Status := Draft;
       Nonce     : Nonce_Value := 0;
       Gas_Limit : Natural range 0 .. 999_999 := Default_Gas_Limit;
-      Gas_Price : Natural range 0 .. 999_999_999 := 0;  -- Wei
+      Gas_Price : Natural range 1 .. 999_999_999 := 1_000_000;  -- Wei (min 1 Gwei)
       Value     : Wei_Balance := 0;
       Chain_ID  : Natural := Sepolia_Chain_ID;
    end record;

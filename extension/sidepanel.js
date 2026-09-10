@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     impact: "100% Free pro 500 milionů neslyšících a nevidomých lidí. Komerční flat-rate $111/měsíc.",
     memory: "100% In-Memory RAM Only, Zero-Trace. Ash Sweeper provádí skartaci v 04:23 UTC.",
     devpost: "5 Devpost výzev 2026: WebMCP Sovereign Mesh, A11y 500M Voices, Agentic Komenský, Solar AI, Multimodal 3D Avatar.",
-    network_switch: "Propojení přes switch: LAN IP 191.168.123.192 (Obelix uzel na Ubuntu) <-> Windows PC. Porty: 3000 (Avatar), 8088/8085 (Studio), 8423 (Obelix SPARK)."
+    network_switch: "Propojení přes switch: Linux Obelix uzel (192.168.123.172) <-> Windows PC (192.168.123.191). Porty: 3010 (Avatar), 8085 (Studio), 8423 (Obelix SPARK)."
   };
 
   // ------------------------------------------------------------
@@ -144,17 +144,17 @@ Naše mise je pomoci 500 milionům neslyšících a nevidomých lidí na celém 
 <br>• Integrovaný <strong>Spark TTS</strong> most pro okamžitý hlasový popis.`;
     }
 
-    // 8. Síťové propojení přes switch (LAN IP 191.168.123.192)
-    if (q.includes('switch') || q.includes('191.168') || q.includes('192.168') || q.includes('propojen') || q.includes('komp') || q.includes('lan') || q.includes('ip')) {
-      return `🔌 <strong>Síťové propojení přes Switch (LAN IP 191.168.123.192):</strong><br>
-Perfektní! Počítače máš propojené napřímo přes switch. To znamená, že <strong>na Windows nemusíš instalovat těžký backend ani Docker</strong>:<br>
-• <strong>Ubuntu ESPRIMO (191.168.123.192)</strong> běží jako těžký výpočetní uzel <strong>OBELIX</strong>.<br>
-• <strong>Z Windows PC</strong> stačí v prohlížeči otevřít:<br>
-  - <strong>3D Znakový Avatar:</strong> <code>http://191.168.123.192:3000</code><br>
-  - <strong>Hackathon AI Studio:</strong> <code>http://191.168.123.192:8088</code> (nebo <code>:8085</code>)<br>
-  - <strong>Obelix SPARK Node:</strong> <code>http://191.168.123.192:8423</code><br>
-  - <strong>Grafana Metriky:</strong> <code>http://191.168.123.192:3001</code><br>
-Všechny služby naslouchají na <code>0.0.0.0</code>, takže komunikace mezi kompy běží s nulovou latencí (&lt; 1 ms) bez zátěže Windows PC!`;
+    // 8. Síťové propojení přes switch (Linux 192.168.123.172 <-> Windows 192.168.123.191)
+    if (q.includes('switch') || q.includes('192.168') || q.includes('propojen') || q.includes('komp') || q.includes('lan') || q.includes('ip')) {
+      return `🔌 <strong>Síťové propojení přes Switch:</strong><br>
+Na switchi má <strong>Linux server (Ubuntu) IP 192.168.123.172</strong> a <strong>Windows PC IP 192.168.123.191</strong>.<br>
+• <strong>Ubuntu ESPRIMO (192.168.123.172)</strong> běží jako těžký výpočetní uzel <strong>OBELIX</strong>.<br>
+• <strong>Z Windows PC</strong> v prohlížeči otevři:<br>
+  - <strong>Hackathon AI Studio:</strong> <code>http://192.168.123.172:8085/hackathon_studio.html</code><br>
+  - <strong>3D Znakový Avatar:</strong> <code>http://192.168.123.172:3010</code><br>
+  - <strong>Grafana Metriky:</strong> <code>http://192.168.123.172:3001</code><br>
+  - <strong>Prometheus:</strong> <code>http://192.168.123.172:9090</code><br>
+Komunikace mezi kompy běží přímo přes switch s bleskovou odezvou pod 1 ms!`;
     }
 
     // Obecná odpověď s kontextem
