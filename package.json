@@ -7,7 +7,7 @@
     "dev": "npm run dev --prefix dlp3d",
     "build": "npm run build --prefix dlp3d",
     "start": "npm run start --prefix dlp3d",
-    "dev:studio": "python -m http.server 8088 --directory web",
+    "dev:studio": "python -m http.server 8088 --bind 0.0.0.0 --directory web",
     "flutter:get": "cd app && flutter pub get",
     "flutter:run": "cd app && flutter run -d chrome",
     "flutter:build": "cd app && flutter build web",
