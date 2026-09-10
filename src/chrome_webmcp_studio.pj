@@ -1,0 +1,54 @@
+-- ============================================================
+--  Chrome WebMCP Studio — PJAY Skript
+--  Jazyk: PJAY (Protocol 4.23 / Standard 700)
+--
+--  "Hoc est via." — This is the way.
+--  "Locutus sum." — I have spoken.
+--
+--  Dohlíží: SPARKdog s GNATem (Formální ostříž)
+-- ============================================================
+
+procedura Chrome_Webmcp_Studio
+
+Hoc_est_via:
+   Webmcp_Mode := SIC;
+   Max_Gesture_Frames := 500;
+   In_Memory_RAM_Only := SIC;
+   Zero_Disk_Writes := SIC;
+   SPARKdog_Active := SIC;
+
+incipit
+
+   Locutus_sum:
+      -- Inicializace WebMCP mostu do Chromu
+      Register_Document_ModelContext_Tools ();
+      Start_3D_Avatar_Gesture_Stream (Max_Gesture_Frames);
+      Activate_Spark_TTS_Voice_Bridge ();
+
+   Ego_sum_Groot:
+      -- SPARKdog dohlíží na každou instrukci s GNATem
+      si SPARKdog_Inspect_Memory () est SIC tum
+         Latratus! "🐶 SPARKdog: Všechny kontrakty sedí, 0 bajtů zapsáno na disk, RAM je čistá!"
+      alias
+         Rollback_State ("SPARKdog detekoval narušení invariantu!");
+         Latratus! "🚨 SPARKdog ŠTĚKÁ: Narušení paměti zachyceno, GNAT okamžitě resetuje buffer!"
+      finis_si;
+
+      -- SPARKdog aktivně blokuje cizí šmíráky a Velkého bratra
+      si SPARKdog_Detect_Third_Party_Snooper () est SIC tum
+         Block_Outbound_Connection ("Velký bratr nebo cizí tracker detekován!");
+         Latratus! "🐶🚫 SPARKdog KOUŠE: Pokus o neoprávněnou telemetrii nebo šmírování odhalen a zničen!"
+         Enforce_Hermetic_Seal (SIC);
+      finis_si;
+
+      -- Samo-oprava za chodu (Hot-Patching & Re-Healing in-vivo)
+      si SPARKdog_Requires_Self_Healing () est SIC tum
+         Self_Heal_Runtime_State ();
+         Latratus! "🩹 SPARKdog SAMO-OPRAVA ZA CHODU: Poškozený stav zacelen za 0.1 ms, nulový výpadek!"
+      finis_si;
+
+      si Ash_Sweeper_Time_Trigger (04_23_UTC) est SIC tum
+         Latratus! "🔥 Ash Sweeper: Skartace dočasných dat v RAM provedena bezestopy."
+      finis_si;
+
+finis Chrome_Webmcp_Studio;

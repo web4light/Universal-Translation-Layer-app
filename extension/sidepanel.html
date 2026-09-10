@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Asterisk (*) — Sovereign AI Studio & Asistent</title>
+  <style>
+    :root {
+      --bg: #04060c;
+      --card: #090d1a;
+      --card-hover: #10172a;
+      --gold: #f59e0b;
+      --cyan: #38bdf8;
+      --green: #10b981;
+      --red: #ef4444;
+      --border: rgba(245, 158, 11, 0.25);
+      --border-dim: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+    }
+    .badge {
+      font-size: 0.68rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    
+    /* Tabs navigation */
+    .tabs-nav {
+      display: flex;
+      background: #0b1120;
+      border: 1px solid var(--border-dim);
+      border-radius: 8px;
+      padding: 0.2rem;
+      gap: 0.2rem;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.45rem 0.3rem;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--gold);
+      color: #000;
+    }
+    .tab-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      gap: 0.6rem;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Tab 1: Assistant */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--border-dim);
+      border-radius: 8px;
+    }
+    .chat-header {
+      padding: 0.4rem 0.6rem;
+      background: #0e1526;
+      border-bottom: 1px solid var(--border-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .msg {
+      max-width: 90%;
+      padding: 0.55rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: #1e3a8a;
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .msg-bot {
+      align-self: flex-start;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      border-bottom-left-radius: 2px;
+    }
+    .msg-bot strong {
+      color: var(--gold);
+    }
+    .msg-bot pre {
+      background: #020617;
+      padding: 0.4rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      margin-top: 0.3rem;
+      border: 1px solid #1e293b;
+      overflow-x: auto;
+      color: #38bdf8;
+    }
+    .chips-row {
+      display: flex;
+      gap: 0.3rem;
+      overflow-x: auto;
+      padding: 0.4rem 0.6rem;
+      background: #080c18;
+      border-top: 1px solid var(--border-dim);
+      white-space: nowrap;
+    }
+    .chip {
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--cyan);
+      font-size: 0.68rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+    .chat-input-area {
+      display: flex;
+      padding: 0.5rem;
+      gap: 0.4rem;
+      background: #0b1120;
+      border-top: 1px solid var(--border-dim);
+    }
+    .chat-input {
+      flex: 1;
+      background: #030712;
+      border: 1px solid #1e293b;
+      color: #fff;
+      padding: 0.5rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .chat-send-btn {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 0 0.8rem;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    /* Tab 2: Studio */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .field-lbl {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid #1e293b;
+      color: #fff;
+      padding: 0.5rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: inherit;
+    }
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .presets-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .btn-preset {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 0.3rem 0.55rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .btn-preset:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+    .btn-generate {
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #000;
+      border: none;
+      padding: 0.65rem;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    .output-box {
+      background: #020307;
+      border: 1px solid #334155;
+      padding: 0.65rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.74rem;
+      color: #4ade80;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+
+    /* Tab 3: SPARKdog Status */
+    .status-card {
+      background: var(--card);
+      border: 1px solid var(--border-dim);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .status-tag-ok {
+      color: var(--green);
+      font-weight: bold;
+    }
+    .status-tag-warn {
+      color: var(--gold);
+      font-weight: bold;
+    }
+    .btn-heal {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 0.55rem;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .btn-heal:hover {
+      background: rgba(16, 185, 129, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span>✦ ASTERISK (*)</span>
+      <span style="font-size: 0.75rem; color: #cbd5e1;">SOVEREIGN</span>
+    </div>
+    <span class="badge" id="connStatus">RAM-ONLY • 100% OK</span>
+  </header>
+
+  <nav class="tabs-nav">
+    <button class="tab-btn active" data-tab="tabAssistant">💬 Asistent (Kontext)</button>
+    <button class="tab-btn" data-tab="tabStudio">⚡ Studio</button>
+    <button class="tab-btn" data-tab="tabGuard">🛡️ SPARKdog</button>
+  </nav>
+
+  <!-- TAB 1: ASISTENT S PLNÝM KONTEXTEM -->
+  <section class="tab-content active" id="tabAssistant">
+    <div class="chat-container">
+      <div class="chat-header">
+        <span>🧠 Znalost: Asterisk, Obelix, SPARK, Devpost, Samo-oprava</span>
+        <span style="color: var(--green);">● In-Memory RAM</span>
+      </div>
+      
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg msg-bot">
+          👋 Zdar, vítej v suverénní centrále! Jsem tvůj <strong>asistent v RAM</strong>. Znám veškerý tvůj kontext:
+          <br>• <strong>Asterisk (*)</strong> (WebMCP Chrome klient, 3D avatar pro 500M lidí)
+          <br>• <strong>Obelix</strong> (výpočetní node v Dockeru, SPARK vault)
+          <br>• <strong>SPARKdog s GNATem</strong> (nulové pády, hermetický štít, likvidace Velkého Bratra)
+          <br>• <strong>Samo-oprava za chodu</strong> (In-vivo hot healing za 0.1 ms)
+          <br>• <strong>Solární Genesis & PJAY 4.23</strong>
+          <br><br>Na co se chceš zeptat nebo co jdeme vybudovat?
+        </div>
+      </div>
+
+      <div class="chips-row">
+        <div class="chip" data-q="Jak funguje samo-oprava za chodu?">🩹 Samo-oprava za chodu</div>
+        <div class="chip" data-q="Vysvětli architekturu Asterisk vs Obelix">🏛️ Asterisk vs Obelix</div>
+        <div class="chip" data-q="Jak SPARKdog blokuje Velkého Bratra?">🛡️ Velký Bratr a šmíráci</div>
+        <div class="chip" data-q="Jaký je stav pro Devpost hackathony?">🏆 Devpost 2026</div>
+        <div class="chip" data-q="Co je PJAY skript a standard 700?">📜 PJAY Protokol 4.23</div>
+      </div>
+
+      <form class="chat-input-area" id="chatForm">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Napiš cokoliv svému asistentovi..." autocomplete="off">
+        <button type="submit" class="chat-send-btn">Odeslat</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- TAB 2: HACKATHON GENERATOR STUDIO -->
+  <section class="tab-content" id="tabStudio">
+    <div class="field-lbl">Předvolby pro Devpost výzvy:</div>
+    <div class="presets-container">
+      <button class="btn-preset" data-title="WebMCP Sovereign Challenge 2026" data-prompt="Decentralizovaný mesh pro streamovaný překlad znakové řeči v RAM.">🌐 WebMCP</button>
+      <button class="btn-preset" data-title="500M Voices Accessibility" data-prompt="3D Znakový avatar + Spark TTS pro 500M lidí 100% Free bez nutnosti tréninku.">🤟 A11y 500M</button>
+      <button class="btn-preset" data-title="Google All Things Agentic" data-prompt="Agent Jan Amos Komenský didaktický 5-fázový taskmaster s 15s failoverem.">🤖 Agentic</button>
+      <button class="btn-preset" data-title="Solar Sovereign AI Challenge" data-prompt="Kód a hardware napájený 100% ze slunce a bateriového úložiště s $0 idle cost.">☀️ Solar</button>
+    </div>
+
+    <div class="field-group">
+      <label class="field-lbl" for="pTitle">Název projektu:</label>
+      <input type="text" id="pTitle" value="Asterisk (*) Sovereign WebMCP">
+    </div>
+
+    <div class="field-group">
+      <label class="field-lbl" for="pPrompt">Zadání / Prompt výzvy:</label>
+      <textarea id="pPrompt" rows="2">Decentralizovaný in-memory stream pro 500M lidí bez zápisu na disk s formálním SPARK důkazem a samo-opravou za chodu.</textarea>
+    </div>
+
+    <button class="btn-generate" id="btnBuild">🚀 VYBUDOVAT PROJEKT</button>
+
+    <div class="field-group">
+      <label class="field-lbl">Výsledek / Devpost Submission:</label>
+      <div class="output-box" id="pOutput">> Zvolte předvolbu a klikněte na Vybudovat...</div>
+    </div>
+  </section>
+
+  <!-- TAB 3: SPARKDOG MONITOR & SAMO-OPRAVA -->
+  <section class="tab-content" id="tabGuard">
+    <div class="status-card">
+      <div class="status-item">
+        <span>Dohledový strážce:</span>
+        <span class="status-tag-ok">SPARKdog + GNAT 14</span>
+      </div>
+      <div class="status-item">
+        <span>Paměťový režim:</span>
+        <span class="status-tag-ok">In-Memory RAM (0 bajtů disk)</span>
+      </div>
+      <div class="status-item">
+        <span>Hermetický štít:</span>
+        <span class="status-tag-ok">AKTIVNÍ (Šmíráci likvidováni)</span>
+      </div>
+      <div class="status-item">
+        <span>Samo-oprava za chodu:</span>
+        <span class="status-tag-ok" id="selfHealStatus">PŘIPRAVENA (0.1 ms failover)</span>
+      </div>
+      <div class="status-item">
+        <span>Ash Sweeper:</span>
+        <span class="status-tag-warn">Plánován na 04:23 UTC</span>
+      </div>
+      
+      <button class="btn-heal" id="btnSimulateHeal">
+        <span>🩹</span>
+        <span>Otestovat Samo-opravu za chodu (Hot-Patch)</span>
+      </button>
+    </div>
+    <div class="output-box" id="guardLog" style="max-height: 160px;">[SPARKdog Guardian] Připraven. Všechny invarianty a paměťové hranice v pořádku.</div>
+  </section>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

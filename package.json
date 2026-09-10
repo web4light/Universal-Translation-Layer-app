@@ -1,0 +1,28 @@
+{
+  "name": "universal-translation-layer",
+  "version": "4.23.0",
+  "description": "Asterisk (*) Sovereign WebMCP Mesh Platform & Universal Translation Layer",
+  "scripts": {
+    "install:all": "npm --prefix dlp3d install",
+    "dev": "npm run dev --prefix dlp3d",
+    "build": "npm run build --prefix dlp3d",
+    "start": "npm run start --prefix dlp3d",
+    "dev:studio": "python -m http.server 8088 --directory web",
+    "flutter:get": "cd app && flutter pub get",
+    "flutter:run": "cd app && flutter run -d chrome",
+    "flutter:build": "cd app && flutter build web",
+    "ada:build": "gprbuild -P spark_agent.gpr",
+    "ada:run": "node -e \"const { spawn } = require('child_process'); const exe = process.platform === 'win32' ? './obj/spark_agent_main.exe' : './obj/spark_agent_main'; spawn(exe, { stdio: 'inherit' });\""
+  },
+  "keywords": [
+    "webmcp",
+    "spark",
+    "ada",
+    "accessibility",
+    "sign-language",
+    "sovereign-ai",
+    "windows-ready"
+  ],
+  "author": "Pan Jeskyně",
+  "license": "GPL-3.0"
+}

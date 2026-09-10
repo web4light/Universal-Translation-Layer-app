@@ -1,0 +1,18 @@
+project Eth_Wallet is
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj/eth_wallet";
+   for Source_Files use (
+      "eth_wallet.ads",
+      "eth_wallet.adb",
+      "eth_secp256k1.ads",
+      "eth_secp256k1.adb",
+      "eth_keccak.ads",
+      "eth_keccak.adb",
+      "eth_rlp.ads",
+      "eth_rlp.adb"
+   );
+   package Prove is
+      for Proof_Switches ("Ada") use
+        ("--level=2", "--warnings=continue", "-j0");
+   end Prove;
+end Eth_Wallet;

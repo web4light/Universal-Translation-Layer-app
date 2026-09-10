@@ -1,0 +1,37 @@
+# ============================================================
+#  OBELIX — Heavyweight Sovereign Compute & SPARK Vault
+# ============================================================
+FROM ubuntu:24.04
+
+LABEL maintainer="phoenix@web4light.online"
+LABEL org.opencontainers.image.title="OBELIX Heavy Compute Engine"
+LABEL org.opencontainers.image.description="Solar-powered heavy compute node and SPARK vault"
+LABEL org.opencontainers.image.licenses="GPL-3.0"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# System dependencies: GNAT Ada toolchain + Python + Audio + FFmpeg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnat \
+    gprbuild \
+    python3 \
+    python3-pip \
+    python3-venv \
+    ffmpeg \
+    libsndfile1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy source and configurations
+COPY . .
+
+# Build SPARK Core executable inside Obelix container
+RUN gprbuild -P spark_agent.gpr
+
+# Expose ports for Heavy Compute, WebMCP Mesh & Prometheus
+EXPOSE 8000 9302 9303 9306 9307
+
+# Launch Obelix Heavy Compute Daemon
+CMD ["./obj/spark_agent_main"]

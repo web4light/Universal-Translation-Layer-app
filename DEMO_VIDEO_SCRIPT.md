@@ -1,60 +1,41 @@
-# 🎬 4-Minute Demo Video Script: Agent Komenský (UTL)
-## Hackathon: All Things Agentic ($180,000 USD)
+# 🎬 3-Minute Demo Video Script: Asterisk Sovereign WebMCP Mesh Platform
+## Hackathon Pitch & Walkthrough
 
-Tento scénář je přesně navržen tak, aby během 4 minut splnil 100 % požadavků poroty a ukázal funkční projekt, backend na Google Cloudu a unikátní technickou hloubku.
-
----
-
-### ⏱️ Časový harmonogram videa (0:00 – 4:00)
-
+⏱️ Časový plán (0:00 – 3:00):
 ```
-0:00 ─── 0:45 │ 1. Problém & Hodnotová nabídka (Proč to vzniklo)
-0:45 ─── 1:45 │ 2. Architektura & Ada/SPARK Formální Verifikace (Fortified Fleet)
-1:45 ─── 2:45 │ 3. Živé Demo: Agent Komenský & Karel IV. Dabing (Taskmaster)
-2:45 ─── 3:30 │ 4. Důkaz nasazení na Google Cloud Run & Telemetrie
-3:30 ─── 4:00 │ 5. Závěr & Vize (Web 4.23 / Standard 700)
+0:00 ─── 0:40 │ 1. Problém & Lidský příběh (Proč to vzniklo)
+0:40 ─── 1:30 │ 2. Živé Demo: Reálné fungování a okamžitá přístupnost
+1:30 ─── 2:15 │ 3. Ada/SPARK Bezpečnost & In-Memory Zero-Trace Soukromí
+2:15 ─── 2:45 │ 4. WebMCP document.modelContext & Škálovatelnost
+2:45 ─── 3:00 │ 5. Solar Genesis & Závěrečné poselství
 ```
 
 ---
 
-### 🎙️ Podrobný text a záběry obrazovky
+### 🎙️ Detailní scénář a záběry:
 
-#### 1. Problém & Hodnotová nabídka (0:00 – 0:45)
-- **Co mít na obrazovce:** Webové rozhraní [https://web4light.online](https://web4light.online) a logo projektu.
-- **Mluvené slovo (CZ/EN):**
-  > *"Každý den vznikají miliony hodin cizojazyčného obsahu a vzdělávacích materiálů. Překladače textu nestačí a dabing je drahý, pomalý a ztrácí emoce a identitu původního herce.
-  > Představujeme **Universal Translation Layer (UTL) — Protocol 4.23** vedený **Agentem Janem Amosem Komenským**. Náš autonomní systém vezme cizí titulky, přeloží je přes Gemini 3.5 Flash se zachováním kontextu a syntetizuje český dabing přímo hlasem původního herce."*
+#### 1. Problém & Lidský příběh (0:00 – 0:40)
+* **Obrazovka**: Titulní stránka `Asterisk Sovereign WebMCP Mesh Platform` a ukázka problému.
+* **Mluvené slovo**:
+  > "Běžná řešení vyžadují složité registrace, trénování a posílají citlivá data do cizích cloudů.
+  > Představujeme **Asterisk Sovereign WebMCP Mesh Platform** — systém navržený tak, aby řešil Decentralizovaná in-memory síť pro streamovaný překlad znakové řeči a Spark TTS syntézu pro 500M lidí přes WebMCP protok... ihned a s maximálním ohledem na lidskou důstojnost."
 
----
+#### 2. Živé Demo (0:40 – 1:30)
+* **Obrazovka**: Spuštění webové aplikace v prohlížeči, okamžitá odezva v reálném čase.
+* **Mluvené slovo**:
+  > "Podívejte se na živý běh: žádné čekání, žádné zpoždění. Data proudí v reálném čase přímo v prohlížeči."
 
-#### 2. Architektura: Ada/SPARK & Google Antigravity SDK (0:45 – 1:45)
-- **Co mít na obrazovce:** Terminál s kódem `asgard_orchestrator.ads`, `agent_komensky.ads` a spuštění `gnatprove` nebo `antigravity_agent.py`.
-- **Mluvené slovo (CZ/EN):**
-  > *"Zatímco většina AI agentů jsou křehké skripty, náš Taskmaster je opevněn formální matematickou verifikací v **Ada/SPARK 2022**. 
-  > Pomocí **Google Antigravity SDK** koordinuje Agent Komenský 4 specializované cechy: Zbrojíře, Písaře, Strážce a Zákoníky. Matematicky garantujeme nulové přetečení paměti, nulové výjimky a 15sekundový automatický failover při výpadku primárního uzlu."*
+#### 3. Ada/SPARK & In-Memory Bezpečnost (1:30 – 2:15)
+* **Obrazovka**: Terminál s formální verifikací `gnatprove` a kódem SPARK jádra.
+* **Mluvené slovo**:
+  > "Naše jádro je matematicky ověřeno v Ada/SPARK 2022. Garantujeme nulové pády, absenci memory leaků a 100% běh v paměti RAM bez zápisu na disk."
 
----
+#### 4. WebMCP & Škálování (2:15 – 2:45)
+* **Obrazovka**: Inspekce `document.modelContext` v DevTools a telemetrie.
+* **Mluvené slovo**:
+  > "Díky standardu WebMCP je náš systém přímo integrován do agentních rozhraní prohlížeče."
 
-#### 3. Živé Demo: Agent Komenský v akci (1:45 – 2:45)
-- **Co mít na obrazovce:** Spuštění `python3 src/agent_komensky.py` a přehrání vygenerovaného audio vzorku (hlas Karla IV. / dabing scény).
-- **Mluvené slovo (CZ/EN):**
-  > *"Sledujte Agenta Komenského v 5 didaktických fázích:
-  > 1. Labyrint světa – dekompozice a diarizace postav.
-  > 2. Janua Linguarum – inteligentní překlad přes Gemini.
-  > 3. Orbis Pictus – časová synchronizace a Spark-TTS zero-shot klonování hlasu.
-  > 4. SPARK důkaz – formální ověření časových kontraktů.
-  > 5. Ráj srdce – okamžitá distribuce hotového dabovaného audia."*
-
----
-
-#### 4. Důkaz nasazení na Google Cloud Run (2:45 – 3:30)
-- **Co mít na obrazovce:** Google Cloud Console $\rightarrow$ Dashboard služby **Cloud Run** (`utl-asgard-orchestrator`), logy a `.run.app` URL.
-- **Mluvené slovo (CZ/EN):**
-  > *"Náš backend je plně kontejnerizován a nasazen v **Google Cloud Run**. Využíváme architekturu Scale-to-Zero pro udržení nákladů na absolutní nule ($0), přičemž systém okamžitě škáluje při příchodu nových požadavků. Prometheus telemetrie na portu 9302 poskytuje nepřetržitý dohled nad zdravím sítě."*
-
----
-
-#### 5. Závěr & Budoucnost (3:30 – 4:00)
-- **Co mít na obrazovce:** GitHub repozitář a slogan: *Loquere lingua tua. Omnes te audient sua lingua. Tua voce.*
-- **Mluvené slovo (CZ/EN):**
-  > *"Agent Komenský a Universal Translation Layer přinášejí suverénní, matematicky ověřenou a lidskou komunikaci pro celý svět. Děkujeme porotě All Things Agentic Hackathonu!"*
+#### 5. Závěr (2:45 – 3:00)
+* **Obrazovka**: Logo projektu a odkaz na web4light.online / GitHub.
+* **Mluvené slovo**:
+  > "Kód vytvořený ze Slunce pro lidi. Děkujeme porotě!"

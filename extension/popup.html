@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg: #070913;
+      --card: #0e1428;
+      --gold: #ffd700;
+      --cyan: #38bdf8;
+      --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 340px;
+      background: var(--bg);
+      color: #f1f5f9;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 1.2rem;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .title { font-size: 1.1rem; font-weight: bold; color: var(--gold); }
+    .badge {
+      font-size: 0.75rem;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+    }
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid #1e293b;
+      padding: 0.8rem;
+      border-radius: 8px;
+      margin-bottom: 0.8rem;
+    }
+    .toggle-lbl { font-size: 0.9rem; }
+    .toggle-desc { font-size: 0.75rem; color: #94a3b8; }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: "";
+      height: 18px; width: 18px;
+      left: 3px; bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--gold); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+    .btn-sidepanel {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #000;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-sidepanel:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">✦ Asterisk (*) WebMCP</div>
+    <div class="badge">Mesh Online</div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-lbl">🤟 3D Znakový Avatar</div>
+      <div class="toggle-desc">Overlay pro libovolné video/web</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="chkAvatar" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-lbl">🔊 Spark TTS Popis Scény</div>
+      <div class="toggle-desc">Čtení a popis pro nevidomé</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="chkTTS" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-lbl">⚡ Výpočetní Dar (WebGPU)</div>
+      <div class="toggle-desc">Daruj 2% výkonu pro síť 500M</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="chkMesh" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <button class="btn-sidepanel" id="openSidePanelBtn">
+    🎨 Otevřít Hackathon AI Studio
+  </button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

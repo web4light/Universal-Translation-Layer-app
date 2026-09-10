@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Asterisk (*) — Sovereign WebMCP & 3D Accessibility",
+  "version": "4.23.0",
+  "description": "100% Free 3D Sign Language avatar, Spark TTS audio descriptions & Sovereign Hackathon AI Studio via WebMCP mesh.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Asterisk (*) Sovereign WebMCP"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icon.png", "sidepanel.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
