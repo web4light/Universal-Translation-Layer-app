@@ -1,0 +1,311 @@
+   <!ENTITY version_from_wind_base
+    '<version>
+      <getenv name="WIND_BASE"></getenv>
+      <grep regexp=".*[/\\](vxworks-6[0-9.]*).*" group="1"></grep>
+      <must_match>vxworks-6.*</must_match>
+     </version>'
+   >
+
+   <!ENTITY version_from_wind_base_cert
+    '<version>
+      <getenv name="WIND_BASE"></getenv>
+      <grep regexp=".*[/\\](vxworks-cert-6[0-9.]*).*" group="1"></grep>
+      <must_match>vxworks-cert-6.*</must_match>
+     </version>'
+   >
+
+   <!ENTITY runtimes_vx6
+    '<runtimes>kernel,kernel-smp,kernel-sjlj,rtp,rtp-smp</runtimes>'
+   >
+
+   <!ENTITY runtimes_vx6cert
+    '<runtimes>
+      kernel,cert,ravenscar-cert,zfp,rtp,ravenscar-cert-rtp
+     </runtimes>'
+   >
+
+   <!ENTITY gnat_pre_6.4
+     '<compiler language="Ada" version="3.16" />
+      <compiler language="Ada" version="5.00" />
+      <compiler language="Ada" version="5.01" />
+      <compiler language="Ada" version="5.02" />
+      <compiler language="Ada" version="5.03" />
+      <compiler language="Ada" version="5.04" />
+      <compiler language="Ada" version="6.0" />
+      <compiler language="Ada" version="6.1" />
+      <compiler language="Ada" version="6.2" />
+      <compiler language="Ada" version="6.3" />
+      <compiler language="Ada" version="6.4" />'
+   >
+
+  <!ENTITY if_gnat_pre_6.4
+   '<compilers>
+       <compiler language="Ada" />
+    </compilers>
+    <compilers>
+      &gnat_pre_6.4;
+    </compilers>'
+  >
+
+  <!ENTITY if_gnat_post_6.4
+   '<compilers>
+       <compiler language="Ada" />
+    </compilers>
+    <compilers negate="true" >
+      &gnat_pre_6.4;
+    </compilers>'
+  >
+
+  <!ENTITY config_rtp_cflags
+    '<config>
+   package Compiler is
+      for Leading_Required_Switches ("C") use
+        Compiler &apos; Leading_Required_Switches ("C") &amp; ("-mrtp")
+        &amp; ("-I" &amp; Wind_Base &amp; "/target/usr/h",
+               "-I" &amp; Wind_Base &amp; "/target/usr/h/wrn/coreip");
+   end Compiler;
+
+   package Compiler is
+      for Leading_Required_Switches ("C++") use
+        Compiler &apos; Leading_Required_Switches ("C++") &amp; ("-mrtp")
+        &amp; ("-I" &amp; Wind_Base &amp; "/target/usr/h",
+               "-I" &amp; Wind_Base &amp; "/target/usr/h/wrn/coreip");
+   end Compiler;
+     </config>'
+  >
+
+  <!ENTITY config_rtp_lib
+    '
+     <!-- As a special exception, on arm-vx6, rts-rtp is smp-based. -->
+     <config>
+     rtp_smp_suffix := "";
+     case TARGET_ADA is
+       when "arm-wrs-vxworks" =>
+         rtp_smp_suffix := "_smp";
+       when others =>
+         rtp_smp_suffix := "";
+     end case;
+
+     package Linker is
+        for Required_Switches use
+          Linker &apos; Required_Switches
+          &amp; ("-L" &amp; Wind_Base
+                 &amp; "/target/lib" &amp; rtp_smp_suffix &amp; "/usr/lib/"
+                 &amp; "&this_cpu_subdir;",
+                 "-L" &amp; Wind_Base
+                 &amp; "/target/usr/lib" &amp; rtp_smp_suffix &amp; "/"
+                 &amp; "&this_cpu_subdir;");
+     end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_rtp_smp_lib
+    '<config>
+     package Linker is
+        for Required_Switches use
+          Linker &apos; Required_Switches
+          &amp; ("-L" &amp; Wind_Base
+                 &amp; "/target/lib_smp/usr/lib/"
+                 &amp; "&this_cpu_subdir;");
+     end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_rtp_cert_lib
+    '<config>
+     package Linker is
+        for Required_Switches use
+          Linker &apos; Required_Switches
+          &amp; ("-L" &amp; Wind_Base
+                 &amp; "/target/usr/lib_cert_rtp/"
+                 &amp; "&this_cpu_subdir;");
+     end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_no_startfiles_no_defaultlibs
+    '<config>
+     package Linker is
+        for Required_Switches use
+          Linker &apos; Required_Switches
+          &amp; ("-nostartfiles", "-nodefaultlibs");
+     end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_kernel_cflags
+    '<config>
+   package Compiler is
+      for Leading_Required_Switches ("C") use
+        Compiler &apos; Leading_Required_Switches ("C")
+        &amp; ("-I" &amp; Wind_Base &amp; "/target/h",
+               "-I" &amp; Wind_Base &amp; "/target/h/wrn/coreip");
+   end Compiler;
+
+   package Compiler is
+      for Leading_Required_Switches ("C++") use
+        Compiler &apos; Leading_Required_Switches ("C++")
+        &amp; ("-I" &amp; Wind_Base &amp; "/target/h",
+               "-I" &amp; Wind_Base &amp; "/target/h/wrn/coreip");
+   end Compiler;
+     </config>'
+  >
+
+  <!ENTITY config_wrs_ar
+    '<config>
+   for Archive_Builder  use ("ar" &amp; "&this_gnu_wrs_suffix;", "cr");
+   for Archive_Builder_Append_Option use ("q");
+   for Archive_Indexer  use ("ranlib" &amp; "&this_gnu_wrs_suffix;");
+   for Archive_Suffix   use ".a";
+     </config>'
+  >
+
+  <!ENTITY configurations_vx6
+  '
+  <!--  Note: vx6 and vx6cert share the same target name, so
+        in configurations chunks are added into vx6-specific
+        files if_this_target will match both vx6 and vx6cert.
+        A way to discriminate the two kind of platforms is to
+        use runtime names and compiler names.
+
+        For now, however, we still have one global target-independant
+        compiler for GNAT. So most of the following chuncks apply on
+        both vx6 and vx6cert. In order to ease the maintenance,
+        have a comment to make it explicit when they apply to both.
+   -->
+
+   <configuration>
+     &if_this_target;
+     <!-- vx6 and vx6cert -->
+
+     &config_wind_base;
+   </configuration>
+
+   <configuration>
+    &if_gnat_pre_6.4;
+    &if_this_target;
+    <!-- vx6 and vx6cert -->
+
+    &config_wrs_ar;
+   </configuration>
+
+   <configuration>
+    &if_gnat_post_6.4;
+    &if_this_target;
+    <!-- vx6 and vx6cert -->
+
+    &config_gnat_ar;
+   </configuration>
+
+   <configuration>
+    &if_no_ada;
+    &if_this_target;
+    <!-- vx6 and vx6cert -->
+
+    &config_gnat_ar;
+   </configuration>
+
+   <configuration>
+     &if_rtp;
+     &if_this_target;
+     <!-- vx6 and vx6cert -->
+
+     &config_rtp_cflags;
+   </configuration>
+
+   <configuration>
+    &if_ravenscar_cert_rtp;
+    &if_this_target;
+    <!-- vx6cert -->
+
+    &config_wrs_rtp_base;
+   </configuration>
+
+   <configuration>
+     &if_kernel_full;
+     &if_this_target;
+     <!-- vx6 and vx6cert -->
+
+     &config_kernel_cflags;
+   </configuration>
+
+   <configuration>
+     &if_zfp;
+     &if_this_target;
+     <!-- vx6cert -->
+
+     &config_kernel_cflags;
+   </configuration>
+
+   <configuration>
+     &if_ravenscar_cert;
+     &if_this_target;
+     <!-- vx6cert -->
+
+     &config_kernel_cflags;
+   </configuration>
+
+   <!-- In Cert and 653 printf should not be considered as a builtin -->
+   <configuration>
+     &if_zfp;
+     &if_this_target;
+     <!-- vx6cert -->
+
+     &config_no_builtin;
+   </configuration>
+
+   <configuration>
+     &if_cert_based;
+     &if_this_target;
+     <!-- vx6cert -->
+
+     &config_no_builtin;
+   </configuration>
+
+   <!-- -L options. Should only be needed for non-Ada projects.
+        They would be useless for programs that have Ada in them,
+        since these are passed by specs file passed to gcc
+        by a pragma Linker_Options in system; and would be harmless
+        if it were for x86-vx6: on this target,
+        to discriminate between vxsim and real target, we only
+        have an option on command line, and gprconfig/gprbuild
+        do not have a way to look for such an option on the command line.
+        All in all, we do not pass them if there is Ada in the project.
+    -->
+
+   <configuration>
+     &if_no_ada;
+     &if_rtp_strict;
+     &if_this_target;
+     <!-- vx6 and vx6cert -->
+
+     &config_rtp_lib;
+   </configuration>
+
+   <configuration>
+     &if_no_ada;
+     &if_rtp_smp;
+     &if_this_target;
+     <!-- vx6 and vx6cert -->
+
+     &config_rtp_smp_lib;
+   </configuration>
+
+   <configuration>
+    &if_no_ada;
+    &if_ravenscar_cert_rtp;
+    &if_this_target;
+    <!-- vx6cert -->
+
+    &config_rtp_cert_lib;
+   </configuration>
+
+   <configuration>
+     &if_cert_based;
+     &if_this_target;
+    <!-- vx6cert -->
+
+    &config_no_startfiles_no_defaultlibs;
+  </configuration>
+  '
+  >

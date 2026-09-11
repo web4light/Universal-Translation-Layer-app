@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<gprconfig>
+   <!--  This package provides the rules to handle Windows resource files -->
+
+   <configuration>
+     <compilers>
+       <compiler language="WinRes" />
+     </compilers>
+     <config>
+   package Compiler is
+      for Driver ("WinRes") use "${PREFIX(WinRes)}windres";
+      for Trailing_Required_Switches ("WinRes") use ("-i");
+      for Object_File_Suffix ("WinRes") use ".coff";
+      for Object_File_Switches ("WinRes") use ("-o", "");
+   end Compiler;
+
+   package Naming is
+      for Body_Suffix ("WinRes") use ".rc";
+   end Naming;
+
+   package Linker is
+      for Unconditional_Linking ("WinRes") use "True";
+   end Linker;
+
+     </config>
+   </configuration>
+
+</gprconfig>
