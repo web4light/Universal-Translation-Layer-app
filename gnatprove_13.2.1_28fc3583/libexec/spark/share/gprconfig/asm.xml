@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<gprconfig>
+   <!--  This package provides the default standard options for a gcc
+         Asm compiler -->
+
+   <configuration>
+     <compilers>
+       <compiler name="^GCC-ASM$" language="Asm_Cpp" />
+     </compilers>
+     <config>
+   package Compiler is
+      for Driver            ("Asm_Cpp") use "${PATH(asm_cpp)}${PREFIX(asm_cpp)}gcc";
+      for Leading_Required_Switches ("Asm_Cpp") use
+         Compiler'Leading_Required_Switches ("Asm_Cpp") &amp;
+         ("-c", "-x", "assembler-with-cpp");
+      for Include_Switches        ("Asm_Cpp") use ("-I");
+      for Max_Command_Line_Length use "8192";
+      for Response_File_Format    ("Asm_Cpp") use "GCC_GNU";
+      for Dependency_Switches ("Asm_Cpp") use ("-MMD", "-MF", "");
+   end Compiler;
+     </config>
+   </configuration>
+
+   <configuration>
+     <compilers>
+       <compiler name="^GCC-ASM$" language="Asm" />
+     </compilers>
+     <config>
+   package Compiler is
+      for Driver            ("Asm") use "${PATH(asm)}${PREFIX(asm)}gcc";
+      for Leading_Required_Switches ("Asm") use
+        Compiler'Leading_Required_Switches ("Asm") &amp;
+        ("-c", "-x", "assembler");
+      for Include_Switches        ("Asm") use ("-I");
+      for Max_Command_Line_Length use "8192";
+      for Response_File_Format    ("Asm") use "GCC_GNU";
+   end Compiler;
+     </config>
+   </configuration>
+
+   <configuration>
+     <compilers>
+       <compiler name="^GCC-ASM$" language="Asm2" />
+     </compilers>
+     <config>
+   package Compiler is
+      for Driver            ("Asm2") use "${PATH(asm2)}${PREFIX(asm2)}gcc";
+      for Leading_Required_Switches ("Asm2") use
+        Compiler'Leading_Required_Switches ("Asm2") &amp;
+        ("-c", "-x", "assembler");
+      for Include_Switches        ("Asm2") use ("-I");
+      for Max_Command_Line_Length use "8192";
+      for Response_File_Format    ("Asm2") use "GCC_GNU";
+      for Dependency_Switches ("Asm2") use ("-MMD", "-MF", "");
+   end Compiler;
+     </config>
+   </configuration>
+</gprconfig>

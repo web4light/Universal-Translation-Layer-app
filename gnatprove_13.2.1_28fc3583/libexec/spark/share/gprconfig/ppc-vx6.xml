@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gprconfig [
+<!ENTITY % env.ent SYSTEM "env.ent"> %env.ent;
+<!ENTITY % shortcuts.ent SYSTEM "shortcuts.ent"> %shortcuts.ent;
+<!ENTITY % vxworks.ent SYSTEM "vxworks.ent"> %vxworks.ent;
+<!ENTITY % vx6.ent SYSTEM "vx6.ent"> %vx6.ent;
+
+<!-- Local target-specific conditions -->
+
+<!ENTITY this_target 'powerpc-wrs-vxworks'>
+<!ENTITY this_gnu_wrs_suffix 'ppc'>
+
+<!ENTITY if_these_c_compilers
+    '<compilers>
+       <compiler name="^GCC_Pro$" />
+       <compiler name="^GCC-WRS6$" />
+       <compiler name="^GCC-WRS6CERT$" />
+     </compilers>'>
+
+<!ENTITY if_these_cpp_compilers
+    '<compilers>
+       <compiler name="^G\+\+-WRS6$" />
+       <compiler name="^G\+\+-WRS6CERT$" />
+     </compilers>'>
+
+<!ENTITY if_these_gnu_wrs_compilers
+    '<compilers>
+       <compiler name="^GCC-WRS6$" />
+       <compiler name="^G\+\+-WRS6$" />
+       <compiler name="^GCC-WRS6CERT$" />
+       <compiler name="^G\+\+-WRS6CERT$" />
+     </compilers>'>
+
+<!ENTITY this_wrs_rtp_base '0x40000000'>
+<!-- For vx6cert -->
+
+<!ENTITY this_cpu_subdir 'ppc/PPC32/common'>
+]>
+<gprconfig>
+
+  &environment;
+
+  &configurations_vxworks_gpp;
+
+  &configurations_vx6;
+
+</gprconfig>

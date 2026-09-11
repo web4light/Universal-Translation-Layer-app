@@ -35,8 +35,7 @@ PRVNÍ KROK (TEĎ NA i7 Windows):
    start.bat
 
    Terminal 2:
-   cd c:\Users\pan_jeskyne\Favorites\vakuova-mincovna
-   start_shadow.bat
+   pip install prometheus_client requests
 
 2. Koukni na metriky:
    http://localhost:9302/metrics  (Primary)
