@@ -1,0 +1,3 @@
+NT SKIP too slow on windows
+assertions SKIP minor proof diff
+ALL XFAIL nightly diff not reproducible (U210-022)

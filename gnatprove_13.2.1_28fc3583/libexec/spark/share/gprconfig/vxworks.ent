@@ -1,0 +1,491 @@
+   <!ENTITY version_from_wrs_gnu_cc_vx5
+    '<version>
+      <external>cc${PREFIX} -v</external>
+      <grep regexp=".*(tornado 2|VxWorks 5).*" group="1"></grep>
+      <must_match>(tornado 2|VxWorks 5)</must_match>
+     </version>'
+   >
+
+   <!ENTITY version_from_wrs_gnu_cpp_vx5
+    '<version>
+      <external>c++${PREFIX} -v</external>
+      <grep regexp=".*(tornado 2|VxWorks 5).*" group="1"></grep>
+      <must_match>(tornado 2|VxWorks 5)</must_match>
+     </version>'
+   >
+
+   <!ENTITY target_from_wrs_gnu_cc
+    '<target>
+      <external>cc${PREFIX} -dumpmachine</external>
+      <grep regexp="[^\r\n]+"></grep>
+     </target>'
+   >
+
+   <!ENTITY target_from_wrs_gnu_cpp
+    '<target>
+      <external>c++${PREFIX} -dumpmachine</external>
+      <grep regexp="[^\r\n]+"></grep>
+    </target>'
+   >
+
+   <!ENTITY config_wind_base
+    '<config>
+   Wind_Base := external ("WIND_BASE");
+   Wind_Usr := external ("WIND_USR", Wind_Base &amp; "/target/usr/");
+     </config>'
+   >
+
+   <!ENTITY config_mrtp
+    '<config>
+  package Linker is
+     for Required_Switches use
+  	Linker &apos; Required_Switches &amp; ("-mrtp");
+  end Linker;
+    </config>'
+   >
+
+   <!ENTITY config_mlongcall_c
+     '<config>
+   package Compiler is
+      case TARGET_C is
+         when "arm-wrs-vxworks" =>
+           for Leading_Required_Switches ("C") use
+             Compiler &apos; Leading_Required_Switches ("C")
+             &amp; ("-mlong-calls");
+
+         when "powerpc-wrs-vxworks" =>
+           for Leading_Required_Switches ("C") use
+             Compiler &apos; Leading_Required_Switches ("C")
+             &amp; ("-mlongcall");
+        when others =>
+           null;
+      end case;
+   end Compiler;
+     </config>'
+   >
+
+   <!ENTITY config_mlongcall_cpp
+     '<config>
+   package Compiler is
+      case TARGET_CPP is
+         when "arm-wrs-vxworks" =>
+           for Leading_Required_Switches ("C++") use
+             Compiler &apos; Leading_Required_Switches ("C++")
+             &amp; ("-mlong-calls");
+
+         when "powerpc-wrs-vxworks" | "powerpc-wrs-vxworks7" =>
+           for Leading_Required_Switches ("C++") use
+             Compiler &apos; Leading_Required_Switches ("C++")
+             &amp; ("-mlongcall");
+
+        when others =>
+           null;
+      end case;
+   end Compiler;
+     </config>'
+   >
+
+  <!ENTITY config_wrs_rtp_base
+    '<config>
+   WRS_RTP_Base := external ("WRS_RTP_BASE", "&this_wrs_rtp_base;");
+   package Linker is
+      for Leading_Switches ("Ada") use
+        Linker &apos; Leading_Switches ("Ada")
+        &amp; ("-Wl,--defsym,__wrs_rtp_base=" &amp; WRS_RTP_Base);
+      for Leading_Switches ("C") use
+        Linker &apos; Leading_Switches ("C")
+        &amp; ("-Wl,--defsym,__wrs_rtp_base=" &amp; WRS_RTP_Base);
+      for Leading_Switches ("C++") use
+        Linker &apos; Leading_Switches ("C++")
+        &amp; ("-Wl,--defsym,__wrs_rtp_base=" &amp; WRS_RTP_Base);
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY if_target_gpp
+    '<targets>
+       <target name="^.*-wrs-vxworks$" />
+       <target name="^.*-wrs-vxworks7$" />
+       <target name="^.*-wrs-vxworks7r2$" />
+     </targets>'>
+
+  <!ENTITY rtp_runtimes
+     '<compiler runtime="^rtp$" />
+      <compiler runtime="-rtp$" />
+      <compiler runtime="^rtp-" />
+      <compiler runtime="-rtp-" />'
+  >
+
+  <!ENTITY if_rtp
+    '<compilers>
+      &rtp_runtimes;
+     </compilers>'
+  >
+
+  <!ENTITY if_not_rtp
+    '<compilers negate="true">
+      &rtp_runtimes;
+     </compilers>'
+  >
+
+  <!ENTITY if_ravenscar_cert_rtp
+    '<compilers>
+       <compiler runtime="^ravenscar-cert-rtp$" />
+     </compilers>'
+  >
+
+  <!ENTITY if_ravenscar_cert
+    '<compilers>
+       <compiler runtime="^ravenscar-cert$" />
+     </compilers>'
+  >
+
+  <!ENTITY if_cert_based
+    '<compilers>
+       <compiler runtime="cert" />
+     </compilers>'
+  >
+
+  <!ENTITY if_zfp
+    '<compilers>
+       <compiler runtime="^zfp$" />
+     </compilers>'
+  >
+
+  <!-- Our naming scheme is such that the name of full rtp runtimes
+       start with a "rtp" token -->
+
+  <!ENTITY if_rtp_full
+    '<compilers>
+       <compiler runtime="^rtp$" />
+       <compiler runtime="^rtp-" />
+     </compilers>'
+  >
+
+  <!ENTITY if_rtp_strict
+    '<compilers>
+       <compiler runtime="^rtp$" />
+     </compilers>'
+  >
+
+  <!ENTITY if_rtp_smp
+    '<compilers>
+       <compiler runtime="^rtp-smp$" />
+     </compilers>'
+  >
+
+  <!-- Our naming scheme is such that the name of full dkm runtimes
+       start with a "kernel" token -->
+
+  <!ENTITY if_kernel_full
+    '<compilers>
+       <compiler runtime="^kernel$" />
+       <compiler runtime="^kernel-" />
+     </compilers>'
+  >
+
+  <!ENTITY if_not_kernel_full
+    '<compilers negate="true">
+       <compiler runtime="^kernel$" />
+       <compiler runtime="^kernel-" />
+     </compilers>'
+  >
+
+  <!ENTITY if_ada_rtp
+    '<compilers>
+      <compiler name="^GNAT$" runtime="^rtp$" />
+      <compiler name="^GNAT$" runtime="-rtp$" />
+      <compiler name="^GNAT$" runtime="^rtp-" />
+      <compiler name="^GNAT$" runtime="-rtp-" />
+     </compilers>'
+  >
+
+  <!ENTITY config_ada_rtp
+    '<config>
+   package Compiler is
+      for Leading_Required_Switches ("Ada") use
+        Compiler &apos; Leading_Required_Switches ("Ada") &amp; ("-mrtp");
+   end Compiler;
+     </config>'
+  >
+
+  <!ENTITY if_large_rts
+    '<compilers>
+      <compiler runtime="-large$" />
+     </compilers>'
+  >
+
+  <!ENTITY config_no_builtin
+  '
+     <config>
+   package Compiler is
+      for Leading_Required_Switches ("C") use
+        Compiler &apos; Leading_Required_Switches ("C")
+        &amp; ("-fno-builtin");
+   end Compiler;
+
+   package Compiler is
+      for Leading_Required_Switches ("C++") use
+        Compiler &apos; Leading_Required_Switches ("C++")
+        &amp; ("-fno-builtin");
+   end Compiler;
+     </config>
+  '
+  >
+
+  <!ENTITY config_e500v2_cflags
+    '<config>
+   package Compiler is
+      for Leading_Required_Switches ("C") use
+        Compiler &apos; Leading_Required_Switches ("C")
+        &amp; ("-te500v2", "-fno-implicit-fp");
+
+      for Leading_Required_Switches ("C++") use
+        Compiler &apos; Leading_Required_Switches ("C++")
+        &amp; ("-te500v2", "-fno-implicit-fp");
+   end Compiler;
+     </config>'
+  >
+
+  <!ENTITY config_x86_64_cmodel_large_flags
+    '<config>
+   package Compiler is
+      for Leading_Required_Switches ("Ada") use
+        Compiler &apos; Leading_Required_Switches ("Ada")
+        &amp; ("-mcmodel=large");
+
+      for Leading_Required_Switches ("C") use
+        Compiler &apos; Leading_Required_Switches ("C")
+        &amp; ("-mcmodel=large");
+
+      for Leading_Required_Switches ("C++") use
+        Compiler &apos; Leading_Required_Switches ("C++")
+        &amp; ("-mcmodel=large");
+   end Compiler;
+   package Linker is
+      for Leading_Switches ("Ada") use
+        Linker &apos; Leading_Switches ("Ada")
+        &amp; ("-mcmodel=large");
+      for Leading_Switches ("C") use
+        Linker &apos; Leading_Switches ("C")
+        &amp; ("-mcmodel=large");
+      for Leading_Switches ("C++") use
+        Linker &apos; Leading_Switches ("C++")
+        &amp; ("-mcmodel=large");
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_out_suffix
+    '<config>
+   package Builder is
+      for Executable_Suffix use ".out";
+   end Builder;
+     </config>'
+  >
+
+  <!ENTITY config_vxe_suffix
+    '<config>
+   package Builder is
+      for Executable_Suffix use ".vxe";
+   end Builder;
+     </config>'
+  >
+
+  <!ENTITY config_ada_linker
+    '<config>
+   package Linker is
+      for Driver use Compiler &apos; Driver ("Ada");
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_c_linker
+    '<config>
+   package Linker is
+      for Driver use Compiler &apos; Driver ("C");
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_cpp_linker
+    '<config>
+   package Linker is
+      for Driver use Compiler &apos; Driver ("C++");
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY config_dkm_linker
+    '<config>
+   package Linker is
+      for Driver use "&this_target;-vxlink";
+   end Linker;
+     </config>'
+  >
+
+  <!ENTITY configurations_vxworks_gpp
+  '
+  <!--  Note: vx6 and vx6cert share the same target name, so
+   	in configurations chunks are added into vx6-specific
+        files if_this_target will match both vx6 and vx6cert.
+        A way to discriminate the two kind of platforms is to
+	use runtime names and compiler names.
+
+        For now, however, we still have one global target-independant
+        compiler for GNAT. So most of the following chuncks apply on
+        both vx6 and vx6cert. In order to ease the maintenance,
+        have a comment to make it explicit when they apply to both.
+   -->
+
+  <configuration>
+    &if_rtp;
+    &if_this_target;
+    <!-- vx6, vx7 and vx6cert -->
+
+    &config_vxe_suffix;
+  </configuration>
+
+  <configuration>
+    &if_not_rtp;
+    &if_this_target;
+    <!-- vx6, vx7 and vx6cert -->
+
+    &config_out_suffix;
+  </configuration>
+
+  <configuration>
+    &if_ada_rtp;
+    &if_this_target;
+    <!-- vx6, vx7 and vx6cert -->
+
+    &config_ada_rtp;
+  </configuration>
+
+  <configuration>
+    &if_rtp;
+    &if_this_target;
+    <!-- vx6, vx7 and vx6cert -->
+
+    &config_mrtp;
+  </configuration>
+
+   <!-- mlongcall is passed by default in the case of GNAT.
+        Do the same thing for WRS compilers for consistency.  -->
+
+   <configuration>
+     &if_these_gnu_wrs_compilers;
+     &if_this_target;
+     <!-- vx6 and vx7 -->
+
+     &config_mlongcall_c;
+   </configuration>
+
+   <configuration>
+     &if_these_cpp_compilers;
+     &if_this_target;
+     <!-- vx6 and vx7 -->
+
+     &config_mlongcall_cpp;
+   </configuration>
+
+   <!-- For VxWorks kernel modules, use vxlink for linking: this tool takes
+        care of generating the proper _ctors and _dtors symbols used to
+        elaborate DKMs. -->
+   <configuration>
+     &if_not_rtp;
+     &if_gnat_20_and_later;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_dkm_linker;
+   </configuration>
+
+   <!-- For older versions of GNAT Pro, use Ada driver as default for
+        linking, since cc* and c++* do not recognize the -crtbe swtich needed
+        for ZCX.
+        If no Ada is used in the project, default to the natural linker for
+        the language. -->
+   <configuration>
+     &if_ada;
+     &if_not_rtp;
+     &if_gnat_20_pre;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_ada_linker;
+   </configuration>
+
+   <configuration>
+     &if_no_ada;
+     &if_not_rtp;
+     &if_gnat_20_pre;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_cpp_linker;
+   </configuration>
+
+   <configuration>
+     &if_cpp;
+     &if_rtp;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_cpp_linker;
+   </configuration>
+
+   <configuration>
+     &if_ada;
+     &if_no_cpp;
+     &if_rtp;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_ada_linker;
+   </configuration>
+
+   <configuration>
+     &if_c_only;
+     &if_rtp;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_c_linker;
+   </configuration>
+
+   <!-- Partial link enabled when generating static libraries -->
+
+   <configuration>
+     &if_ada;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_ada_partial_link;
+   </configuration>
+
+   <configuration>
+     &if_no_ada;
+     &if_cpp;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_cpp_partial_link;
+   </configuration>
+
+   <configuration>
+     &if_c_only;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_c_partial_link;
+   </configuration>
+
+   <configuration>
+     &if_large_rts;
+     &if_this_target;
+     <!-- vx6, vx7 and vx6cert -->
+
+     &config_x86_64_cmodel_large_flags;
+   </configuration>
+  '>
