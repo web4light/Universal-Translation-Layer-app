@@ -1,0 +1,24 @@
+auto-gpr-with = false
+description = "Automatic formal verification of SPARK code"
+licenses = "GPL-3.0-or-later"
+maintainers = [
+"chouteau@adacore.com",
+]
+maintainers-logins = [
+"Fabien-Chouteau",
+]
+name = "gnatprove"
+version = "13.2.1"
+[configuration]
+auto_gpr_with = true
+disabled = true
+generate_ada = true
+generate_c = true
+generate_gpr = true
+output_dir = "config"
+[environment]
+[environment.GPR_PROJECT_PATH]
+prepend = "${CRATE_ROOT}/lib/gnat"
+[environment.PATH]
+prepend = "${CRATE_ROOT}/bin"
+

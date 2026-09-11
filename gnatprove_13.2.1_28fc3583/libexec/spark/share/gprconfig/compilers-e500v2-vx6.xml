@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gprconfig [
+<!ENTITY % env.ent SYSTEM "env.ent"> %env.ent;
+<!ENTITY % shortcuts.ent SYSTEM "shortcuts.ent"> %shortcuts.ent;
+<!ENTITY % vxworks.ent SYSTEM "vxworks.ent"> %vxworks.ent;
+<!ENTITY % vx6.ent SYSTEM "vx6.ent"> %vx6.ent;
+]>
+<gprconfig>
+
+  <compiler_description>
+    <name>E500V2-VX6-GCC-WRS</name>
+    <executable prefix="1">cc(ppc)</executable>
+
+    &version_from_wind_base;
+    &languages_c;
+    &runtimes_vx6;
+    <target>e500v2-wrs-vxworks</target>
+  </compiler_description>
+
+  <compiler_description>
+    <name>E500V2-VX6-G++-WRS</name>
+    <executable prefix="1">c\+\+(ppc)</executable>
+
+    &version_from_wind_base;
+    &languages_cpp;
+    &runtimes_vx6;
+    <target>e500v2-wrs-vxworks</target>
+  </compiler_description>
+
+  <compiler_description>
+    <name>GCC-WRS6CERTE500V2</name>
+    <executable prefix="1">cc(ppc)</executable>
+
+    &version_from_wind_base_cert;
+    &languages_c;
+    &runtimes_vx6cert;
+    <target>e500v2-wrs-vxworks</target>
+  </compiler_description>
+
+  <compiler_description>
+    <name>G++-WRS6CERTE500V2</name>
+    <executable prefix="1">c\+\+(ppc)</executable>
+
+    &version_from_wind_base_cert;
+    &languages_cpp;
+    &runtimes_vx6cert;
+    <target>e500v2-wrs-vxworks</target>
+  </compiler_description>
+
+</gprconfig>
