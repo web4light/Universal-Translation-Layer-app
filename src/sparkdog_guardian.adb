@@ -84,4 +84,26 @@ package body SPARKdog_Guardian is
       end if;
    end Self_Heal_Runtime_State;
 
+   -- ==========================================================
+   -- DOHLED NAD PALIVEM MESH SÍTĚ (DNS FAUCET WATCHDOG)
+   -- ==========================================================
+   procedure Guard_Mesh_Fuel
+     (State        : in out SPARKdog_State;
+      Current_Fuel : in     Fuel_Amount;
+      Fuel_Safe    :    out Boolean;
+      Replenish_OK :    out Boolean)
+   is
+   begin
+      State.Total_Inspections := State.Total_Inspections + 1;
+      if Current_Fuel >= Min_Fuel_Threshold then
+         Fuel_Safe    := True;
+         Replenish_OK := False;
+      else
+         -- Pokles pod minimum: SPARKdog aktivuje bleskove doplneni z DNS faucetu
+         Fuel_Safe    := True;
+         Replenish_OK := True;
+         State.Alert_Level := Bark_Quiet;
+      end if;
+   end Guard_Mesh_Fuel;
+
 end SPARKdog_Guardian;

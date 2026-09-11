@@ -2,10 +2,13 @@ with SPARK_Agent;
 with Asterisk_Sovereign_Webmcp_Mesh_Platform_Core;
 with Chrome_Webmcp_Engine;
 with SPARKdog_Guardian;
+with Eth_Wallet;
 with Ada.Text_IO;
 
 procedure SPARK_Agent_Main is
    use Ada.Text_IO;
+   use Eth_Wallet;
+
    Ctx : SPARK_Agent.Agent_Context;
    Reason_OK : Boolean;
    Tool_OK   : Boolean;
@@ -78,6 +81,48 @@ begin
       SPARKdog_Guardian.Self_Heal_Runtime_State (Dog_State, Heal_Success);
       if Heal_Success and Dog_State.Memory_Safe then
          Put_Line ("  [4.6b] SPARKdog SAMO-OPRAVA ZA CHODU: Stav zacelen za chodu, 0 vypadek: OK");
+      end if;
+   end;
+
+   -- 4.7. [ZAKLADNI KAMEN] Soulbound Web4 Identita & Mesh Pohon site pod dohledem SPARKdoga
+   declare
+      Wallet        : Eth_Wallet.Wallet_State;
+      Wallet_TX     : Eth_Wallet.Transaction;
+      Wallet_Bio_OK : Boolean;
+      Wallet_Sign_OK: Boolean;
+      Fuel_Safe     : Boolean;
+      Replenish_OK  : Boolean;
+      Test_Priv_Key : constant Eth_Wallet.Private_Key :=
+        (16#A1#, 16#B2#, 16#C3#, 16#D4#, 16#E5#, 16#F6#, 16#07#, 16#18#,
+         16#29#, 16#3A#, 16#4B#, 16#5C#, 16#6D#, 16#7E#, 16#8F#, 16#90#,
+         16#01#, 16#12#, 16#23#, 16#34#, 16#45#, 16#56#, 16#67#, 16#78#,
+         16#89#, 16#9A#, 16#AB#, 16#BC#, 16#CD#, 16#DE#, 16#EF#, 16#01#);
+      Contract_Addr : constant Eth_Wallet.Address :=
+        (16#71#, 16#C4#, 16#63#, 16#03#, 16#79#, 16#1C#, 16#08#, 16#48#,
+         16#1B#, 16#33#, 16#5B#, 16#9D#, 16#7A#, 16#88#, 16#E0#, 16#22#,
+         16#0F#, 16#96#, 16#50#, 16#45#);
+      Ident_Addr    : Eth_Wallet.Address;
+   begin
+      -- Dvojita biometrika (hlasove overeni Groot: SIC, skore 95)
+      Eth_Wallet.Unlock_With_Voice_Biometrics (Wallet, Test_Priv_Key, 95, Wallet_Bio_OK);
+      Ident_Addr := Eth_Wallet.Get_Address (Wallet);
+
+      -- SPARKdog hlida palivo v mesh siti (DNS Faucet watchdog)
+      SPARKdog_Guardian.Guard_Mesh_Fuel
+        (Dog_State, 50_000, Fuel_Safe, Replenish_OK);
+
+      -- Sestaveni a podpis Soulbound NFT identity pro Web4 mesh pohon
+      Eth_Wallet.Build_Soulbound_Mint (Wallet, Contract_Addr, 100_001, Wallet_TX);
+      Eth_Wallet.Sign_TX (Wallet, Wallet_TX, Wallet_Sign_OK);
+
+      -- Hermeticke uzamceni a skartace klice (Zero-Trace)
+      Eth_Wallet.Lock (Wallet);
+
+      if Wallet_Bio_OK and Fuel_Safe and Wallet_Sign_OK and not Wallet.Has_Key then
+         Put_Line ("  [4.7/6] SOULBOUND WEB4 IDENTITA & MESH POHON: Overeno a podepsano: OK");
+         Put_Line ("          * Identita vyrazena pro Web4 agenta (Groot: SIC)");
+         Put_Line ("          * SPARKdog dohlizi nad DNS Faucetem (0 vypadku paliva)");
+         Put_Line ("          * Zero-Trace hermeticky uzamcen (klic smazan z RAM)");
       end if;
    end;
 

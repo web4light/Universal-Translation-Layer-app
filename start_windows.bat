@@ -21,10 +21,11 @@ echo   [4] Otevrit slozku Chrome rozsireni (Sidepanel Asistent)
 echo   [5] Spustit Flutter aplikaci (Desktop / Web)
 echo   [6] Spustit VSE (3D Avatar + Studio)
 echo   [7] Re-instalovat zavislosti (npm install)
+echo   [8] Otestovat Soulbound ETH Wallet (Ada/SPARK Web4)
 echo   [0] Ukoncit
 echo.
 echo ============================================================
-set /p VOLBA="Zadejte volbu [0-7]: "
+set /p VOLBA="Zadejte volbu [0-8]: "
 
 if "%VOLBA%"=="1" goto START_AVATAR
 if "%VOLBA%"=="2" goto START_STUDIO
@@ -33,6 +34,7 @@ if "%VOLBA%"=="4" goto OPEN_EXT
 if "%VOLBA%"=="5" goto START_FLUTTER
 if "%VOLBA%"=="6" goto START_ALL
 if "%VOLBA%"=="7" goto REINSTALL
+if "%VOLBA%"=="8" goto START_WALLET
 if "%VOLBA%"=="0" goto EXIT
 goto MENU
 
@@ -122,6 +124,23 @@ echo Re-instaluji zavislosti pro dlp3d...
 cd dlp3d
 call npm install
 cd ..
+pause
+goto MENU
+
+:START_WALLET
+echo.
+echo Prekladam a spoustim Soulbound ETH Wallet (Web4)...
+gprbuild -P eth_wallet.gpr
+if %ERRORLEVEL% EQU 0 (
+    echo [OK] Preklad uspesny, spoustim test penezenky...
+    if exist obj\eth_wallet\eth_wallet_main.exe (
+        obj\eth_wallet\eth_wallet_main.exe
+    ) else if exist obj\eth_wallet\eth_wallet_main (
+        obj\eth_wallet\eth_wallet_main
+    )
+) else (
+    echo [CHYBA] Preklad eth_wallet selhal!
+)
 pause
 goto MENU
 

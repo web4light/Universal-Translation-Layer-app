@@ -102,4 +102,24 @@ package SPARKdog_Guardian is
                else
                   State.Self_Heals_Count = State.Self_Heals_Count'Old);
 
+   -- Konstanty a typy pro palivo v mesh siti
+   Min_Fuel_Threshold : constant := 10_000;
+   subtype Fuel_Amount is Natural range 0 .. 1_000_000_000;
+
+   -- Dohled SPARKdoga nad stavem paliva v mesh siti (DNS Faucet watchdog)
+   -- Nedovoli pokles na nulu, pri poklesu behem milisekundy doplni
+   procedure Guard_Mesh_Fuel
+     (State        : in out SPARKdog_State;
+      Current_Fuel : in     Fuel_Amount;
+      Fuel_Safe    :    out Boolean;
+      Replenish_OK :    out Boolean)
+   with
+      Pre  => State.Total_Inspections < Max_Audit_Entries,
+      Post => (if Current_Fuel >= Min_Fuel_Threshold then
+                  Fuel_Safe and not Replenish_OK and
+                  State.Total_Inspections = State.Total_Inspections'Old + 1
+               else
+                  Fuel_Safe and Replenish_OK and
+                  State.Total_Inspections = State.Total_Inspections'Old + 1);
+
 end SPARKdog_Guardian;

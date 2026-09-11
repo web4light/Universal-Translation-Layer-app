@@ -209,8 +209,7 @@ package body Eth_Keccak is
       for I in 0 .. Hash_Length - 1 loop
          Idx := I / 8;
          Output (I + 1) :=
-           Natural (State (Idx mod 5, Idx / 5) / (2 ** ((I mod 8) * 8)))
-           mod 256;
+           Natural ((State (Idx mod 5, Idx / 5) / (2 ** ((I mod 8) * 8))) mod 256);
       end loop;
    end Hash;
 

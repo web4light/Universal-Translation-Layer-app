@@ -12,7 +12,11 @@
     "flutter:run": "cd app && flutter run -d chrome",
     "flutter:build": "cd app && flutter build web",
     "ada:build": "gprbuild -P spark_agent.gpr",
-    "ada:run": "node -e \"const { spawn } = require('child_process'); const exe = process.platform === 'win32' ? './obj/spark_agent_main.exe' : './obj/spark_agent_main'; spawn(exe, { stdio: 'inherit' });\""
+    "ada:run": "node -e \"const { spawn } = require('child_process'); const exe = process.platform === 'win32' ? './obj/spark_agent_main.exe' : './obj/spark_agent_main'; spawn(exe, { stdio: 'inherit' });\"",
+    "wallet:build": "gprbuild -P eth_wallet.gpr",
+    "wallet:run": "node -e \"const { spawn } = require('child_process'); const exe = process.platform === 'win32' ? './obj/eth_wallet/eth_wallet_main.exe' : './obj/eth_wallet/eth_wallet_main'; spawn(exe, { stdio: 'inherit' });\"",
+    "strands:run": ".venv/bin/python3 src/strands_good_neighbor_agent.py",
+    "strands:serve": ".venv/bin/python3 src/strands_server.py"
   },
   "keywords": [
     "webmcp",

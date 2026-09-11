@@ -1,6 +1,41 @@
-# 👑 Karel IV. — Real-time Voice Translator
+# ✦ Strands Good Neighbor Sovereign Agent & Universal Translation Layer
+### *Accessible 3D Sign Language & Spark-TTS for 500M Deaf & Blind Humans*
 
-**AsgardLab** | [web4light.online](https://web4light.online) | phoenix@web4light.online
+**AsgardLab** | [web4light.online](https://web4light.online) | phoenix@web4light.online  
+**License:** [GNU General Public License v3.0](LICENSE) (Open Source)
+
+---
+
+## 🏆 Devpost Hackathon: Agents for Humans ($40,000 USD)
+
+This platform unites three sovereign projects (`Universal-Translation-Layer`, `husgraal`, and `webmcp-mesh-sovereign`) into an autonomous accessibility solution for the **Good Neighbor Agents** track using the official **AWS Strands Agents SDK**.
+
+- 🤝 **Track:** **Good Neighbor Agents** (Accessibility, Non-profit & Community Impact)
+- 🤖 **Framework:** **AWS Strands Agents SDK** (`strands-agents` & `strands-agents-tools`)
+- 🔒 **Formal Verification:** **Ada/SPARK 2026** zero-crash, zero-heap mathematical safety
+- ⚖️ **Legal Ethics Guard:** **HusGraal Judge Lab** (formal GDPR & EU AI Act compliance)
+- 👁️ **Multimodal Accessibility:** 3D Sign Language Avatar (`dlp3d`) + Spark-TTS Audio Descriptors
+- 🛡️ **Zero-Trace Privacy:** In-memory loopback buffers with Ash Sweeper (0 disk writes)
+
+### ⚡ Quick Strands Agent Run
+
+```bash
+# Spuštění Strands Good Neighbor Agenta:
+npm run strands:run
+
+# Spuštění Strands REST/WebMCP API Serveru (port 8089):
+npm run strands:serve
+
+# Formální Ada/SPARK verifikace peněženky a guardiana:
+npm run wallet:run
+npm run ada:run
+```
+
+See [DEVPOST_SUBMISSION.md](DEVPOST_SUBMISSION.md) for full project architecture, ethics proofs, and submission text.
+
+---
+
+## 👑 Karel IV. — Real-time Voice Translator
 
 > *Named after Charles IV (Karel IV.) — King of Bohemia, fluent in 7 languages. 1316–1378.*
 
