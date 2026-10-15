@@ -1,70 +1,63 @@
-Vakuová Mincovna & Transkomunikátor
-Copyright (C) 2026 Pan Jeskyně
+# 📜 ASGARD DUAL LICENSE AGREEMENT
+### (Sovereign Dual Licensing Model for Non-Commercial & Commercial Use)
+**Verze:** 2.0 (Říjen 2026)  
+**Autor a výhradní držitel autorských práv:** Jakub Panocha (Pán Jeskyně)  
+**Entita / Trust:** Rebirth Phoenix Foundation Trust  
+**Oficiální kontakt pro komerční licence:** `asgard.lab4@gmail.com` | `https://web4light.online`  
 
-=============================================================================
-DUAL LICENSE
-=============================================================================
+---
 
-This software is available under two licenses:
+### DŮLEŽITÉ UPOZORNĚNÍ — ČTĚTE POZORNĚ:
+STAŽENÍM, KOPÍROVÁNÍM, INSTALACÍ, SPUŠTĚNÍM, PŘÍSTUPEM PŘES API NEBO JAKÝMKOLIV UŽITÍM TOHOTO SOFTWARU, ZDROJOVÝCH KÓDŮ (Ada/SPARK, Rust, TypeScript, Python atd.) NEBO MODELŮ VYJADŘUJETE SVŮJ BEZVÝHRADNÝ SOUHLAS S NÍŽE UVEDENÝMI PODMÍNKAMI TÉTO DVOJÍ LICENCE.
 
-1. GNU GENERAL PUBLIC LICENSE Version 3 (GPL-3.0)
-   For open-source and non-commercial use.
+---
 
-2. COMMERCIAL LICENSE
-   For commercial use without GPL obligations.
-   Contact the author for pricing and terms.
+## 1. STRANY A DEFINICE
 
-=============================================================================
-LICENSE 1: GNU GENERAL PUBLIC LICENSE Version 3
-=============================================================================
+1.1. **„Autor“** znamená Jakub Panocha (Pán Jeskyně), fyzická osoba a zakladatel ekosystému Web 4.23 / Rebirth Phoenix Foundation Trust.  
+1.2. **„Uživatel“** nebo **„Vy“** znamená fyzickou nebo právnickou osobu, která software stahuje, zkoumá nebo užívá.  
+1.3. **„Nekomerční užití“ (Non-Commercial Use)** znamená jakékoliv užití softwaru výhradně pro:
+  * Osobní, neplacené a nekomerční vzdělávání nebo badatelský výzkum,
+  * Nezávislé ověřování formálních matematických důkazů v nástrojích GNATprove / SPARK,
+  * Podporu, asistenci a přístupnost pro osoby se zdravotním postižením (neslyšící a nevidomí — 100% Free Forever).  
+1.4. **„Komerční užití“ (Commercial Use)** znamená jakékoliv užití softwaru za účelem:
+  * Vývoje, provozu nebo distribuce komerčních produktů a placených služeb,
+  * Provozování softwaru jako služby (SaaS, PaaS, cloud API endpoint),
+  * Začlenění kódu, SPARK modulů nebo binárek do komerční infrastruktury (Docker, Kubernetes, AWS, Azure, GCP),
+  * Trénování, dolaďování (fine-tuning) nebo destilace komerčních AI modelů,
+  * Jakékoliv činnosti v rámci podnikání nebo hospodářské činnosti právnických a podnikajících fyzických osob.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License.
+---
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+## 2. NEKOMERČNÍ LICENCE (TŘÍDA „A“ — ZDARMA PRO VEŘEJNÉ DOBRO)
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+2.1. **Udělení práv:** Autor uděluje Uživateli bezplatnou, nevýhradní a nepřevoditelnou licenci užívat tento software po celém světě, **výhradně a pouze pro Nekomerční užití**.  
+2.2. **Podmínka zachování autorství:** Při každém nekomerčním užití musí být v celém rozsahu zachovány všechny autorské hlavičky, zmínky o Autorovi (Jakub Panocha / Rebirth Phoenix) a tento licenční soubor.
 
-=============================================================================
-LICENSE 2: COMMERCIAL LICENSE
-=============================================================================
+---
 
-For commercial use, redistribution in proprietary products, or use
-without the GPL-3.0 obligations (including the requirement to release
-source code), a commercial license is required.
+## 3. PŘÍSNÝ ZÁKAZ KOMERČNÍHO UŽITÍ BEZ SOUHLASU (ANTI-PARAZITISMUS)
 
-Commercial license covers:
-  - Use in proprietary/closed-source products
-  - SaaS deployment without source disclosure
-  - OEM integration
-  - Priority support
+3.1. **Zákaz komerčního užití:** **JAKÉKOLIV KOMERČNÍ UŽITÍ TOHOTO SOFTWARU ČI JEHO ODVOZENIN JE BEZ PŘEDCHOZÍHO VÝSLOVNÉHO PÍSEMNÉHO SOUHLASU AUTORA PŘÍSNĚ ZAKÁZÁNO.**  
+3.2. **Pravidlo kontaktu:** **Pokud chce kdokoliv (jednotlivec, firma, korporace, instituce) na tomto kódu či jeho výstupech komerčně vydělávat nebo jej monetizovat, MUSÍ SE PŘEDEM SPOJIT S AUTOREM (Jakub Panocha) A SJEDNAT INDIVIDUÁLNÍ PLACENOU KOMERČNÍ LICENCI.**  
+3.3. **Neoprávněné komerční užití (Smluvní pokuta a podíl na zisku):** Subjekt, který software nebo jakoukoliv jeho část užije komerčně bez platné Komerční licence od Autora, je povinen:
+  * Bezodkladně zastavit neoprávněný provoz,
+  * Odvést Autorovi smluvní licenční vyrovnání ve výši **50 % (slovy: padesáti procent) ze všech hrubých tržeb, obratu a zisků** plynoucích z provozu či integrace tohoto softwaru za celou dobu neoprávněného užití,
+  * Tímto není dotčen nárok Autora na náhradu škody a nemajetkové újmy v plné výši dle platných zákonů.
 
-To obtain a commercial license, contact:
-  Author: Pan Jeskyně
-  Project: Vakuová Mincovna / Transkomunikátor
+---
 
-=============================================================================
-THIRD-PARTY COMPONENTS
-=============================================================================
+## 4. KOMERČNÍ PROTOKOL (TŘÍDA „B“ — INDIVIDUÁLNÍ LICENCE)
 
-This software uses the following open-source components:
+4.1. Zájemci o komerční licenci kontaktují Autora na: `asgard.lab4@gmail.com` nebo prostřednictvím portálu `https://web4light.online`.  
+4.2. Podmínky komerční licence, mýtné poplatky a vypořádání (včetně možnosti krytí ve Standardu 700 / fyzickém stříbře Mincovny Panoramatix) jsou předmětem individuální písemné smlouvy.
 
-  Faucet SDN Controller   Apache License 2.0
-  Gemini CLI              Apache License 2.0
-  Prometheus              Apache License 2.0
-  GNAT Ada Runtime        GPL-2.0 with GCC Runtime Library Exception
-  prometheus_client       Apache License 2.0
-  requests                Apache License 2.0
-  n8n                     Sustainable Use License (self-hosted: free)
+---
 
-=============================================================================
-STANDARD 700
-=============================================================================
+## 5. ZŘEKNUTÍ SE ZÁRUK A VOLBA PRÁVA
 
-1 MINCE = 12 gramů stříbra
-Matematicky ověřeno pomocí Ada/SPARK formální verifikace.
+5.1. **AS IS:** Software je poskytován „tak, jak stojí a leží“ (AS IS). Autor neposkytuje žádné záruky za bezchybnost nebo vhodnost pro konkrétní účel.  
+5.2. **Jurisdikce:** Tato smlouva se řídí autorským právem České republiky (Autorský zákon č. 121/2000 Sb.) a mezinárodními úmluvami o ochraně duševního vlastnictví (Bernská úmluva, WIPO).
+
+---
+*Anno Domini 2026 • Vykováno v Citadele Asgard pro otevřený svět pod ochranou svrchovaného práva.*
