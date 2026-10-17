@@ -1,0 +1,62 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build Flutter iOS Application
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust for Apple Silicon A19 Pro (aarch64-apple-ios)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Build Asgard A19 Pro Rust AI & 3D Avatar Core
+        run: |
+          cd rust_a19_core
+          cargo build --release --target aarch64-apple-ios
+          mkdir -p ../app/ios/Runner/RustA19Core
+          cp target/aarch64-apple-ios/release/libasgard_a19_core.a ../app/ios/Runner/RustA19Core/
+          cp include/asgard_a19_core.h ../app/ios/Runner/RustA19Core/
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          cd app
+          flutter pub get
+
+      - name: Build iOS (No codesign)
+        run: |
+          cd app
+          flutter build ios --release --no-codesign
+
+      - name: Package Payload to .ipa
+        run: |
+          cd app/build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r AsgardApp-unsigned.ipa Payload
+          mv AsgardApp-unsigned.ipa ../../../
+
+      - name: Upload iOS Build Artifact & A19 Pro Static Library
+        uses: actions/upload-artifact@v4
+        with:
+          name: Asgard-iOS-A19Pro-App
+          path: |
+            AsgardApp-unsigned.ipa
+            rust_a19_core/target/aarch64-apple-ios/release/libasgard_a19_core.a
+            rust_a19_core/include/asgard_a19_core.h
+          retention-days: 7

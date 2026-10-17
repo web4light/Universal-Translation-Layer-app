@@ -40,3 +40,4 @@ logs/
 # Backup files
 *.bak
 *.tmp
+rust_a19_core/target/

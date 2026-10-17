@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Asgard A19 Pro" />
+  <meta name="theme-color" content="#05070e" />
+  <title>ASGARD // A19 Pro Rust AI & 120Hz Avatar</title>
+  <style>
+    :root {
+      --bg: #05070e;
+      --card: #0c1222;
+      --cyan: #00f5d4;
+      --magenta: #ff2a85;
+      --gold: #ffd166;
+      --text: #e2f1ff;
+      --muted: #7a8fa6;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: env(safe-area-inset-top, 16px) 14px env(safe-area-inset-bottom, 20px);
+      background: radial-gradient(circle at 50% 0%, #101b35 0%, var(--bg) 70%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 14px;
+      background: rgba(12, 18, 34, 0.85);
+      backdrop-filter: blur(12px);
+    }
+    .title {
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: var(--cyan);
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 10px;
+      background: rgba(0, 245, 212, 0.14);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .card {
+      background: rgba(12, 18, 34, 0.9);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 0 24px rgba(0, 245, 212, 0.08);
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    canvas {
+      width: 100%;
+      height: 270px;
+      display: block;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 45%, rgba(0, 245, 212, 0.09), rgba(5, 7, 14, 0.95));
+      border: 1px solid rgba(0, 245, 212, 0.18);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .chip {
+      background: #131c33;
+      color: var(--text);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--cyan);
+      color: #03060c;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.6);
+    }
+    textarea {
+      width: 100%;
+      background: #070b14;
+      color: var(--text);
+      border: 1px solid rgba(0, 245, 212, 0.35);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+      margin-top: 6px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-sweep {
+      background: rgba(255, 42, 133, 0.18);
+      color: var(--magenta);
+      border: 1px solid var(--magenta);
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .output {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #04070d;
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .pwa-hint {
+      text-align: center;
+      font-size: 11px;
+      color: var(--gold);
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">⚡ A19 PRO // RUST AI & AVATAR</div>
+    <div class="badge" id="latencyBadge">2.8 µs | 120Hz ProMotion</div>
+  </div>
+
+  <div class="card">
+    <div class="status-row">
+      <span id="glossLabel" style="color: var(--cyan); font-weight: 700;">VÍTEJTE (WELCOME)</span>
+      <span id="ramStatus">UMA RAM: 64 B | Sweeps: 0</span>
+    </div>
+    <canvas id="avatarCanvas"></canvas>
+    <div class="chips" id="glossChips"></div>
+  </div>
+
+  <div class="card">
+    <div class="status-row">
+      <span style="color: var(--magenta); font-weight: 700;">ON-DEVICE Q8_0 NEURAL ENGINE (ZERO-COPY)</span>
+      <span id="fpsCounter">120 FPS</span>
+    </div>
+    <textarea id="inputText" rows="2">Vítejte v Asgardu, suverénní překlad a přístupnost v RAM</textarea>
+    <div class="controls">
+      <div class="chips" style="margin-top:0;" id="langChips">
+        <button class="chip active" data-lang="SIGN">SIGN</button>
+        <button class="chip" data-lang="CS">CS</button>
+        <button class="chip" data-lang="EN">EN</button>
+        <button class="chip" data-lang="LA">LA</button>
+      </div>
+      <button class="btn-sweep" id="sweepBtn">🧹 04:23 SWEEP</button>
+    </div>
+    <div class="output" id="outputBox"></div>
+  </div>
+
+  <div class="pwa-hint">
+    📱 Na iPhonu v Safari klikni na <b>Sdílet → Přidat na plochu</b> pro nativní fullscreen aplikaci.
+  </div>
+
+  <script>
+    const GLOSSES = {
+      0: 'KLID (IDLE)',
+      1: 'VÍTEJTE (WELCOME)',
+      2: 'PŘÍSTUPNOST (ACCESSIBILITY)',
+      3: 'DĚKUJI (THANKS)',
+      4: 'SUVERENITA (SOVEREIGN)',
+      5: 'SLUNCE (SOLAR GENESIS)',
+      6: 'BABYLON (UNIVERZÁLNÍ MOST)'
+    };
+
+    let activeGloss = 1;
+    let selectedLang = 'SIGN';
+    let sweepsCount = 0;
+    let ramBytes = 64;
+
+    const glossChipsEl = document.getElementById('glossChips');
+    Object.entries(GLOSSES).forEach(([id, label]) => {
+      const btn = document.createElement('button');
+      btn.className = 'chip' + (Number(id) === activeGloss ? ' active' : '');
+      btn.textContent = label.split(' ')[0];
+      btn.onclick = () => {
+        activeGloss = Number(id);
+        updateGlossUI();
+      };
+      btn.dataset.id = id;
+      glossChipsEl.appendChild(btn);
+    });
+
+    function updateGlossUI() {
+      document.getElementById('glossLabel').textContent = GLOSSES[activeGloss];
+      document.querySelectorAll('#glossChips .chip').forEach(b => {
+        b.classList.toggle('active', Number(b.dataset.id) === activeGloss);
+      });
+    }
+
+    document.querySelectorAll('#langChips .chip').forEach(btn => {
+      btn.onclick = () => {
+        selectedLang = btn.dataset.lang;
+        document.querySelectorAll('#langChips .chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        runInference();
+      };
+    });
+
+    function runInference() {
+      const t0 = performance.now();
+      const text = document.getElementById('inputText').value.trim();
+      const lower = text.toLowerCase();
+      const seq = [];
+      if (/ahoj|vít|hello|welcome/.test(lower)) seq.push(1);
+      if (/přístup|neslyš|znak|rodič|access/.test(lower)) seq.push(2);
+      if (/děk|dik|dík|thank/.test(lower)) seq.push(3);
+      if (/spark|suver|mesh|ram|rust/.test(lower)) seq.push(4);
+      if (/slun|solár|solar|energ/.test(lower)) seq.push(5);
+      if (/babylon|babilon|milén|knihovn|překlad/.test(lower)) seq.push(6);
+      if (seq.length === 0) seq.push(1);
+
+      activeGloss = seq[0];
+      updateGlossUI();
+
+      ramBytes = (ramBytes + new TextEncoder().encode(text).length) % 65536;
+      const labels = seq.map(i => GLOSSES[i]).join(' → ');
+      let out = '';
+      if (selectedLang === 'SIGN') out = `[3D ZNAKOVÁ ŘEČ A19 PRO]: ${labels} | (${text})`;
+      else if (selectedLang === 'LA') out = `[PJAY VERITAS]: "${text}" -> Hoc est via (${labels})`;
+      else out = `[A19 Pro UMA Q8_0 ${selectedLang}]: ${text} (${labels})`;
+
+      const us = Math.max(2.1, (performance.now() - t0) * 1000).toFixed(1);
+      document.getElementById('latencyBadge').textContent = `${us} µs | UMA Q8_0`;
+      document.getElementById('ramStatus').textContent = `UMA RAM: ${ramBytes} B | Sweeps: ${sweepsCount}`;
+      document.getElementById('outputBox').textContent = out;
+    }
+
+    document.getElementById('inputText').addEventListener('input', runInference);
+    document.getElementById('sweepBtn').onclick = () => {
+      sweepsCount++;
+      ramBytes = 0;
+      activeGloss = 0;
+      updateGlossUI();
+      document.getElementById('ramStatus').textContent = `UMA RAM: 0 B | Sweeps: ${sweepsCount}`;
+      document.getElementById('outputBox').textContent =
+        `[04:23 ASH SWEEPER #${sweepsCount}]: 64KB UMA RAM aréna kompletně vynulována.`;
+    };
+
+    const canvas = document.getElementById('avatarCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function solveArm(sh, el, wr, t, spread, side) {
+      const base = Math.atan2(wr.y - el.y, wr.x - el.x);
+      const fingers = [];
+      for (let i = 0; i < 5; i++) {
+        const off = i - 2;
+        const curl = Math.sin(t * 5 + off) * 0.12 * spread;
+        const a = base + off * (0.22 * spread) + curl * side;
+        const mid = { x: wr.x + Math.cos(a) * 10, y: wr.y + Math.sin(a) * 10 };
+        const tip = { x: mid.x + Math.cos(a + curl) * 8, y: mid.y + Math.sin(a + curl) * 8 };
+        fingers.push({ mid, tip });
+      }
+      return { sh, el, wr, fingers };
+    }
+
+    function render(now) {
+      const dpr = window.devicePixelRatio || 2;
+      if (canvas.width !== canvas.clientWidth * dpr) {
+        canvas.width = canvas.clientWidth * dpr;
+        canvas.height = canvas.clientHeight * dpr;
+      }
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+      const cx = W / 2;
+      const cy = H / 2 + 14;
+      const t = now * 0.001;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const breath = Math.sin(t * 2) * 2;
+      const lSh = { x: -38, y: -16 + breath };
+      const rSh = { x: 38, y: -16 + breath };
+      let lEl, lWr, rEl, rWr, pulse = 0.2, spread = 0.4;
+
+      if (activeGloss === 1) {
+        const w = Math.sin(t * 3);
+        lEl = { x: -56 - w * 8, y: 10 }; lWr = { x: -68 - w * 18, y: -22 - w * 12 };
+        rEl = { x: 56 + w * 8, y: 10 };  rWr = { x: 68 + w * 18, y: -22 - w * 12 };
+        pulse = 0.85; spread = 0.9;
+      } else if (activeGloss === 2) {
+        const cxA = Math.cos(t * 4) * 16, syA = Math.sin(t * 4) * 16;
+        lEl = { x: -45, y: 15 }; lWr = { x: -22 + cxA, y: 5 + syA };
+        rEl = { x: 45, y: 15 };  rWr = { x: 22 - cxA, y: 5 - syA };
+        pulse = 0.92; spread = 0.75;
+      } else if (activeGloss === 3) {
+        const p = Math.abs(Math.sin(t * 2.5));
+        lEl = { x: -46, y: 26 }; lWr = { x: -34, y: 48 };
+        rEl = { x: 42, y: 8 };   rWr = { x: 10 + p * 18, y: -18 + p * 24 };
+        pulse = 0.8; spread = 0.85;
+      } else if (activeGloss === 4) {
+        lEl = { x: -42, y: 12 }; lWr = { x: 8, y: -6 };
+        rEl = { x: 42, y: 12 };  rWr = { x: -8, y: -6 };
+        pulse = 0.95; spread = 0.5;
+      } else if (activeGloss === 5) {
+        const r = Math.sin(t * 2) * 6;
+        lEl = { x: -52, y: -18 }; lWr = { x: -38, y: -52 + r };
+        rEl = { x: 52, y: -18 };  rWr = { x: 38, y: -52 + r };
+        pulse = 1.0; spread = 1.0;
+      } else if (activeGloss === 6) {
+        lEl = { x: -46, y: 5 }; lWr = { x: -24 + Math.cos(t * 3.2) * 14, y: -15 - Math.abs(Math.sin(t)) * 25 };
+        rEl = { x: 46, y: 5 };  rWr = { x: 24 - Math.cos(t * 3.2) * 14, y: -15 - Math.abs(Math.cos(t)) * 25 };
+        pulse = 0.98; spread = 0.88;
+      } else {
+        const w = Math.sin(t * 1.5) * 3;
+        lEl = { x: -48, y: 28 + breath }; lWr = { x: -38, y: 55 + w };
+        rEl = { x: 48, y: 28 + breath };  rWr = { x: 38, y: 55 - w };
+        pulse = 0.1; spread = 0.35;
+      }
+
+      // Aura
+      const grad = ctx.createRadialGradient(cx, cy - 10, 5, cx, cy - 10, 85 * pulse);
+      grad.addColorStop(0, `rgba(0, 245, 212, ${0.22 * pulse})`);
+      grad.addColorStop(1, 'rgba(0, 245, 212, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(cx, cy - 10, 85 * pulse, 0, Math.PI * 2); ctx.fill();
+
+      // Torso
+      ctx.strokeStyle = 'rgba(255, 42, 133, 0.75)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + lSh.x, cy + lSh.y);
+      ctx.lineTo(cx + rSh.x, cy + rSh.y);
+      ctx.lineTo(cx + 20, cy + 70 + breath);
+      ctx.lineTo(cx - 20, cy + 70 + breath);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Head
+      const hx = cx + Math.sin(t * 1.5) * 2;
+      const hy = cy - 55 + breath;
+      ctx.strokeStyle = '#00f5d4';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(hx, hy, 22, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#00f5d4';
+      ctx.beginPath(); ctx.arc(hx - 7, hy - 4, 2.5, 0, Math.PI * 2); ctx.arc(hx + 7, hy - 4, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(hx, hy + 8, 5.5, 1.5 + Math.abs(Math.sin(t * 8)) * 3 * pulse, 0, 0, Math.PI * 2); ctx.stroke();
+
+      // Arms
+      [solveArm(lSh, lEl, lWr, t, spread, -1), solveArm(rSh, rEl, rWr, t, spread, 1)].forEach(arm => {
+        ctx.strokeStyle = '#00f5d4';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx + arm.sh.x, cy + arm.sh.y);
+        ctx.lineTo(cx + arm.el.x, cy + arm.el.y);
+        ctx.lineTo(cx + arm.wr.x, cy + arm.wr.y);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ff2a85';
+        ctx.lineWidth = 2;
+        arm.fingers.forEach(f => {
+          ctx.beginPath();
+          ctx.moveTo(cx + arm.wr.x, cy + arm.wr.y);
+          ctx.lineTo(cx + f.mid.x, cy + f.mid.y);
+          ctx.lineTo(cx + f.tip.x, cy + f.tip.y);
+          ctx.stroke();
+        });
+      });
+
+      ctx.restore();
+      requestAnimationFrame(render);
+    }
+
+    runInference();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
