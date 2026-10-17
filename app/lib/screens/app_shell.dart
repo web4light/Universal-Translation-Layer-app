@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/cyberpunk_theme.dart';
 import 'dashboard_screen.dart';
 import 'translate_screen.dart';
+import 'a19_avatar_screen.dart';
 import 'agents_screen.dart';
 import 'mesh_screen.dart';
 import 'settings_screen.dart';
@@ -21,6 +22,7 @@ class _AppShellState extends State<AppShell> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     TranslateScreen(),
+    A19AvatarScreen(),
     AgentsScreen(),
     MeshScreen(),
     SettingsScreen(),
@@ -55,6 +57,11 @@ class _AppShellState extends State<AppShell> {
               icon: Icon(Icons.translate),
               activeIcon: _NeonIcon(icon: Icons.translate),
               label: 'Translate',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.memory),
+              activeIcon: _NeonIcon(icon: Icons.memory),
+              label: 'A19 Pro',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.smart_toy),

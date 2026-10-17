@@ -1,0 +1,22 @@
+[package]
+name = "asgard_a19_core"
+version = "0.4.23"
+edition = "2021"
+authors = ["Pan Jeskyně <pan.jeskyne@web4.cz>"]
+description = "Suverénní on-device AI a 3D kinematické jádro v Rustu pro Apple Silicon A19 Pro (UMA Zero-Copy & Zero-Trace RAM)"
+license = "GPL-3.0-or-later"
+
+[lib]
+name = "asgard_a19_core"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "a19_bench"
+path = "src/bin/a19_bench.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
