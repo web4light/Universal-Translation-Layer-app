@@ -40,3 +40,6 @@ logs/
 # Backup files
 *.bak
 *.tmp
+
+# Large raw media (kept on NAS)
+data/voice_samples/werich_Jan Werich - Fimfárum.wav
