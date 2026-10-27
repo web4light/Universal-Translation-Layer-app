@@ -41,3 +41,5 @@ logs/
 *.bak
 *.tmp
 rust_a19_core/target/
+
+spark/obj/
